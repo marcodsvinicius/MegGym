@@ -296,6 +296,31 @@
     return { emoji: "bolt", title: `Já são ${weekCount} ${weekCount === 1 ? "treino" : "treinos"} na semana`, text: "Bom ritmo! Que tal mais um hoje?" };
   }
 
+  function homeStructureCard() {
+    const plan = Store.plan(user.id);
+    const st = plan && Store.getStructure(plan.structureId);
+    if (!st) return "";
+    const pr = structureProgress(st);
+    return `
+      <section class="home-structure">
+        <a class="home-structure-head" href="#/estruturas/${encodeURIComponent(st.id)}">
+          <span>
+            <span class="meta">Sua estrutura</span><br>
+            <strong>${escapeHtml(st.name)}</strong>
+          </span>
+          <span class="home-structure-count"><strong>${pr.done}</strong>/${pr.duration}</span>
+        </a>
+        <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+        ${
+          pr.completed
+            ? `<p class="meta">${icon("emoji_events", "mi-inline")} Estrutura concluída!</p>`
+            : pr.next
+              ? `<button class="btn btn-primary btn-block" type="button" data-start-workout="${escapeHtml(pr.next.workout.id)}">${icon("play_arrow", "mi-inline")} Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</button>`
+              : ""
+        }
+      </section>`;
+  }
+
   function renderHome() {
     setHeader("MegGym");
     setTab("inicio");
@@ -354,6 +379,8 @@
             </a>`
           : ""
       }
+
+      ${homeStructureCard()}
 
       <section class="motivation">
         ${icon(msg.emoji, "motivation-emoji")}
@@ -696,6 +723,9 @@
     setHeader("Treinos", { action: `<a class="btn btn-sm btn-primary" href="#/treinos/novo">${icon("add", "mi-inline")} Novo</a>` });
     setTab("treinos");
     const list = Store.workouts();
+    const structs = Store.structures();
+    const plan = Store.plan(user.id);
+    structs.sort((a, b) => (b.id === plan?.structureId) - (a.id === plan?.structureId));
     const session = Store.session(user.id);
     const activeWorkout = session && Store.getWorkout(session.workoutId);
     app.innerHTML = `
@@ -706,6 +736,18 @@
             </a>`
           : ""
       }
+      <section class="list-section">
+        <div class="subsection-head">
+          <h2 class="subsection-title">Estrutura de treinos</h2>
+          <a class="btn btn-sm" href="#/estruturas/novo">${icon("add", "mi-inline")} Nova</a>
+        </div>
+        ${
+          structs.length
+            ? `<div class="workout-list">${structs.map(structureCard).join("")}</div>`
+            : `<p class="meta">Agrupe vários treinos numa sequência para seguir (ex.: ABC).</p>`
+        }
+      </section>
+      <div class="subsection-head list-section-title"><h2 class="subsection-title">Treinos</h2></div>
       ${
         list.length
           ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>`
@@ -753,16 +795,289 @@
         </button>
       </div>`;
     bindPersonalNote();
-    $("start-btn").addEventListener("click", () => {
-      const current = Store.session(user.id);
-      if (current && current.workoutId !== w.id) {
-        const other = Store.getWorkout(current.workoutId);
-        if (!confirm(`Você tem o treino "${other?.name || "anterior"}" em andamento. Descartar e iniciar este?`)) return;
-        Store.cancelSession(user.id);
-      }
-      if (!Store.session(user.id)) Store.startSession(user.id, w.id);
-      location.hash = `#/treinos/${encodeURIComponent(w.id)}/executar`;
+    $("start-btn").addEventListener("click", () => startWorkout(w));
+  }
+
+  // Inicia (ou continua) um treino e abre a tela de execução.
+  function startWorkout(w) {
+    const current = Store.session(user.id);
+    if (current && current.workoutId !== w.id) {
+      const other = Store.getWorkout(current.workoutId);
+      if (!confirm(`Você tem o treino "${other?.name || "anterior"}" em andamento. Descartar e iniciar este?`)) return;
+      Store.cancelSession(user.id);
+    }
+    if (!Store.session(user.id)) Store.startSession(user.id, w.id);
+    location.hash = `#/treinos/${encodeURIComponent(w.id)}/executar`;
+  }
+
+  /* ================= Estruturas de treino ================= */
+
+  const letter = (i) => String.fromCharCode(65 + (i % 26));
+  // "Treino — Peito + Ombros" → "Peito + Ombros" (para não repetir "Treino A — Treino — …").
+  const shortName = (name) => String(name || "").replace(/^treino\s*[—–-]\s*/i, "");
+
+  // Progresso do usuário numa estrutura: treinos dela feitos desde que começou a seguir.
+  function structureProgress(st) {
+    const plan = Store.plan(user.id);
+    const following = plan?.structureId === st.id;
+    const ids = st.workoutIds || [];
+    const done = following
+      ? Store.history(user.id).filter((h) => h.finishedAt >= plan.startedAt && ids.includes(h.workoutId)).length
+      : 0;
+    const duration = Number(st.duration) || 0;
+    const valid = ids.map((id, i) => ({ i, workout: Store.getWorkout(id) })).filter((x) => x.workout);
+    const next = valid.length ? valid[done % valid.length] : null;
+    return {
+      following,
+      done,
+      duration,
+      completed: following && duration > 0 && done >= duration,
+      next: next ? { workout: next.workout, letter: letter(next.i) } : null,
+      percent: duration ? Math.min(100, Math.round((done / duration) * 100)) : 0,
+    };
+  }
+
+  function structureCard(st) {
+    const pr = structureProgress(st);
+    const names = (st.workoutIds || [])
+      .map((id, i) => {
+        const w = Store.getWorkout(id);
+        return w ? `<span class="letter-chip">${letter(i)}</span>` : "";
+      })
+      .join("");
+    return `
+      <a class="structure-card ${pr.following ? "following" : ""}" href="#/estruturas/${encodeURIComponent(st.id)}">
+        <div class="workout-card-head">
+          <h3>${escapeHtml(st.name)}</h3>
+          ${pr.completed ? `<span class="badge badge-iniciante">Concluída</span>` : pr.following ? `<span class="badge badge-live">Seguindo</span>` : ""}
+        </div>
+        ${st.description ? `<p class="exercise-desc clamp-2">${escapeHtml(st.description)}</p>` : ""}
+        <div class="structure-meta">
+          <span class="letters">${names}</span>
+          <span class="meta">${icon("event_repeat", "mi-inline")} ${pr.duration} treinos</span>
+        </div>
+        ${
+          pr.following
+            ? `<div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+               <p class="meta">${pr.done} de ${pr.duration}${pr.next && !pr.completed ? ` · próximo: Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}` : ""}</p>`
+            : ""
+        }
+      </a>`;
+  }
+
+  function renderStructureDetail(id) {
+    setTab("treinos");
+    const st = Store.getStructure(id);
+    if (!st) {
+      setHeader("Estrutura", { back: "#/treinos" });
+      app.innerHTML = empty("help", "Estrutura não encontrada.");
+      return;
+    }
+    setHeader(st.name, { back: "#/treinos", action: `<a class="btn btn-sm" href="#/estruturas/${encodeURIComponent(st.id)}/editar">Editar</a>` });
+    const pr = structureProgress(st);
+    const plan = Store.plan(user.id);
+    const items = (st.workoutIds || [])
+      .map((wid, i) => {
+        const w = Store.getWorkout(wid);
+        if (!w) return `<li class="item-row"><span class="item-index">${letter(i)}</span><div class="item-main"><em>Treino removido</em></div></li>`;
+        const isNext = pr.following && !pr.completed && pr.next?.workout.id === w.id && pr.next.letter === letter(i);
+        return `
+          <li><a class="item-row item-link ${isNext ? "highlight-next" : ""}" href="#/treinos/${encodeURIComponent(w.id)}">
+            <span class="item-index letter-index">${letter(i)}</span>
+            <div class="item-main">
+              <div class="item-title">Treino ${letter(i)} — ${escapeHtml(shortName(w.name))}</div>
+              <div class="group-chips" style="margin-top:6px">${groupChips(workoutGroups(w.items))}</div>
+              <div class="meta">${w.items.length} exercícios${isNext ? " · <strong>próximo</strong>" : ""}</div>
+            </div>
+            <span class="chevron" aria-hidden="true">›</span>
+          </a></li>`;
+      })
+      .join("");
+
+    let progressHtml = "";
+    if (pr.following) {
+      progressHtml = `
+        <section class="structure-progress">
+          <div class="week-head"><h2>Seu progresso</h2><span class="meta">desde ${new Date(plan.startedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span></div>
+          <div class="structure-progress-value"><strong>${pr.done}</strong> de ${pr.duration} treinos</div>
+          <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+          ${
+            pr.completed
+              ? `<p class="meta">${icon("emoji_events", "mi-inline")} Estrutura concluída! Parabéns pela constância.</p>`
+              : pr.next
+                ? `<p class="meta">Próximo: <strong>Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</strong></p>`
+                : ""
+          }
+        </section>`;
+    }
+
+    app.innerHTML = `
+      ${st.description ? `<p class="lead">${escapeHtml(st.description)}</p>` : ""}
+      <div class="structure-facts">
+        <span class="fact">${icon("event_repeat", "mi-inline")} Duração: ${pr.duration} treinos</span>
+        <span class="fact">${icon("format_list_numbered", "mi-inline")} ${(st.workoutIds || []).length} treinos na sequência</span>
+      </div>
+      ${progressHtml}
+      <section class="subsection">
+        <h2 class="subsection-title">Sequência</h2>
+        <ol class="item-list">${items || `<li class="state state-sm">Nenhum treino.</li>`}</ol>
+      </section>
+      <div class="sticky-cta">
+        ${
+          pr.following && !pr.completed && pr.next
+            ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-start">${icon("play_arrow", "mi-inline")} Iniciar Treino ${pr.next.letter}</button>
+               <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
+            : pr.completed
+              ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow">${icon("replay", "mi-inline")} Recomeçar estrutura</button>
+                 <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
+              : `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow" ${pr.next ? "" : "disabled"}>${icon("flag", "mi-inline")} Seguir esta estrutura</button>`
+        }
+      </div>`;
+
+    $("st-start")?.addEventListener("click", () => startWorkout(pr.next.workout));
+    $("st-follow")?.addEventListener("click", () => {
+      const current = plan && plan.structureId !== st.id ? Store.getStructure(plan.structureId) : null;
+      if (current && !confirm(`Você está seguindo "${current.name}". Trocar para "${st.name}"? O progresso recomeça.`)) return;
+      Store.followStructure(user.id, st.id);
+      toast(`Agora você segue ${st.name}!`, "success");
+      renderStructureDetail(st.id);
     });
+    $("st-unfollow")?.addEventListener("click", () => {
+      if (!confirm("Parar de seguir esta estrutura? O progresso será zerado.")) return;
+      Store.unfollowStructure(user.id);
+      renderStructureDetail(st.id);
+    });
+  }
+
+  let structureDraft = null;
+
+  function renderStructureForm(editId) {
+    setTab("treinos");
+    const editing = editId ? Store.getStructure(editId) : null;
+    if (editId && !editing) {
+      setHeader("Estrutura", { back: "#/treinos" });
+      app.innerHTML = empty("help", "Estrutura não encontrada.");
+      return;
+    }
+    if (!structureDraft || structureDraft.id !== (editing?.id || null)) {
+      structureDraft = editing
+        ? { id: editing.id, name: editing.name, description: editing.description || "", duration: editing.duration || "", workoutIds: [...(editing.workoutIds || [])] }
+        : { id: null, name: "", description: "", duration: 30, workoutIds: [] };
+    }
+    const d = structureDraft;
+    const back = editing ? `#/estruturas/${encodeURIComponent(editing.id)}` : "#/treinos";
+    setHeader(editing ? "Editar estrutura" : "Nova estrutura", { back });
+    app.innerHTML = `
+      <form class="form-stack" id="structure-form" novalidate>
+        <div class="field">
+          <label for="st-name">Nome <span class="req">*</span></label>
+          <input class="input" id="st-name" maxlength="60" value="${escapeHtml(d.name)}" placeholder="Ex.: Push/Pull (ABC)">
+        </div>
+        <div class="field">
+          <label for="st-description">Descrição</label>
+          <textarea class="textarea textarea-sm" id="st-description" maxlength="600" placeholder="Objetivo, como alternar os treinos…">${escapeHtml(d.description)}</textarea>
+        </div>
+        <div class="field">
+          <label for="st-duration">Duração (quantidade de treinos) <span class="req">*</span></label>
+          <input class="input" id="st-duration" type="number" inputmode="numeric" min="1" max="365" value="${escapeHtml(d.duration)}">
+        </div>
+        <section class="subsection">
+          <h2 class="subsection-title">Sequência de treinos</h2>
+          <ol class="item-list" id="st-items"></ol>
+          <span class="field-error hidden" id="st-items-error"></span>
+        </section>
+        <section class="subsection">
+          <h2 class="subsection-title">Adicionar treino</h2>
+          <ul class="item-list" id="st-picker"></ul>
+        </section>
+        <div class="sticky-cta">
+          <button class="btn btn-primary btn-block btn-lg" type="submit">${editing ? "Salvar estrutura" : "Criar estrutura"}</button>
+          ${editing ? `<button class="btn btn-danger btn-block" type="button" id="st-delete">Excluir estrutura</button>` : ""}
+        </div>
+      </form>`;
+
+    const renderItems = () => {
+      $("st-items").innerHTML = d.workoutIds.length
+        ? d.workoutIds
+            .map((wid, i) => {
+              const w = Store.getWorkout(wid);
+              return `
+                <li class="item-row" data-index="${i}">
+                  <span class="item-index letter-index">${letter(i)}</span>
+                  <div class="item-main"><div class="item-title">${w ? escapeHtml(w.name) : "<em>Treino removido</em>"}</div>
+                  ${w ? `<div class="meta">${w.items.length} exercícios</div>` : ""}</div>
+                  <div class="item-actions item-actions-row">
+                    <button class="icon-btn icon-btn-sm" type="button" data-st-action="up" aria-label="Subir" ${i === 0 ? "disabled" : ""}>${icon("arrow_upward")}</button>
+                    <button class="icon-btn icon-btn-sm" type="button" data-st-action="down" aria-label="Descer" ${i === d.workoutIds.length - 1 ? "disabled" : ""}>${icon("arrow_downward")}</button>
+                    <button class="icon-btn icon-btn-sm icon-btn-danger" type="button" data-st-action="remove" aria-label="Remover">${icon("close")}</button>
+                  </div>
+                </li>`;
+            })
+            .join("")
+        : `<li class="state state-sm">Adicione os treinos na ordem em que devem ser feitos (A, B, C…).</li>`;
+      if (d.workoutIds.length) $("st-items-error").classList.add("hidden");
+      const all = Store.workouts();
+      $("st-picker").innerHTML = all.length
+        ? all
+            .map(
+              (w) => `
+              <li class="item-row">
+                <div class="item-main"><div class="item-title">${escapeHtml(w.name)}</div>
+                <div class="group-chips" style="margin-top:6px">${groupChips(workoutGroups(w.items))}</div></div>
+                <button class="btn btn-sm ${d.workoutIds.includes(w.id) ? "" : "btn-primary"}" type="button" data-st-add="${escapeHtml(w.id)}">${icon("add", "mi-inline")} ${d.workoutIds.includes(w.id) ? "De novo" : "Adicionar"}</button>
+              </li>`
+            )
+            .join("")
+        : `<li class="state state-sm">Crie treinos primeiro.</li>`;
+    };
+
+    $("st-name").addEventListener("input", (e) => (d.name = e.target.value));
+    $("st-description").addEventListener("input", (e) => (d.description = e.target.value));
+    $("st-duration").addEventListener("input", (e) => (d.duration = e.target.value));
+    $("st-items").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-st-action]");
+      if (!btn) return;
+      const i = Number(btn.closest("[data-index]").dataset.index);
+      const a = btn.dataset.stAction;
+      if (a === "remove") d.workoutIds.splice(i, 1);
+      if (a === "up" && i > 0) [d.workoutIds[i - 1], d.workoutIds[i]] = [d.workoutIds[i], d.workoutIds[i - 1]];
+      if (a === "down" && i < d.workoutIds.length - 1) [d.workoutIds[i + 1], d.workoutIds[i]] = [d.workoutIds[i], d.workoutIds[i + 1]];
+      renderItems();
+    });
+    $("st-picker").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-st-add]");
+      if (!btn) return;
+      d.workoutIds.push(btn.dataset.stAdd);
+      renderItems();
+    });
+    $("structure-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      d.name = $("st-name").value.trim();
+      const duration = Number($("st-duration").value);
+      const errors = [];
+      if (!d.name) errors.push(["st-name", "Dê um nome à estrutura."]);
+      if (!Number.isInteger(duration) || duration < 1 || duration > 365) errors.push(["st-duration", "Informe de 1 a 365 treinos."]);
+      showErrors(e.target, errors);
+      const itemsError = $("st-items-error");
+      itemsError.textContent = d.workoutIds.length ? "" : "Adicione pelo menos um treino.";
+      itemsError.classList.toggle("hidden", Boolean(d.workoutIds.length));
+      if (errors.length || !d.workoutIds.length) return;
+      const saved = Store.saveStructure(
+        { ...(d.id ? { id: d.id } : {}), name: d.name, description: $("st-description").value.trim(), duration, workoutIds: [...d.workoutIds] },
+        user
+      );
+      structureDraft = null;
+      toast(editing ? "Estrutura salva!" : "Estrutura criada!", "success");
+      location.hash = `#/estruturas/${encodeURIComponent(saved.id)}`;
+    });
+    $("st-delete")?.addEventListener("click", () => {
+      if (!confirm(`Excluir a estrutura "${editing.name}"? Os treinos continuam existindo.`)) return;
+      Store.deleteStructure(editing.id);
+      structureDraft = null;
+      toast("Estrutura excluída.");
+      location.hash = "#/treinos";
+    });
+    renderItems();
   }
 
   /* ---------- Criar / editar treino ---------- */
@@ -1364,7 +1679,14 @@
     const parts = path.split("/").filter(Boolean).map(decodeURIComponent);
     if (!(parts[0] === "treinos" && (parts[1] === "novo" || parts[2] === "editar"))) draft = null;
 
+    if (!(parts[0] === "estruturas" && (parts[1] === "novo" || parts[2] === "editar"))) structureDraft = null;
     switch (parts[0]) {
+      case "estruturas":
+        if (parts[1] === "novo") renderStructureForm(null);
+        else if (parts[1] && parts[2] === "editar") renderStructureForm(parts[1]);
+        else if (parts[1]) renderStructureDetail(parts[1]);
+        else location.replace("#/treinos");
+        break;
       case "treinos":
         if (parts[1] === "novo") renderWorkoutForm(null);
         else if (parts[1] && parts[2] === "editar") renderWorkoutForm(parts[1]);
@@ -1726,6 +2048,12 @@
   }
 
   app.addEventListener("click", (e) => {
+    const start = e.target.closest("[data-start-workout]");
+    if (start) {
+      const w = Store.getWorkout(start.dataset.startWorkout);
+      if (w) startWorkout(w);
+      return;
+    }
     const toggle = e.target.closest("[data-equip-filter]");
     if (toggle) {
       equipFilter = toggle.dataset.equipFilter === "on";

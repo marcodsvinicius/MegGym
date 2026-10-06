@@ -1219,3 +1219,51 @@ body.sheet-open { overflow: hidden; }
 .my-note .subsection-title { display: block; margin-bottom: 8px; }
 .my-note .meta { margin-top: 4px; }
 .note-box { margin: 8px 0 0; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); white-space: pre-line; }
+
+/* ---------- Estruturas de treino ---------- */
+.list-section { margin-bottom: 22px; }
+.list-section-title { margin-bottom: 10px; }
+.structure-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--surface)), var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  box-shadow: var(--shadow);
+  color: var(--text);
+  text-decoration: none;
+}
+.structure-card.following { border-color: var(--accent); }
+.structure-card h3 { font-size: 1.1rem; }
+.structure-card .meta, .structure-card .exercise-desc { margin: 0; }
+.structure-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.letters { display: flex; gap: 4px; }
+.letter-chip, .letter-index {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 800;
+  font-size: .85rem;
+}
+.letter-index { width: 30px; height: 30px; border-radius: 9px; }
+.structure-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.fact { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--surface-2); font-weight: 600; font-size: .85rem; }
+.structure-progress { padding: 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.structure-progress h2 { font-size: 1.05rem; font-weight: 800; }
+.structure-progress .meta { margin: 0; }
+.structure-progress-value { font-size: 1rem; color: var(--text-muted); }
+.structure-progress-value strong { font-size: 1.8rem; color: var(--text); }
+.highlight-next { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.item-actions-row { flex-direction: row; }
+.home-structure { display: flex; flex-direction: column; gap: 10px; padding: 16px; margin-bottom: 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border)); box-shadow: var(--shadow); }
+.home-structure-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--text); text-decoration: none; }
+.home-structure-head .meta { margin: 0; }
+.home-structure-count { font-size: .95rem; color: var(--text-muted); }
+.home-structure-count strong { font-size: 1.6rem; color: var(--text); }
+.home-structure .meta { margin: 0; }

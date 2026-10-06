@@ -12,6 +12,8 @@
     session: "meggym.session.", // + id do usuário
     seed: "meggym.workoutsSeed",
     notes: "meggym.notes.", // + id do usuário → { [workoutId]: texto }
+    structures: "meggym.structures",
+    plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
 
   function read(key, fallback) {
@@ -159,6 +161,13 @@
       .filter((w) => seed.replaceExisting || !current.some((c) => c.id === w.id))
       .map((w) => ({ ...w, createdBy: w.createdBy || "MegGym", createdAt: now }));
     write(KEY.workouts, seed.replaceExisting ? fresh : [...current, ...fresh]);
+    if (Array.isArray(seed.structures)) {
+      const currentStructures = structures();
+      const newStructures = seed.structures
+        .filter((st) => !currentStructures.some((c) => c.id === st.id))
+        .map((st) => ({ ...st, createdBy: st.createdBy || "MegGym", createdAt: now }));
+      write(KEY.structures, [...currentStructures, ...newStructures]);
+    }
     if (seed.replaceExisting) {
       // Treino em andamento de um treino apagado não faz mais sentido.
       users().forEach((u) => {
@@ -197,6 +206,53 @@
 
   function cancelSession(userId) {
     write(KEY.session + userId, null);
+  }
+
+  /* ---------- Estruturas de treino (compartilhadas) ---------- */
+
+  function structures() {
+    return read(KEY.structures, []);
+  }
+
+  function getStructure(id) {
+    return structures().find((st) => st.id === id) || null;
+  }
+
+  function saveStructure(structure, user) {
+    const list = structures();
+    const index = list.findIndex((st) => st.id === structure.id);
+    let saved;
+    if (index >= 0) {
+      saved = list[index] = { ...list[index], ...structure, updatedAt: new Date().toISOString() };
+    } else {
+      saved = { ...structure, id: newId("st"), createdBy: user?.name || "", createdAt: new Date().toISOString() };
+      list.push(saved);
+    }
+    write(KEY.structures, list);
+    return saved;
+  }
+
+  function deleteStructure(id) {
+    write(KEY.structures, structures().filter((st) => st.id !== id));
+    users().forEach((u) => {
+      if (plan(u.id)?.structureId === id) write(KEY.plan + u.id, null);
+    });
+  }
+
+  /* ---------- Estrutura que o usuário está seguindo ---------- */
+
+  function plan(userId) {
+    return read(KEY.plan + userId, null);
+  }
+
+  function followStructure(userId, structureId) {
+    const value = { structureId, startedAt: new Date().toISOString() };
+    write(KEY.plan + userId, value);
+    return value;
+  }
+
+  function unfollowStructure(userId) {
+    write(KEY.plan + userId, null);
   }
 
   /* ---------- Observações pessoais (só do usuário) ---------- */
@@ -265,6 +321,13 @@
     getWorkout,
     saveWorkout,
     deleteWorkout,
+    structures,
+    getStructure,
+    saveStructure,
+    deleteStructure,
+    plan,
+    followStructure,
+    unfollowStructure,
     applySeed,
     session,
     startSession,

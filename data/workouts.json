@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "replaceExisting": false,
   "workouts": [
     {
@@ -117,6 +117,18 @@
           "rest": "60-90s",
           "load": ""
         }
+      ]
+    }
+  ],
+  "structures": [
+    {
+      "id": "push-pull-abc",
+      "name": "Push/Pull (ABC)",
+      "description": "Divisão empurrar/puxar para treinar em casa: Treino A trabalha peito, ombros e tríceps (empurrar); Treino B trabalha costas e bíceps (puxar). Alterne A e B, respeitando o descanso entre as sessões.",
+      "duration": 30,
+      "workoutIds": [
+        "peito-ombros-triceps",
+        "costas-biceps"
       ]
     }
   ]
