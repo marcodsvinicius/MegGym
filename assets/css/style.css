@@ -1049,3 +1049,20 @@ body.sheet-open { overflow: hidden; }
 }
 .last-workout .btn { flex: none; }
 .app-main .hello + .resume-banner { margin-top: -6px; }
+
+/* ---------- Início: imagem de fundo no topo ---------- */
+.home-hero { margin: -16px calc(-1 * var(--gutter)) 14px; padding: 28px var(--gutter) 22px; }
+.home-hero .hello { margin: 0; }
+.home-hero.has-image {
+  min-height: 180px;
+  display: flex;
+  align-items: flex-end;
+  background-color: #1a1a1a;
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, .15) 0%, rgba(0, 0, 0, .65) 100%), var(--hero-image);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+.home-hero.has-image .page-subtitle { color: rgba(255, 255, 255, .85); }
+.home-hero.has-image .page-title { text-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+@media (min-width: 720px) { .home-hero { border-radius: 0 0 var(--radius) var(--radius); } }

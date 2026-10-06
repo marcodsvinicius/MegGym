@@ -268,10 +268,14 @@
     const session = Store.session(user.id);
     const activeWorkout = session && Store.getWorkout(session.workoutId);
 
+    const bgSrc = window.MEGGYM_CONFIG?.HOME_BACKGROUND;
+    const bg = bgSrc && /^(https:\/\/|assets\/)/.test(bgSrc) ? bgSrc : "";
     app.innerHTML = `
-      <div class="hello">
-        <p class="page-subtitle">Olá,</p>
-        <h2 class="page-title">${escapeHtml(user.name)} 👋</h2>
+      <div class="home-hero ${bg ? "has-image" : ""}" ${bg ? `style="--hero-image:url('${escapeHtml(bg.replace(/'/g, "%27"))}')"` : ""}>
+        <div class="hello">
+          <p class="page-subtitle">Olá,</p>
+          <h2 class="page-title">${escapeHtml(user.name)} 👋</h2>
+        </div>
       </div>
 
       ${
