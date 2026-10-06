@@ -344,7 +344,7 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=5"></script>
+  <script src="assets/js/config.js?v=6"></script>
   <script>
     // Carrega o admin do modo escolhido em config.js (BACKEND: "github" ou "supabase").
     (function () {
@@ -355,7 +355,7 @@
         : ["common.js", "admin-github.js"];
       files.forEach(function (name) {
         var el = document.createElement("script");
-        el.src = "assets/js/" + name + "?v=5";
+        el.src = "assets/js/" + name + "?v=6";
         el.async = false; // mantém a ordem
         document.body.appendChild(el);
       });

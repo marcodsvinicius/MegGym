@@ -1,10 +1,21 @@
 # MegGym
 academia em casa
 
-Site responsivo para escolher um **grupo muscular** e ver os exercícios sugeridos (nome, descrição, séries, repetições, descanso, dificuldade, imagem/GIF e vídeo). Os exercícios são cadastrados por uma **área de admin** e ficam salvos no próprio repositório (modo GitHub) ou no **Supabase** (modo banco). O site roda no **GitHub Pages**, sem custo.
+App web (mobile first) de treino: lista de exercícios por **grupo muscular**, criação de **treinos**, execução marcando cada exercício e **histórico** de atividade. Os exercícios são cadastrados por uma **área de admin** e ficam salvos no próprio repositório (modo GitHub) ou no **Supabase** (modo banco). O site roda no **GitHub Pages**, sem custo.
 
 - **Site:** `https://marcodsvinicius.github.io/MegGym/`
 - **Admin:** `https://marcodsvinicius.github.io/MegGym/admin.html`
+
+## Como funciona o app
+
+- **Entrada:** cada pessoa entra digitando o nome (perfis ficam no aparelho; dá para trocar em Atividade → Sair).
+- **Menu inferior:** Início · Treinos · Exercícios · Atividade.
+- **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
+- **Treinos:** nome, descrição e exercícios (com séries × repetições). Os grupos musculares do treino são calculados a partir dos exercícios. Todos os perfis do aparelho veem todos os treinos.
+- **Executar:** "Iniciar treino" abre a lista para marcar cada exercício; com todos marcados, "Terminar treino" registra dia, horário e duração.
+- **Atividade:** nome, resumo e histórico de treinos de cada pessoa.
+
+> Por enquanto, perfis, treinos, histórico e exercícios cadastrados no app ficam salvos **só no navegador do aparelho** (localStorage). Os exercícios base vêm de `data/exercises.json`.
 
 ## Como publicar (uma vez só)
 
@@ -63,7 +74,8 @@ insert into public.admins (email) values ('email@dela.com');
 ## Estrutura
 
 ```
-index.html            site público (cards de grupos → exercícios)
+index.html            app (login, treinos, exercícios, atividade)
+assets/js/store.js    dados salvos no aparelho (perfis, treinos, histórico)
 admin.html            área de cadastro
 supabase/schema.sql   tabelas, segurança e dados iniciais do banco
 data/exercises.json   cópia de reserva dos dados (usada se o Supabase falhar)
@@ -71,7 +83,7 @@ assets/css/style.css  estilos (responsivo, tema claro/escuro)
 assets/js/config.js   modo (BACKEND), URL e chave pública do Supabase
 assets/js/supabase.js cliente da API do Supabase (banco, login, imagens)
 assets/js/common.js   funções compartilhadas
-assets/js/app.js      lógica do site
+assets/js/app.js      telas e navegação do app
 assets/js/admin.js    lógica do admin (modo Supabase)
 assets/js/admin-github.js  lógica do admin (modo GitHub)
 ```
