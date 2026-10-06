@@ -172,16 +172,163 @@
 
   /* ================= Início ================= */
 
+  const WEEKDAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+  function startOfDay(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  // Segunda-feira da semana atual, 00:00.
+  function startOfWeek(date = new Date()) {
+    const d = startOfDay(date);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d;
+  }
+
+  function dayKey(date) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  }
+
+  function durationMs(h) {
+    return Math.max(0, new Date(h.finishedAt) - new Date(h.startedAt));
+  }
+
+  function formatTotal(ms) {
+    const minutes = Math.round(ms / 60000);
+    if (minutes < 60) return { value: String(minutes), unit: "min" };
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return { value: m ? `${h}h${String(m).padStart(2, "0")}` : `${h}h`, unit: "" };
+  }
+
+  // Dias seguidos com treino, terminando hoje (ou ontem, se ainda não treinou hoje).
+  function streak(history) {
+    const days = new Set(history.map((h) => dayKey(h.finishedAt)));
+    const cursor = startOfDay(new Date());
+    if (!days.has(dayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+    let count = 0;
+    while (days.has(dayKey(cursor))) {
+      count++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return count;
+  }
+
+  function motivation({ weekCount, trainedToday, streakDays, todayIndex, firstName }) {
+    if (trainedToday && streakDays >= 3) return { emoji: "🔥", title: `${streakDays} dias seguidos!`, text: "Que sequência! Continue assim, a constância é o que traz resultado." };
+    if (trainedToday) return { emoji: "💪", title: "Treino de hoje feito!", text: "Missão cumprida. Agora é descansar, se hidratar e voltar amanhã." };
+    if (weekCount === 0 && todayIndex === 0) return { emoji: "🚀", title: `Semana nova, ${firstName}!`, text: "Que tal começar com o pé direito e fazer o primeiro treino hoje?" };
+    if (weekCount === 0) return { emoji: "⏰", title: "Bora começar a semana?", text: "Ainda dá tempo! Um treino hoje já faz diferença." };
+    if (streakDays >= 2) return { emoji: "🔥", title: `${streakDays} dias seguidos`, text: "Não deixe a sequência parar. Treine hoje!" };
+    if (weekCount >= 4) return { emoji: "🏆", title: "Semana de campeão!", text: `Você já treinou ${weekCount} vezes nesta semana. Incrível!` };
+    return { emoji: "👊", title: `Já são ${weekCount} ${weekCount === 1 ? "treino" : "treinos"} na semana`, text: "Bom ritmo! Que tal mais um hoje?" };
+  }
+
   function renderHome() {
     setHeader("MegGym");
     setTab("inicio");
+    const history = Store.history(user.id);
+    const weekStart = startOfWeek();
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const week = history.filter((h) => {
+      const t = new Date(h.finishedAt);
+      return t >= weekStart && t < weekEnd;
+    });
+    const trainedDays = new Set(week.map((h) => dayKey(h.finishedAt)));
+    const today = startOfDay(new Date());
+    const todayIndex = (today.getDay() + 6) % 7;
+    const total = formatTotal(week.reduce((sum, h) => sum + durationMs(h), 0));
+    const streakDays = streak(history);
+    const firstName = user.name.split(" ")[0];
+    const msg = motivation({ weekCount: week.length, trainedToday: trainedDays.has(dayKey(today)), streakDays, todayIndex, firstName });
+
+    const days = WEEKDAYS.map((label, i) => {
+      const date = new Date(weekStart);
+      date.setDate(date.getDate() + i);
+      const done = trainedDays.has(dayKey(date));
+      const isToday = i === todayIndex;
+      const future = i > todayIndex;
+      const count = week.filter((h) => dayKey(h.finishedAt) === dayKey(date)).length;
+      const state = done ? "done" : future ? "future" : isToday ? "today" : "missed";
+      const title = `${date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric" })}: ${done ? `${count} treino${count > 1 ? "s" : ""}` : future ? "ainda não chegou" : "sem treino"}`;
+      return `
+        <li class="week-day ${state} ${isToday ? "is-today" : ""}" title="${escapeHtml(title)}">
+          <span class="week-day-label">${label}</span>
+          <span class="week-day-dot" aria-hidden="true">${done ? "✓" : date.getDate()}</span>
+          <span class="visually-hidden">${escapeHtml(title)}</span>
+        </li>`;
+    }).join("");
+
+    const last = history[0];
+    const lastWorkout = last && Store.getWorkout(last.workoutId);
+    const session = Store.session(user.id);
+    const activeWorkout = session && Store.getWorkout(session.workoutId);
+
     app.innerHTML = `
       <div class="hello">
         <p class="page-subtitle">Olá,</p>
         <h2 class="page-title">${escapeHtml(user.name)} 👋</h2>
       </div>
-      <div id="install-slot" data-context="home">${installCard("home")}</div>
-      ${empty("🚧", "Em breve novidades por aqui.")}`;
+
+      ${
+        activeWorkout
+          ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
+              <span>▶ Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
+            </a>`
+          : ""
+      }
+
+      <section class="motivation">
+        <span class="motivation-emoji" aria-hidden="true">${msg.emoji}</span>
+        <div>
+          <h2>${escapeHtml(msg.title)}</h2>
+          <p>${escapeHtml(msg.text)}</p>
+        </div>
+      </section>
+
+      <section class="week-card" aria-labelledby="week-title">
+        <div class="week-head">
+          <h2 id="week-title">Sua semana</h2>
+          <span class="meta">${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} – ${new Date(weekEnd - 1).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>
+        </div>
+        <div class="week-stats">
+          <div class="week-stat">
+            <span class="week-stat-value">${week.length}</span>
+            <span class="week-stat-label">${week.length === 1 ? "treino" : "treinos"}</span>
+          </div>
+          <div class="week-stat">
+            <span class="week-stat-value">${total.value}<small>${total.unit}</small></span>
+            <span class="week-stat-label">de treino</span>
+          </div>
+          <div class="week-stat">
+            <span class="week-stat-value">${trainedDays.size}<small>/7</small></span>
+            <span class="week-stat-label">dias ativos</span>
+          </div>
+        </div>
+        <ol class="week-days" aria-label="Dias da semana">${days}</ol>
+      </section>
+
+      <section class="subsection">
+        <h2 class="subsection-title">Último treino</h2>
+        ${
+          last
+            ? `<div class="last-workout">
+                <span class="history-icon" aria-hidden="true">✅</span>
+                <div class="item-main">
+                  <div class="item-title">${escapeHtml(last.workoutName)}</div>
+                  <div class="meta">${escapeHtml(formatDateTime(last.finishedAt))} · ${formatDuration(last.startedAt, last.finishedAt)} · ${last.exerciseCount} exercícios</div>
+                </div>
+                ${lastWorkout ? `<a class="btn btn-sm btn-primary" href="#/treinos/${encodeURIComponent(lastWorkout.id)}">Fazer de novo</a>` : ""}
+              </div>`
+            : empty("🏁", "Você ainda não terminou nenhum treino.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Escolher um treino</a>`)
+        }
+      </section>
+
+      <div id="install-slot" data-context="home">${installCard("home")}</div>`;
   }
 
   /* ================= Exercícios ================= */

@@ -984,3 +984,68 @@ body.sheet-open { overflow: hidden; }
 }
 .segmented button span { font-size: 1.15rem; }
 .segmented button[aria-checked="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+
+/* ---------- Início: incentivo e semana ---------- */
+.motivation {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #ffb400));
+  color: #fff;
+}
+.motivation-emoji { font-size: 2.2rem; line-height: 1; flex: none; }
+.motivation h2 { font-size: 1.1rem; font-weight: 800; }
+.motivation p { margin: 4px 0 0; font-size: .92rem; opacity: .95; }
+
+.week-card {
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.week-head h2 { font-size: 1.05rem; font-weight: 800; }
+.week-head .meta { margin: 0; }
+.week-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.week-stat { display: flex; flex-direction: column; padding: 10px; border-radius: var(--radius-sm); background: var(--surface-2); }
+.week-stat-value { font-size: 1.6rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.week-stat-value small { font-size: .85rem; font-weight: 700; color: var(--text-muted); margin-left: 2px; }
+.week-stat-label { color: var(--text-muted); font-size: .78rem; font-weight: 600; }
+
+.week-days { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.week-day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.week-day-label { font-size: .72rem; font-weight: 700; color: var(--text-muted); }
+.week-day-dot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: .85rem;
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+}
+.week-day.done .week-day-dot { background: var(--success); border-color: var(--success); color: #fff; font-size: 1rem; }
+.week-day.missed .week-day-dot { border-style: dashed; opacity: .7; }
+.week-day.future .week-day-dot { opacity: .45; }
+.week-day.is-today .week-day-label { color: var(--accent); }
+.week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent); }
+.week-day.is-today.done .week-day-dot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 30%, transparent); }
+
+.last-workout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.last-workout .btn { flex: none; }
+.app-main .hello + .resume-banner { margin-top: -6px; }
