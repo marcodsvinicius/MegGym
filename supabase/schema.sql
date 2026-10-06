@@ -5,13 +5,12 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- 1) TROQUE o e-mail abaixo pelo e-mail que você vai usar para entrar
---    no admin. Só e-mails desta lista conseguem cadastrar/editar.
+-- 1) E-mail(s) que podem entrar no admin e cadastrar/editar.
 -- ---------------------------------------------------------------------
 create table if not exists public.admins (
   email text primary key
 );
-insert into public.admins (email) values ('SEU_EMAIL_AQUI@exemplo.com')
+insert into public.admins (email) values ('marcodsvinicius@gmail.com')
 on conflict do nothing;
 
 -- ---------------------------------------------------------------------

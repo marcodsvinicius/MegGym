@@ -19,7 +19,7 @@ Os exercícios ficam num banco **Supabase** (plano gratuito). O site lê direto 
 
 ### Configuração (uma vez só)
 1. No painel do Supabase, abra **SQL Editor → New query**.
-2. Cole todo o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e **troque `SEU_EMAIL_AQUI@exemplo.com` pelo seu e-mail** (linha do `insert into public.admins`).
+2. Cole todo o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) (o e-mail de admin já está nele).
 3. Clique em **Run**. Isso cria as tabelas, as regras de segurança, o espaço para imagens e os exercícios iniciais.
 4. Em **Authentication → Users → Add user → Create new user**, crie seu usuário com o **mesmo e-mail**, uma senha e marque **Auto Confirm User**.
 5. (Recomendado) Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**.
