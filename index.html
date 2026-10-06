@@ -9,7 +9,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <link rel="stylesheet" href="assets/css/style.css?v=7">
 </head>
 <body class="app-body">
   <!-- Entrada: nome do usuário -->
@@ -63,22 +63,23 @@
     </nav>
   </div>
 
-  <div class="modal hidden" id="video-modal" role="dialog" aria-modal="true" aria-labelledby="video-title">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h3 id="video-title">Vídeo</h3>
-        <button class="btn btn-sm" type="button" data-close-modal>Fechar ✕</button>
+  <!-- Detalhes do exercício -->
+  <div class="sheet-backdrop hidden" id="sheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="sheet-bar" id="sheet-handle">
+        <span class="sheet-grip" aria-hidden="true"></span>
+        <button class="icon-btn" type="button" id="sheet-close" aria-label="Fechar">✕</button>
       </div>
-      <iframe class="video-frame" id="video-frame" title="Vídeo do exercício" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+      <div class="sheet-content" id="sheet-content"></div>
     </div>
   </div>
 
   <div class="toast hidden" id="toast" role="status"></div>
 
-  <script src="assets/js/config.js?v=6"></script>
-  <script src="assets/js/supabase.js?v=6"></script>
-  <script src="assets/js/common.js?v=6"></script>
-  <script src="assets/js/store.js?v=6"></script>
-  <script src="assets/js/app.js?v=6"></script>
+  <script src="assets/js/config.js?v=7"></script>
+  <script src="assets/js/supabase.js?v=7"></script>
+  <script src="assets/js/common.js?v=7"></script>
+  <script src="assets/js/store.js?v=7"></script>
+  <script src="assets/js/app.js?v=7"></script>
 </body>
 </html>

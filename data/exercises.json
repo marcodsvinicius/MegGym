@@ -84,7 +84,8 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "supino-halteres",
@@ -96,7 +97,11 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
     },
     {
       "id": "crucifixo-halteres",
@@ -108,7 +113,11 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
     },
     {
       "id": "remada-curvada",
@@ -120,7 +129,10 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "remada-unilateral",
@@ -132,7 +144,11 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
     },
     {
       "id": "superman",
@@ -144,7 +160,8 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "desenvolvimento-halteres",
@@ -156,7 +173,11 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
     },
     {
       "id": "elevacao-lateral",
@@ -168,7 +189,10 @@
       "rest": "45-60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "flexao-pike",
@@ -180,7 +204,8 @@
       "rest": "60s",
       "difficulty": "avancado",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "rosca-direta",
@@ -192,7 +217,10 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "rosca-martelo",
@@ -204,7 +232,10 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "triceps-banco",
@@ -216,7 +247,10 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "banco"
+      ]
     },
     {
       "id": "triceps-frances",
@@ -228,7 +262,10 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "agachamento-livre",
@@ -240,7 +277,8 @@
       "rest": "60-90s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "agachamento-bulgaro",
@@ -252,7 +290,11 @@
       "rest": "60-90s",
       "difficulty": "avancado",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "banco",
+        "halter"
+      ]
     },
     {
       "id": "afundo",
@@ -264,7 +306,8 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "stiff-halteres",
@@ -276,7 +319,10 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "ponte-unilateral",
@@ -288,7 +334,8 @@
       "rest": "45s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "elevacao-pelvica",
@@ -300,7 +347,11 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "banco",
+        "halter"
+      ]
     },
     {
       "id": "abducao-elastico",
@@ -312,7 +363,10 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "elastico"
+      ]
     },
     {
       "id": "panturrilha-em-pe",
@@ -324,7 +378,8 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "panturrilha-unilateral",
@@ -336,7 +391,10 @@
       "rest": "45s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "prancha",
@@ -348,7 +406,8 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "abdominal-supra",
@@ -360,7 +419,8 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "elevacao-pernas",
@@ -372,7 +432,8 @@
       "rest": "45-60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "rosca-punho",
@@ -384,7 +445,10 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "farmer-walk",
@@ -396,7 +460,11 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": [
+        "halter",
+        "kettlebell"
+      ]
     },
     {
       "id": "polichinelo",
@@ -408,7 +476,8 @@
       "rest": "30s",
       "difficulty": "iniciante",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "burpee",
@@ -420,7 +489,8 @@
       "rest": "60s",
       "difficulty": "avancado",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     },
     {
       "id": "mountain-climber",
@@ -432,7 +502,8 @@
       "rest": "30-45s",
       "difficulty": "intermediario",
       "image": "",
-      "video": ""
+      "video": "",
+      "equipment": []
     }
   ]
 }

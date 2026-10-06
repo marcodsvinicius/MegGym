@@ -2,7 +2,8 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES } = window.MegGym;
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, equipmentLabels } =
+    window.MegGym;
   const Store = window.MegStore;
 
   const $ = (id) => document.getElementById(id);
@@ -12,6 +13,7 @@
   let user = null;
   let draft = null; // treino sendo criado/editado
   const filters = { search: "", difficulty: "" };
+  let timer = null; // cronômetro do treino em andamento
 
   /* ================= Dados ================= */
 
@@ -73,6 +75,12 @@
   function groupChips(list) {
     return list
       .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}</span>`)
+      .join("");
+  }
+
+  function equipmentChips(list) {
+    return equipmentLabels(list)
+      .map((label) => `<span class="equip-chip">${escapeHtml(label)}</span>`)
       .join("");
   }
 
@@ -140,10 +148,6 @@
 
   function exerciseCard(ex) {
     const img = safeUrl(ex.image);
-    const video = safeUrl(ex.video);
-    const media = img
-      ? `<div class="exercise-media"><img src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}" loading="lazy"></div>`
-      : "";
     const stats = [
       ["Séries", ex.sets],
       ["Repetições", ex.reps],
@@ -152,29 +156,23 @@
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
       .join("");
-    const actions = [];
-    if (video) {
-      actions.push(
-        youtubeId(video)
-          ? `<button class="btn btn-sm" type="button" data-video="${escapeHtml(video)}" data-title="${escapeHtml(ex.name)}">▶ Vídeo</button>`
-          : `<a class="btn btn-sm" href="${escapeHtml(video)}" target="_blank" rel="noopener noreferrer">▶ Vídeo</a>`
-      );
-    }
-    if (ex.custom) {
-      actions.push(`<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>`);
-    }
+    const equip = equipmentChips(ex.equipment);
+    const hasVideo = Boolean(youtubeId(ex.video) || safeUrl(ex.video));
     return `
-      <article class="exercise-card">
-        ${media}
+      <article class="exercise-card tappable" data-exercise="${escapeHtml(ex.id)}" tabindex="0" role="button" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
+        ${img ? `<div class="exercise-media"><img src="${escapeHtml(img)}" alt="" loading="lazy"></div>` : ""}
         <div class="exercise-body">
           <div class="exercise-title">
             <h3>${escapeHtml(ex.name)}</h3>
             ${difficultyBadge(ex.difficulty)}
           </div>
           ${stats ? `<div class="stats">${stats}</div>` : ""}
-          ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : ""}
-          ${ex.custom && ex.createdBy ? `<p class="meta">Cadastrado por ${escapeHtml(ex.createdBy)}</p>` : ""}
-          ${actions.length ? `<div class="exercise-actions">${actions.join("")}</div>` : ""}
+          ${equip ? `<div class="equip-chips">${equip}</div>` : ""}
+          ${ex.description ? `<p class="exercise-desc clamp-2">${escapeHtml(ex.description)}</p>` : ""}
+          <div class="card-foot">
+            <span class="meta">${hasVideo ? "▶ Tem vídeo · " : ""}Toque para ver detalhes</span>
+            ${ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : ""}
+          </div>
         </div>
       </article>`;
   }
@@ -286,6 +284,21 @@
             <select class="select" id="ex-difficulty">${diffOptions}</select>
           </div>
         </div>
+        <fieldset class="field fieldset">
+          <legend>Equipamentos</legend>
+          <div class="check-chips">
+            ${Object.entries(EQUIPMENT)
+              .map(
+                ([id, label]) => `
+                <label class="check-chip">
+                  <input type="checkbox" name="ex-equipment" value="${id}" ${(ex.equipment || []).includes(id) ? "checked" : ""}>
+                  <span>${label}</span>
+                </label>`
+              )
+              .join("")}
+          </div>
+          <span class="hint">Marque todos que forem usados. Deixe em branco se for só com o peso do corpo.</span>
+        </fieldset>
         <div class="field">
           <label for="ex-image">Link de imagem ou GIF</label>
           <input class="input" id="ex-image" inputmode="url" value="${escapeHtml(ex.image || "")}" placeholder="https://…">
@@ -306,6 +319,7 @@
       ["group", "name", "description", "sets", "reps", "rest", "difficulty", "image", "video"].forEach(
         (f) => (values[f] = $(`ex-${f}`).value.trim())
       );
+      values.equipment = [...document.querySelectorAll('input[name="ex-equipment"]:checked')].map((c) => c.value);
       const errors = [];
       if (!values.name) errors.push(["name", "Informe o nome."]);
       if (!values.description) errors.push(["description", "Informe a descrição."]);
@@ -397,12 +411,13 @@
         const ex = findExercise(item.exerciseId);
         const g = ex && findGroup(ex.group);
         return `
-          <li class="item-row">
+          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}"` : ""}>
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
               <div class="meta">${g ? `${escapeHtml(g.icon || "")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(setsReps(item.sets, item.reps))}</div>
             </div>
+            ${ex ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
           </li>`;
       })
       .join("");
@@ -616,7 +631,7 @@
             return `
               <li class="item-row">
                 <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}" aria-hidden="true">${escapeHtml(g?.icon || "💪")}</span>
-                <div class="item-main">
+                <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}">
                   <div class="item-title">${escapeHtml(ex.name)}</div>
                   <div class="meta">${escapeHtml(g?.name || "")}${ex.sets || ex.reps ? ` · ${escapeHtml(setsReps(ex.sets, ex.reps))}` : ""}</div>
                 </div>
@@ -650,26 +665,16 @@
         if (!ex) return "";
         const g = findGroup(ex.group);
         const done = Boolean(session.done[i]);
-        const img = safeUrl(ex.image);
         return `
           <li class="run-item ${done ? "done" : ""}" data-index="${i}">
             <button class="run-check" type="button" data-toggle="${i}" aria-pressed="${done}" aria-label="${done ? "Desmarcar" : "Concluir"} ${escapeHtml(ex.name)}">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </button>
-            <div class="item-main">
+            <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}">
               <div class="item-title">${escapeHtml(ex.name)}</div>
               <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}</div>
               <div class="meta">${g ? `${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}` : ""}${ex.rest ? ` · descanso ${escapeHtml(ex.rest)}` : ""}</div>
-              <details class="run-details">
-                <summary>Como fazer</summary>
-                ${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy">` : ""}
-                <p class="exercise-desc">${escapeHtml(ex.description || "")}</p>
-                ${
-                  safeUrl(ex.video) && youtubeId(ex.video)
-                    ? `<button class="btn btn-sm" type="button" data-video="${escapeHtml(safeUrl(ex.video))}" data-title="${escapeHtml(ex.name)}">▶ Vídeo</button>`
-                    : ""
-                }
-              </details>
+              <div class="meta link-text">Ver execução ›</div>
             </div>
           </li>`;
       })
@@ -677,7 +682,11 @@
 
     app.innerHTML = `
       <div class="run-progress">
-        <div class="run-progress-text"><span id="run-count"></span><span class="meta">Início ${new Date(session.startedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span></div>
+        <div class="run-timer" aria-label="Tempo de treino">
+          <span class="run-timer-value" id="run-timer">00:00</span>
+          <span class="meta">desde ${new Date(session.startedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
+        </div>
+        <div class="run-progress-text"><span id="run-count"></span></div>
         <div class="progress"><div class="progress-bar" id="run-bar"></div></div>
       </div>
       <ol class="run-list">${items}</ol>
@@ -725,7 +734,24 @@
       location.hash = `#/treinos/${encodeURIComponent(w.id)}`;
     });
 
+    const started = new Date(session.startedAt).getTime();
+    const tick = () => {
+      const el = $("run-timer");
+      if (el) el.textContent = formatClock(Date.now() - started);
+    };
+    tick();
+    timer = setInterval(tick, 1000);
+
     updateProgress();
+  }
+
+  function formatClock(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const sec = total % 60;
+    const pad = (n) => String(n).padStart(2, "0");
+    return h ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
   }
 
   /* ================= Atividade ================= */
@@ -798,6 +824,9 @@
   /* ================= Rotas ================= */
 
   function route() {
+    clearInterval(timer);
+    timer = null;
+    closeSheet(true);
     if (!user) return;
     const [path, query = ""] = location.hash.replace(/^#/, "").split("?");
     const params = new URLSearchParams(query);
@@ -877,35 +906,124 @@
     if (href) location.hash = href;
   });
 
-  /* ================= Vídeo ================= */
+  /* ================= Detalhes do exercício (bottom sheet) ================= */
 
-  const modal = $("video-modal");
-  const frame = $("video-frame");
+  const sheet = $("sheet");
+  let sheetReturnFocus = null;
 
-  function openVideo(url, title) {
-    const id = youtubeId(url);
-    if (!id) return;
-    $("video-title").textContent = title || "Vídeo";
-    frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`;
-    modal.classList.remove("hidden");
-    modal.querySelector("[data-close-modal]").focus();
+  function openSheet(exerciseId, prescription = {}) {
+    const ex = findExercise(exerciseId);
+    if (!ex) return;
+    const g = findGroup(ex.group);
+    const img = safeUrl(ex.image);
+    const ytId = youtubeId(ex.video);
+    const videoUrl = safeUrl(ex.video);
+    const sets = prescription.sets || ex.sets;
+    const reps = prescription.reps || ex.reps;
+    const stats = [
+      ["Séries", sets],
+      ["Repetições", reps],
+      ["Descanso", ex.rest],
+    ]
+      .filter(([, v]) => v)
+      .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
+      .join("");
+    const equip = equipmentChips(ex.equipment);
+    const groupCount = g ? exercises().filter((e) => e.group === g.id).length : 0;
+
+    $("sheet-content").innerHTML = `
+      ${img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
+      <div class="sheet-head">
+        <h2 id="sheet-title">${escapeHtml(ex.name)}</h2>
+        ${difficultyBadge(ex.difficulty)}
+      </div>
+      ${stats ? `<div class="stats">${stats}</div>` : ""}
+
+      <section class="sheet-section">
+        <h3>Execução</h3>
+        ${
+          ytId
+            ? `<div class="video-wrap"><iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
+            : videoUrl
+              ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Abrir vídeo</a>`
+              : ""
+        }
+        ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
+      </section>
+
+      <section class="sheet-section">
+        <h3>Equipamentos</h3>
+        ${equip ? `<div class="equip-chips">${equip}</div>` : `<p class="meta">Nenhum — peso do corpo.</p>`}
+      </section>
+
+      ${
+        g
+          ? `<section class="sheet-section">
+              <h3>Grupo muscular</h3>
+              <a class="group-detail" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
+                <span class="group-icon" aria-hidden="true">${escapeHtml(g.icon || "💪")}</span>
+                <span class="item-main">
+                  <span class="item-title">${escapeHtml(g.name)}</span><br>
+                  <span class="meta">${groupCount} ${groupCount === 1 ? "exercício" : "exercícios"} neste grupo · ver todos</span>
+                </span>
+                <span class="chevron" aria-hidden="true">›</span>
+              </a>
+            </section>`
+          : ""
+      }
+      ${ex.custom && ex.createdBy ? `<p class="meta">Cadastrado por ${escapeHtml(ex.createdBy)}</p>` : ""}`;
+
+    sheetReturnFocus = document.activeElement;
+    sheet.classList.remove("hidden");
+    document.body.classList.add("sheet-open");
+    requestAnimationFrame(() => sheet.classList.add("open"));
+    $("sheet-close").focus({ preventScroll: true });
+    $("sheet-content").scrollTop = 0;
   }
 
-  function closeVideo() {
-    frame.src = "about:blank";
-    modal.classList.add("hidden");
+  function closeSheet(immediate = false) {
+    if (sheet.classList.contains("hidden")) return;
+    sheet.classList.remove("open");
+    document.body.classList.remove("sheet-open");
+    const finish = () => {
+      sheet.classList.add("hidden");
+      $("sheet-content").innerHTML = ""; // para o vídeo
+    };
+    if (immediate) finish();
+    else setTimeout(finish, 220);
+    if (!immediate && sheetReturnFocus) sheetReturnFocus.focus?.({ preventScroll: true });
   }
 
   app.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-video]");
-    if (btn) openVideo(btn.dataset.video, btn.dataset.title);
+    if (e.target.closest("a, button, input, select, label, textarea")) return;
+    const target = e.target.closest("[data-exercise]");
+    if (target) openSheet(target.dataset.exercise, { sets: target.dataset.sets, reps: target.dataset.reps });
   });
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal || e.target.closest("[data-close-modal]")) closeVideo();
+  app.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const target = e.target.closest("[data-exercise][tabindex]");
+    if (!target || e.target !== target) return;
+    e.preventDefault();
+    openSheet(target.dataset.exercise);
+  });
+  sheet.addEventListener("click", (e) => {
+    if (e.target === sheet || e.target.closest("#sheet-close")) closeSheet();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal.classList.contains("hidden")) closeVideo();
+    if (e.key === "Escape") closeSheet();
   });
+
+  // Arrastar para baixo fecha o painel.
+  let dragStart = null;
+  $("sheet-handle").addEventListener("touchstart", (e) => (dragStart = e.touches[0].clientY), { passive: true });
+  $("sheet-handle").addEventListener(
+    "touchend",
+    (e) => {
+      if (dragStart !== null && e.changedTouches[0].clientY - dragStart > 60) closeSheet();
+      dragStart = null;
+    },
+    { passive: true }
+  );
 
   /* ================= Início ================= */
 

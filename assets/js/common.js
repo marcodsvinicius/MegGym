@@ -10,6 +10,18 @@
     avancado: "Avançado",
   };
 
+  const EQUIPMENT = {
+    elastico: "Elástico",
+    estacao: "Estação de treinos",
+    halter: "Halter",
+    kettlebell: "Kettlebell",
+    banco: "Banco",
+  };
+
+  function equipmentLabels(list) {
+    return (Array.isArray(list) ? list : []).map((id) => EQUIPMENT[id]).filter(Boolean);
+  }
+
   function escapeHtml(value) {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -140,6 +152,8 @@
     DATA_PATH,
     IMAGE_DIR,
     DIFFICULTIES,
+    EQUIPMENT,
+    equipmentLabels,
     escapeHtml,
     safeUrl,
     safeColor,
