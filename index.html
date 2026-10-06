@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MegGym — Exercícios por grupo muscular</title>
+  <meta name="description" content="Escolha o grupo muscular e veja exercícios com descrição, séries e repetições sugeridas.">
+  <meta name="theme-color" content="#ff5a1f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="#/"><span class="brand-mark">🏋️</span> MegGym</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" id="app" aria-live="polite">
+      <div class="state"><div class="spinner"></div>Carregando exercícios…</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <span>MegGym · academia em casa</span>
+      <a href="admin.html">Área de cadastro</a>
+    </div>
+  </footer>
+
+  <div class="modal hidden" id="video-modal" role="dialog" aria-modal="true" aria-labelledby="video-title">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="video-title">Vídeo</h3>
+        <button class="btn btn-sm" type="button" data-close-modal>Fechar ✕</button>
+      </div>
+      <iframe class="video-frame" id="video-frame" title="Vídeo do exercício" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

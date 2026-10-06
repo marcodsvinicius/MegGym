@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>MegGym — Cadastro de exercícios</title>
+  <meta name="theme-color" content="#ff5a1f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="./"><span class="brand-mark">🏋️</span> MegGym <small style="font-weight:600;color:var(--text-muted)">admin</small></a>
+      <span class="status-pill"><span class="status-dot" id="status-dot"></span><span id="status-text">Desconectado</span></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ===== Conexão com o GitHub ===== -->
+      <section class="panel" id="config-panel">
+        <div class="panel-head">
+          <h2>Conexão com o GitHub</h2>
+          <button class="btn btn-sm hidden" type="button" id="config-toggle">Fechar</button>
+        </div>
+        <div class="notice">
+          Os exercícios ficam salvos no arquivo <code>data/exercises.json</code> do seu repositório.
+          Para salvar daqui, crie um <strong>token pessoal</strong>:
+          <ol>
+            <li>GitHub → <em>Settings → Developer settings → Personal access tokens → Fine-grained tokens</em> → <em>Generate new token</em>.</li>
+            <li>Em <em>Repository access</em>, escolha <em>Only select repositories</em> e selecione este repositório.</li>
+            <li>Em <em>Permissions → Repository permissions</em>, deixe <strong>Contents: Read and write</strong>.</li>
+            <li>Gere, copie e cole abaixo. O token fica salvo só neste navegador.</li>
+          </ol>
+        </div>
+        <form id="config-form" class="form-grid" autocomplete="off">
+          <div class="field span-4">
+            <label for="cfg-owner">Usuário/organização</label>
+            <input class="input" id="cfg-owner" required>
+          </div>
+          <div class="field span-4">
+            <label for="cfg-repo">Repositório</label>
+            <input class="input" id="cfg-repo" required>
+          </div>
+          <div class="field span-4">
+            <label for="cfg-branch">Branch publicada</label>
+            <input class="input" id="cfg-branch" required>
+          </div>
+          <div class="field">
+            <label for="cfg-token">Token pessoal</label>
+            <input class="input" id="cfg-token" type="password" placeholder="github_pat_…" required>
+          </div>
+          <div class="form-actions" style="grid-column: span 12">
+            <button class="btn btn-primary" type="submit">Conectar</button>
+            <button class="btn btn-danger" type="button" id="cfg-forget">Esquecer token</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===== Editor ===== -->
+      <section id="editor" class="hidden">
+        <div class="panel-head">
+          <div>
+            <h1 class="page-title">Cadastro</h1>
+            <p class="page-subtitle">Cada alteração salva vira um commit. O site atualiza em cerca de 1 minuto.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm" type="button" id="reload-btn">↻ Recarregar</button>
+            <button class="btn btn-sm" type="button" id="config-open">⚙ Conexão</button>
+            <a class="btn btn-sm" href="./" target="_blank" rel="noopener">Ver site ↗</a>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" aria-selected="true" data-tab="exercises">Exercícios</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="groups">Grupos musculares</button>
+        </div>
+
+        <!-- Exercícios -->
+        <div data-tab-panel="exercises">
+          <section class="panel" id="exercise-form-panel">
+            <div class="panel-head">
+              <h2 id="exercise-form-title">Novo exercício</h2>
+              <button class="btn btn-sm hidden" type="button" id="exercise-cancel">Cancelar edição</button>
+            </div>
+            <form id="exercise-form" class="form-grid" novalidate>
+              <div class="field span-6">
+                <label for="ex-group">Grupo muscular <span class="req">*</span></label>
+                <select class="select" id="ex-group" required></select>
+              </div>
+              <div class="field span-6">
+                <label for="ex-name">Nome <span class="req">*</span></label>
+                <input class="input" id="ex-name" maxlength="80" required placeholder="Ex.: Supino com halteres">
+              </div>
+              <div class="field">
+                <label for="ex-description">Descrição / execução <span class="req">*</span></label>
+                <textarea class="textarea" id="ex-description" maxlength="1500" required placeholder="Como executar, postura, dicas…"></textarea>
+              </div>
+              <div class="field span-3">
+                <label for="ex-sets">Séries</label>
+                <input class="input" id="ex-sets" maxlength="20" placeholder="Ex.: 4">
+              </div>
+              <div class="field span-3">
+                <label for="ex-reps">Repetições <span class="req">*</span></label>
+                <input class="input" id="ex-reps" maxlength="30" required placeholder="Ex.: 8-12 ou 30s">
+              </div>
+              <div class="field span-3">
+                <label for="ex-rest">Descanso</label>
+                <input class="input" id="ex-rest" maxlength="20" placeholder="Ex.: 60s">
+              </div>
+              <div class="field span-3">
+                <label for="ex-difficulty">Dificuldade</label>
+                <select class="select" id="ex-difficulty">
+                  <option value="">—</option>
+                  <option value="iniciante">Iniciante</option>
+                  <option value="intermediario">Intermediário</option>
+                  <option value="avancado">Avançado</option>
+                </select>
+              </div>
+              <div class="field span-6">
+                <label for="ex-image">Imagem ou GIF</label>
+                <input class="input" id="ex-image" placeholder="https://… (link da imagem)">
+                <span class="hint">Cole um link <strong>ou</strong> envie um arquivo (até 5 MB):</span>
+                <input id="ex-image-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp">
+                <img class="img-preview hidden" id="ex-image-preview" alt="Pré-visualização">
+              </div>
+              <div class="field span-6">
+                <label for="ex-video">Link de vídeo</label>
+                <input class="input" id="ex-video" placeholder="https://youtube.com/watch?v=…">
+                <span class="hint">Links do YouTube abrem dentro do site.</span>
+              </div>
+              <div class="form-actions" style="grid-column: span 12">
+                <button class="btn btn-primary" type="submit" id="exercise-submit">Salvar exercício</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Exercícios cadastrados <span id="exercise-count" class="page-subtitle"></span></h2>
+            </div>
+            <div class="toolbar">
+              <label class="search">
+                <span class="visually-hidden">Buscar</span>
+                <input class="input" id="list-search" type="search" placeholder="Buscar…">
+              </label>
+              <label>
+                <span class="visually-hidden">Filtrar por grupo</span>
+                <select class="select" id="list-group"></select>
+              </label>
+            </div>
+            <ul class="admin-list" id="exercise-list"></ul>
+          </section>
+        </div>
+
+        <!-- Grupos -->
+        <div data-tab-panel="groups" class="hidden">
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="group-form-title">Novo grupo</h2>
+              <button class="btn btn-sm hidden" type="button" id="group-cancel">Cancelar edição</button>
+            </div>
+            <form id="group-form" class="form-grid" novalidate>
+              <div class="field span-6">
+                <label for="gr-name">Nome <span class="req">*</span></label>
+                <input class="input" id="gr-name" maxlength="40" required placeholder="Ex.: Trapézio">
+              </div>
+              <div class="field span-3">
+                <label for="gr-icon">Ícone (emoji)</label>
+                <input class="input" id="gr-icon" maxlength="8" placeholder="💪">
+              </div>
+              <div class="field span-3">
+                <label for="gr-color">Cor</label>
+                <input class="input" id="gr-color" type="color" value="#ff5a1f" style="padding:4px">
+              </div>
+              <div class="form-actions" style="grid-column: span 12">
+                <button class="btn btn-primary" type="submit">Salvar grupo</button>
+              </div>
+            </form>
+          </section>
+          <section class="panel">
+            <h2>Grupos cadastrados</h2>
+            <ul class="admin-list" id="group-list"></ul>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
