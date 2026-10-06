@@ -11,6 +11,7 @@
     history: "meggym.history",
     session: "meggym.session.", // + id do usuário
     seed: "meggym.workoutsSeed",
+    notes: "meggym.notes.", // + id do usuário → { [workoutId]: texto }
   };
 
   function read(key, fallback) {
@@ -152,9 +153,12 @@
     if (!seed || !Array.isArray(seed.workouts)) return false;
     if (read(KEY.seed, 0) >= seed.version) return false;
     const now = new Date().toISOString();
-    const fresh = seed.workouts.map((w) => ({ ...w, createdBy: w.createdBy || "MegGym", createdAt: now }));
-    const kept = seed.replaceExisting ? [] : workouts().filter((w) => !fresh.some((f) => f.id === w.id));
-    write(KEY.workouts, [...fresh, ...kept]);
+    const current = workouts();
+    // Sem replaceExisting: só adiciona os treinos que ainda não existem (não mexe nos já salvos/editados).
+    const fresh = seed.workouts
+      .filter((w) => seed.replaceExisting || !current.some((c) => c.id === w.id))
+      .map((w) => ({ ...w, createdBy: w.createdBy || "MegGym", createdAt: now }));
+    write(KEY.workouts, seed.replaceExisting ? fresh : [...current, ...fresh]);
     if (seed.replaceExisting) {
       // Treino em andamento de um treino apagado não faz mais sentido.
       users().forEach((u) => {
@@ -195,6 +199,20 @@
     write(KEY.session + userId, null);
   }
 
+  /* ---------- Observações pessoais (só do usuário) ---------- */
+
+  function note(userId, workoutId) {
+    return read(KEY.notes + userId, {})[workoutId] || "";
+  }
+
+  function saveNote(userId, workoutId, text) {
+    const all = read(KEY.notes + userId, {});
+    const clean = String(text || "").trim();
+    if (clean) all[workoutId] = clean;
+    else delete all[workoutId];
+    write(KEY.notes + userId, all);
+  }
+
   /* ---------- Histórico ---------- */
 
   function history(userId) {
@@ -220,6 +238,7 @@
       exerciseCount,
       workoutDescription: workout.description || "",
       exercises: snapshot,
+      note: note(user.id, workout.id),
       startedAt: current.startedAt,
       finishedAt: new Date().toISOString(),
     };
@@ -252,6 +271,8 @@
     toggleDone,
     cancelSession,
     history,
+    note,
+    saveNote,
     getHistory,
     finishSession,
   };

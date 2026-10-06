@@ -1,17 +1,122 @@
 {
-  "version": 1,
-  "replaceExisting": true,
+  "version": 2,
+  "replaceExisting": false,
   "workouts": [
     {
       "id": "costas-biceps",
       "name": "Treino — Costas + Bíceps",
       "description": "Costas e bíceps com halteres.",
       "items": [
-        { "exerciseId": "remada-unilateral", "sets": "3", "reps": "8-12", "load": "10 kg" },
-        { "exerciseId": "remada-curvada", "sets": "3", "reps": "8-12", "load": "6 kg por halter" },
-        { "exerciseId": "pullover-halter", "sets": "3", "reps": "12", "load": "" },
-        { "exerciseId": "rosca-concentrada", "sets": "3", "reps": "8-12", "load": "6 kg" },
-        { "exerciseId": "rosca-martelo-unilateral", "sets": "3", "reps": "8-12", "load": "" }
+        {
+          "exerciseId": "remada-unilateral",
+          "sets": "3",
+          "reps": "8-12",
+          "load": "10 kg"
+        },
+        {
+          "exerciseId": "remada-curvada",
+          "sets": "3",
+          "reps": "8-12",
+          "load": "6 kg por halter"
+        },
+        {
+          "exerciseId": "pullover-halter",
+          "sets": "3",
+          "reps": "12",
+          "load": ""
+        },
+        {
+          "exerciseId": "rosca-concentrada",
+          "sets": "3",
+          "reps": "8-12",
+          "load": "6 kg"
+        },
+        {
+          "exerciseId": "rosca-martelo-unilateral",
+          "sets": "3",
+          "reps": "8-12",
+          "load": ""
+        }
+      ]
+    },
+    {
+      "id": "peito-ombros-triceps",
+      "name": "Treino — Peito + Ombros + Tríceps",
+      "description": "Equipamentos: halteres, anilhas, elásticos e roldana. Sem banco.",
+      "notes": "Descanso: exercícios compostos 90–120 segundos; isoladores 60–90 segundos.\nProgressão: ao conseguir o máximo de repetições da faixa em todas as séries com boa técnica e RIR 1–2, aumentar a carga na próxima sessão.",
+      "items": [
+        {
+          "exerciseId": "flexao",
+          "sets": "4",
+          "reps": "8-15",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "supino-chao",
+          "sets": "4",
+          "reps": "8-12",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "crucifixo-chao",
+          "sets": "3",
+          "reps": "10-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "crossover",
+          "sets": "3",
+          "reps": "12-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "arnold-press",
+          "sets": "3",
+          "reps": "8-12",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "elevacao-lateral",
+          "sets": "3",
+          "reps": "12-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "face-pull",
+          "sets": "3",
+          "reps": "12-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "triceps-pushdown",
+          "sets": "3",
+          "reps": "10-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "triceps-frances-unilateral",
+          "sets": "3",
+          "reps": "10-15 por braço",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        }
       ]
     }
   ]

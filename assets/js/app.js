@@ -35,9 +35,13 @@
     return !equipFilter || canDo(ex, user?.equipment);
   }
 
+  // Rótulos do que falta para o usuário fazer o exercício.
   function missingEquipment(ex) {
     const has = new Set(user?.equipment || []);
-    return (ex.equipment || []).filter((id) => !has.has(id));
+    const missing = equipmentLabels((ex.equipment || []).filter((id) => !has.has(id)));
+    const any = ex.equipmentAny || [];
+    if (any.length && !any.some((id) => has.has(id))) missing.push(equipmentLabels(any).join(" ou "));
+    return missing;
   }
 
   // Botão do filtro de equipamentos (usado na lista e ao montar treino).
@@ -104,10 +108,11 @@
       .join("");
   }
 
-  function equipmentChips(list) {
-    return equipmentLabels(list)
-      .map((label) => `<span class="equip-chip">${escapeHtml(label)}</span>`)
-      .join("");
+  function equipmentChips(list, any = []) {
+    const chips = equipmentLabels(list).map((label) => `<span class="equip-chip">${escapeHtml(label)}</span>`);
+    const options = equipmentLabels(any);
+    if (options.length) chips.push(`<span class="equip-chip">${escapeHtml(options.join(" ou "))}</span>`);
+    return chips.join("");
   }
 
   function setsReps(sets, reps) {
@@ -116,7 +121,36 @@
 
   // "3 × 8-12 · 10 kg"
   function prescription(item) {
-    return [setsReps(item.sets, item.reps), item.load].filter(Boolean).join(" · ");
+    return [setsReps(item.sets, item.reps), item.rir ? `RIR ${item.rir}` : "", item.load].filter(Boolean).join(" · ");
+  }
+
+  // Bloco "Minhas observações" (salvo só para o usuário, automaticamente).
+  function personalNoteHtml(workoutId) {
+    return `
+      <section class="subsection my-note">
+        <label class="subsection-title" for="my-note">${icon("edit_note", "mi-inline")} Minhas observações</label>
+        <textarea class="textarea textarea-sm" id="my-note" data-note-workout="${escapeHtml(workoutId)}" maxlength="2000" placeholder="Ex.: aumentar carga da remada, sentir mais o peito no crucifixo…">${escapeHtml(Store.note(user.id, workoutId))}</textarea>
+        <p class="meta" id="my-note-status">Só você vê. Salva automaticamente.</p>
+      </section>`;
+  }
+
+  let noteTimer;
+  function bindPersonalNote() {
+    const area = $("my-note");
+    if (!area) return;
+    const save = () => {
+      Store.saveNote(user.id, area.dataset.noteWorkout, area.value);
+      const status = $("my-note-status");
+      if (status) status.textContent = "Salvo. Só você vê.";
+    };
+    area.addEventListener("input", () => {
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(save, 500);
+    });
+    area.addEventListener("blur", () => {
+      clearTimeout(noteTimer);
+      save();
+    });
   }
 
   function capitalize(text) {
@@ -409,7 +443,7 @@
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
       .join("");
-    const equip = equipmentChips(ex.equipment);
+    const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const hasVideo = Boolean(youtubeId(ex.video) || safeUrl(ex.video));
     return `
       <article class="exercise-card tappable" data-exercise-page="${escapeHtml(ex.id)}" tabindex="0" role="link" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
@@ -423,7 +457,7 @@
           ${equip ? `<div class="equip-chips">${equip}</div>` : ""}
           ${
             missingEquipment(ex).length
-              ? `<p class="missing">Você não marcou: ${escapeHtml(equipmentLabels(missingEquipment(ex)).join(", "))}</p>`
+              ? `<p class="missing">Você não marcou: ${escapeHtml(missingEquipment(ex).join(", "))}</p>`
               : ""
           }
           ${ex.description ? `<p class="exercise-desc clamp-2">${escapeHtml(ex.description)}</p>` : ""}
@@ -695,7 +729,7 @@
         const ex = findExercise(item.exerciseId);
         const g = ex && findGroup(ex.group);
         return `
-          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}"` : ""}>
+          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"` : ""}>
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
@@ -711,11 +745,14 @@
       <div class="group-chips">${groupChips(workoutGroups(w.items))}</div>
       <p class="meta">${w.items.length} exercícios · você fez este treino ${doneCount} ${doneCount === 1 ? "vez" : "vezes"}</p>
       <ol class="item-list">${items || `<li class="state">Nenhum exercício.</li>`}</ol>
+      ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
+      ${personalNoteHtml(w.id)}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
           ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
       </div>`;
+    bindPersonalNote();
     $("start-btn").addEventListener("click", () => {
       const current = Store.session(user.id);
       if (current && current.workoutId !== w.id) {
@@ -740,8 +777,14 @@
     }
     if (!draft || draft.id !== (editing?.id || null)) {
       draft = editing
-        ? { id: editing.id, name: editing.name, description: editing.description || "", items: editing.items.map((i) => ({ load: "", ...i })) }
-        : { id: null, name: "", description: "", items: [] };
+        ? {
+            id: editing.id,
+            name: editing.name,
+            description: editing.description || "",
+            notes: editing.notes || "",
+            items: editing.items.map((i) => ({ load: "", rir: "", rest: "", ...i })),
+          }
+        : { id: null, name: "", description: "", notes: "", items: [] };
     }
     const back = editing ? `#/treinos/${encodeURIComponent(editing.id)}` : "#/treinos";
     setHeader(editing ? "Editar treino" : "Novo treino", { back });
@@ -759,6 +802,10 @@
         <div class="field">
           <label for="w-description">Descrição</label>
           <textarea class="textarea textarea-sm" id="w-description" maxlength="500" placeholder="Objetivo, observações…">${escapeHtml(draft.description)}</textarea>
+        </div>
+        <div class="field">
+          <label for="w-notes">Observações do treino</label>
+          <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas… (todos veem)">${escapeHtml(draft.notes || "")}</textarea>
         </div>
         <div class="field">
           <span class="label">Grupos musculares trabalhados</span>
@@ -795,6 +842,7 @@
 
     $("w-name").addEventListener("input", (e) => (draft.name = e.target.value));
     $("w-description").addEventListener("input", (e) => (draft.description = e.target.value));
+    $("w-notes").addEventListener("input", (e) => (draft.notes = e.target.value));
     $("picker-search").addEventListener("input", renderPicker);
     $("picker-group").addEventListener("change", renderPicker);
 
@@ -820,7 +868,7 @@
       if (!btn) return;
       const ex = findExercise(btn.dataset.add);
       if (!ex) return;
-      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "", load: "" });
+      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "", load: "", rir: "", rest: ex.rest || "" });
       renderDraftItems();
       renderPicker();
       toast(`${ex.name} adicionado`);
@@ -844,11 +892,14 @@
           ...(draft.id ? { id: draft.id } : {}),
           name: draft.name,
           description: draft.description,
-          items: draft.items.map(({ exerciseId, sets, reps, load }) => ({
+          notes: String(draft.notes || "").trim(),
+          items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest }) => ({
             exerciseId,
             sets: String(sets).trim(),
             reps: String(reps).trim(),
             load: String(load || "").trim(),
+            rir: String(rir || "").trim(),
+            rest: String(rest || "").trim(),
           })),
           groups: workoutGroups(draft.items).map((g) => g.id),
         },
@@ -894,7 +945,11 @@
                     <span aria-hidden="true">×</span>
                     <label><span>Repetições</span><input class="input input-sm" data-field="reps" maxlength="20" value="${escapeHtml(item.reps)}"></label>
                   </div>
-                  <label class="load-field"><span>Carga</span><input class="input input-sm" data-field="load" maxlength="30" placeholder="Ex.: 10 kg" value="${escapeHtml(item.load || "")}"></label>
+                  <div class="extra-fields">
+                    <label><span>Carga</span><input class="input input-sm" data-field="load" maxlength="30" placeholder="10 kg" value="${escapeHtml(item.load || "")}"></label>
+                    <label><span>RIR</span><input class="input input-sm" data-field="rir" maxlength="10" placeholder="1-2" value="${escapeHtml(item.rir || "")}"></label>
+                    <label><span>Descanso</span><input class="input input-sm" data-field="rest" maxlength="20" placeholder="60s" value="${escapeHtml(item.rest || "")}"></label>
+                  </div>
                 </div>
                 <div class="item-actions">
                   <button class="icon-btn icon-btn-sm" type="button" data-item-action="up" aria-label="Subir" ${i === 0 ? "disabled" : ""}>${icon("arrow_upward")}</button>
@@ -963,10 +1018,10 @@
             <button class="run-check" type="button" data-toggle="${i}" aria-pressed="${done}" aria-label="${done ? "Desmarcar" : "Concluir"} ${escapeHtml(ex.name)}">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </button>
-            <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}">
+            <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}">
               <div class="item-title">${escapeHtml(ex.name)}</div>
               <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
-              <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${ex.rest ? ` · descanso ${escapeHtml(ex.rest)}` : ""}</div>
+              <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}${item.rest || ex.rest ? ` · descanso ${escapeHtml(item.rest || ex.rest)}` : ""}</div>
               <div class="meta link-text">Ver execução ›</div>
             </div>
           </li>`;
@@ -983,11 +1038,14 @@
         <div class="progress"><div class="progress-bar" id="run-bar"></div></div>
       </div>
       <ol class="run-list">${items}</ol>
+      ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
+      ${personalNoteHtml(w.id)}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="finish-btn"></button>
         <button class="btn btn-ghost btn-block" type="button" id="cancel-run">Cancelar treino</button>
       </div>`;
 
+    bindPersonalNote();
     const valid = w.items.map((item, i) => (findExercise(item.exerciseId) ? i : null)).filter((i) => i !== null);
 
     function updateProgress() {
@@ -1018,8 +1076,10 @@
       const snapshot = valid.map((i) => {
         const item = w.items[i];
         const ex = findExercise(item.exerciseId);
-        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "" };
+        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "" };
       });
+      const area = $("my-note");
+      if (area) Store.saveNote(user.id, w.id, area.value);
       const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
       toast("Treino concluído!", "success");
@@ -1138,7 +1198,7 @@
       ? h.exercises
       : (workout?.items || []).map((item) => {
           const ex = findExercise(item.exerciseId);
-          return ex ? { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "" } : null;
+          return ex ? { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "" } : null;
         }).filter(Boolean);
     const groupsDone = [...new Set(list.map((e) => e.group))].map(findGroup).filter(Boolean);
     const totalSets = list.reduce((sum, e) => sum + (parseInt(e.sets, 10) || 0), 0);
@@ -1186,6 +1246,8 @@
             : `<p class="meta">A lista de exercícios deste registro não está disponível.</p>`
         }
       </section>
+
+      ${h.note ? `<section class="subsection"><h2 class="subsection-title">${icon("edit_note", "mi-inline")} Minhas observações</h2><p class="note-box">${escapeHtml(h.note)}</p></section>` : ""}
 
       <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
       ${
@@ -1584,13 +1646,14 @@
     const stats = [
       ["Séries", sets],
       ["Repetições", reps],
-      ["Descanso", ex.rest],
+      ["Descanso", prescription.rest || ex.rest],
+      ["RIR", prescription.rir],
       ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
       .join("");
-    const equip = equipmentChips(ex.equipment);
+    const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
     return `
@@ -1680,7 +1743,14 @@
       return;
     }
     const target = e.target.closest("[data-exercise]");
-    if (target) openSheet(target.dataset.exercise, { sets: target.dataset.sets, reps: target.dataset.reps, load: target.dataset.load });
+    if (target)
+      openSheet(target.dataset.exercise, {
+        sets: target.dataset.sets,
+        reps: target.dataset.reps,
+        load: target.dataset.load,
+        rir: target.dataset.rir,
+        rest: target.dataset.rest,
+      });
   });
   app.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;

@@ -69,6 +69,22 @@
   ],
   "exercises": [
     {
+      "id": "flexao",
+      "group": "peito",
+      "name": "Flexão de braço",
+      "description": "Flexão tradicional no chão, mantendo corpo alinhado. Descer controladamente e empurrar até quase estender completamente os cotovelos. Pode utilizar elástico nas costas para aumentar a resistência.",
+      "sets": "4",
+      "reps": "8-15",
+      "rest": "90-120s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "triceps"
+      ]
+    },
+    {
       "id": "supino-halteres",
       "group": "peito",
       "name": "Supino reto com halteres",
@@ -87,8 +103,8 @@
     {
       "id": "supino-chao",
       "group": "peito",
-      "name": "Supino no chão",
-      "description": "Deitado no chão com os joelhos dobrados. Desça os halteres até os cotovelos encostarem levemente no chão e empurre para cima contraindo o peito.",
+      "name": "Supino no chão (floor press)",
+      "description": "Deitado no chão, joelhos flexionados e halteres na altura do peito. Empurrar os halteres para cima e descer controladamente até os braços/cotovelos tocarem suavemente o chão.",
       "sets": "4",
       "reps": "10-12",
       "rest": "60s",
@@ -119,7 +135,7 @@
       "id": "crucifixo-chao",
       "group": "peito",
       "name": "Crucifixo no chão",
-      "description": "Deitado no chão, braços acima do peito com cotovelos levemente dobrados. Abra os braços até os cotovelos tocarem o chão e volte contraindo o peito.",
+      "description": "Deitado no chão, braços abertos com leve flexão dos cotovelos. Aproximar os halteres acima do peito em movimento de arco e retornar lentamente.",
       "sets": "3",
       "reps": "12-15",
       "rest": "60s",
@@ -128,6 +144,23 @@
       "video": "",
       "equipment": [
         "halter"
+      ]
+    },
+    {
+      "id": "crossover",
+      "group": "peito",
+      "name": "Crossover na roldana/elástico",
+      "description": "Em pé, puxar as mãos de fora para dentro e cruzá-las levemente à frente do corpo, contraindo o peitoral. Retornar de forma controlada.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "equipmentAny": [
+        "roldana",
+        "elastico"
       ]
     },
     {
@@ -210,8 +243,8 @@
     {
       "id": "arnold-press",
       "group": "ombros",
-      "name": "Arnold press",
-      "description": "Comece com os halteres na frente do rosto, palmas viradas para você. Ao empurrar para cima, gire as palmas para frente. Desça fazendo o caminho inverso.",
+      "name": "Desenvolvimento Arnold",
+      "description": "Segurar os halteres à frente dos ombros, com as palmas voltadas para o corpo. Girar as mãos enquanto empurra os halteres acima da cabeça. Retornar controladamente.",
       "sets": "3",
       "reps": "8-12",
       "rest": "60-90s",
@@ -241,7 +274,7 @@
       "id": "elevacao-lateral",
       "group": "ombros",
       "name": "Elevação lateral",
-      "description": "Braços ao lado do corpo, cotovelos levemente dobrados. Eleve os halteres lateralmente até a altura dos ombros e desça devagar.",
+      "description": "Em pé, elevar os halteres lateralmente até aproximadamente a altura dos ombros, mantendo os cotovelos levemente flexionados. Evitar impulso do tronco.",
       "sets": "3",
       "reps": "12-15",
       "rest": "45-60s",
@@ -296,6 +329,26 @@
       "equipment": [
         "halter",
         "banco"
+      ]
+    },
+    {
+      "id": "face-pull",
+      "group": "ombros",
+      "name": "Face pull na roldana/elástico",
+      "description": "Puxar a corda/elástico em direção ao rosto, levando os cotovelos para trás e abrindo os braços. Controlar o retorno.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "equipmentAny": [
+        "roldana",
+        "elastico"
+      ],
+      "groups": [
+        "costas"
       ]
     },
     {
@@ -378,7 +431,7 @@
       "id": "triceps-frances-unilateral",
       "group": "triceps",
       "name": "Tríceps francês unilateral",
-      "description": "Halter em uma mão acima da cabeça. Desça atrás da cabeça dobrando só o cotovelo e estenda de volta, mantendo o braço parado.",
+      "description": "Segurar um halter acima da cabeça, flexionar o cotovelo levando o peso atrás da cabeça e depois estender o braço. Manter o cotovelo apontado para cima.",
       "sets": "3",
       "reps": "10-12 cada braço",
       "rest": "45-60s",
@@ -438,8 +491,8 @@
     {
       "id": "triceps-pushdown",
       "group": "triceps",
-      "name": "Tríceps na roldana (pushdown)",
-      "description": "Com a roldana presa no alto da porta, cotovelos colados ao corpo. Empurre a alça para baixo até estender os braços e volte devagar.",
+      "name": "Tríceps na roldana (extensão para baixo)",
+      "description": "Manter os cotovelos próximos ao corpo e estender os braços para baixo, contraindo o tríceps. Retornar lentamente sem deixar os cotovelos avançarem.",
       "sets": "3",
       "reps": "12-15",
       "rest": "45-60s",

@@ -1198,3 +1198,24 @@ body.sheet-open { overflow: hidden; }
 .load-field { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font-size: .72rem; color: var(--text-muted); font-weight: 600; }
 .load-field .input-sm { width: 100%; max-width: 200px; }
 .run-load { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-size: .85rem; vertical-align: middle; }
+
+/* ---------- RIR / descanso / observações ---------- */
+.extra-fields { display: grid; grid-template-columns: 1.4fr 1fr 1.2fr; gap: 8px; margin-top: 8px; }
+.extra-fields label { display: flex; flex-direction: column; gap: 2px; font-size: .72rem; color: var(--text-muted); font-weight: 600; min-width: 0; }
+.extra-fields .input-sm { width: 100%; }
+.workout-notes {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  font-size: .9rem;
+}
+.workout-notes p { margin: 0; white-space: pre-line; }
+.workout-notes .mi { color: var(--accent); }
+.my-note .subsection-title { display: block; margin-bottom: 8px; }
+.my-note .meta { margin-top: 4px; }
+.note-box { margin: 8px 0 0; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); white-space: pre-line; }

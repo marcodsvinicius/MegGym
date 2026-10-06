@@ -57,10 +57,12 @@
 
   // O usuário consegue fazer o exercício se tiver todos os equipamentos dele
   // (exercícios sem equipamento = peso do corpo, sempre disponíveis).
+  // equipmentAny: basta ter um deles (ex.: roldana OU elástico).
   function canDo(exercise, userEquipment) {
     const needed = Array.isArray(exercise.equipment) ? exercise.equipment : [];
+    const any = Array.isArray(exercise.equipmentAny) ? exercise.equipmentAny : [];
     const has = new Set(userEquipment || []);
-    return needed.every((id) => has.has(id));
+    return needed.every((id) => has.has(id)) && (!any.length || any.some((id) => has.has(id)));
   }
 
   function equipmentLabels(list) {
