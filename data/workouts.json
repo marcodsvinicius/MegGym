@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "replaceExisting": false,
   "workouts": [
     {
@@ -118,18 +118,100 @@
           "load": ""
         }
       ]
+    },
+    {
+      "id": "legs",
+      "name": "Treino — Legs (pernas em casa)",
+      "description": "Quadríceps, glúteos, posteriores e panturrilhas. Equipamentos: halteres, anilhas, kettlebell e elásticos. Sem banco e sem barra.",
+      "notes": "Descanso: exercícios compostos 90–120 segundos; isoladores 60–90 segundos.\nProgressão: ao atingir o máximo de repetições da faixa em todas as séries com boa técnica e RIR 1–2, aumentar a carga na próxima sessão.",
+      "items": [
+        {
+          "exerciseId": "goblet-squat",
+          "sets": "4",
+          "reps": "8-12",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "agachamento-bulgaro",
+          "sets": "3",
+          "reps": "8-12 por perna",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "agachamento-sumo",
+          "sets": "3",
+          "reps": "10-15",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "elevacao-pelvica-chao",
+          "sets": "4",
+          "reps": "10-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "flexao-joelho-elastico",
+          "sets": "4",
+          "reps": "10-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "afundo-reverso",
+          "sets": "3",
+          "reps": "8-12 por perna",
+          "rir": "1-2",
+          "rest": "90-120s",
+          "load": ""
+        },
+        {
+          "exerciseId": "reverse-nordic-curl",
+          "sets": "3",
+          "reps": "8-15",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "panturrilha-em-pe",
+          "sets": "4",
+          "reps": "12-20",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        },
+        {
+          "exerciseId": "panturrilha-unilateral",
+          "sets": "3",
+          "reps": "12-20 por perna",
+          "rir": "1-2",
+          "rest": "60-90s",
+          "load": ""
+        }
+      ]
     }
   ],
   "structures": [
     {
       "id": "push-pull-abc",
       "name": "Push/Pull (ABC)",
-      "description": "Divisão empurrar/puxar para treinar em casa: Treino A trabalha peito, ombros e tríceps (empurrar); Treino B trabalha costas e bíceps (puxar). Alterne A e B, respeitando o descanso entre as sessões.",
+      "description": "Divisão para treinar em casa: Treino A — peito, ombros e tríceps (empurrar); Treino B — costas e bíceps (puxar); Treino C — pernas. Siga a sequência A → B → C, respeitando o descanso entre as sessões.",
       "duration": 30,
       "workoutIds": [
         "peito-ombros-triceps",
-        "costas-biceps"
-      ]
+        "costas-biceps",
+        "legs"
+      ],
+      "update": true
     }
   ]
 }

@@ -163,10 +163,17 @@
     write(KEY.workouts, seed.replaceExisting ? fresh : [...current, ...fresh]);
     if (Array.isArray(seed.structures)) {
       const currentStructures = structures();
+      // "update": atualiza a estrutura de fábrica se o usuário ainda não a editou.
+      const updated = currentStructures.map((c) => {
+        const fromSeed = seed.structures.find((st) => st.id === c.id);
+        if (!fromSeed?.update || c.updatedAt) return c;
+        const { update, ...data } = fromSeed;
+        return { ...c, ...data };
+      });
       const newStructures = seed.structures
         .filter((st) => !currentStructures.some((c) => c.id === st.id))
-        .map((st) => ({ ...st, createdBy: st.createdBy || "MegGym", createdAt: now }));
-      write(KEY.structures, [...currentStructures, ...newStructures]);
+        .map(({ update, ...st }) => ({ ...st, createdBy: st.createdBy || "MegGym", createdAt: now }));
+      write(KEY.structures, [...updated, ...newStructures]);
     }
     if (seed.replaceExisting) {
       // Treino em andamento de um treino apagado não faz mais sentido.

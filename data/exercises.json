@@ -521,23 +521,25 @@
     {
       "id": "goblet-squat",
       "group": "quadriceps",
-      "name": "Goblet squat",
-      "description": "Segure um halter na vertical junto ao peito. Agache mantendo o tronco ereto e os cotovelos entre os joelhos, e suba.",
+      "name": "Agachamento goblet",
+      "description": "Segurar o peso junto ao peito. Agachar controladamente, mantendo o tronco firme e os joelhos acompanhando a direção dos pés. Subir empurrando o chão.",
       "sets": "4",
-      "reps": "10-12",
-      "rest": "60-90s",
+      "reps": "8-12",
+      "rest": "90-120s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": [
-        "halter"
+      "equipment": [],
+      "equipmentAny": [
+        "halter",
+        "kettlebell"
       ]
     },
     {
       "id": "agachamento-sumo",
       "group": "quadriceps",
       "name": "Agachamento sumô",
-      "description": "Pés bem afastados e pontas para fora, halter(es) seguros à frente entre as pernas. Agache abrindo os joelhos e suba contraindo glúteos.",
+      "description": "Manter os pés afastados e levemente apontados para fora. Segurar o halter entre as pernas, agachar e retornar controladamente.",
       "sets": "4",
       "reps": "10-12",
       "rest": "60-90s",
@@ -554,17 +556,16 @@
     {
       "id": "agachamento-bulgaro",
       "group": "quadriceps",
-      "name": "Agachamento búlgaro",
-      "description": "Pé de trás apoiado no banco e halteres nas mãos. Desça o joelho de trás em direção ao chão mantendo o tronco firme e suba com a perna da frente.",
+      "name": "Afundo búlgaro com halteres",
+      "description": "Apoiar o pé traseiro em uma superfície firme. Flexionar os joelhos e descer controladamente, mantendo o equilíbrio. Subir pressionando o chão com a perna da frente.",
       "sets": "3",
       "reps": "8-12 cada perna",
-      "rest": "60-90s",
+      "rest": "90-120s",
       "difficulty": "avancado",
       "image": "",
       "video": "",
       "equipment": [
-        "halter",
-        "banco"
+        "halter"
       ],
       "groups": [
         "gluteos"
@@ -607,6 +608,24 @@
       ]
     },
     {
+      "id": "afundo-reverso",
+      "group": "quadriceps",
+      "name": "Afundo reverso com halteres",
+      "description": "Dar um passo para trás, flexionar os joelhos e descer controladamente. Retornar empurrando o chão com a perna da frente.",
+      "sets": "3",
+      "reps": "8-12 por perna",
+      "rest": "90-120s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "gluteos"
+      ]
+    },
+    {
       "id": "step-up",
       "group": "quadriceps",
       "name": "Step-up",
@@ -621,6 +640,19 @@
         "halter",
         "banco"
       ]
+    },
+    {
+      "id": "reverse-nordic-curl",
+      "group": "quadriceps",
+      "name": "Reverse nordic curl",
+      "description": "Ajoelhado, manter o quadril estendido e inclinar o tronco lentamente para trás, controlando o movimento com os quadríceps. Retornar à posição inicial.",
+      "sets": "3",
+      "reps": "8-15",
+      "rest": "60-90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "",
+      "equipment": []
     },
     {
       "id": "leg-press",
@@ -716,6 +748,21 @@
       ]
     },
     {
+      "id": "flexao-joelho-elastico",
+      "group": "posterior",
+      "name": "Flexão de joelho com elástico",
+      "description": "Flexionar o joelho contra a resistência do elástico, aproximando o calcanhar do glúteo. Controlar principalmente a volta.",
+      "sets": "4",
+      "reps": "10-15",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "elastico"
+      ]
+    },
+    {
       "id": "elevacao-pelvica",
       "group": "gluteos",
       "name": "Elevação pélvica",
@@ -729,6 +776,21 @@
       "equipment": [
         "halter",
         "banco"
+      ]
+    },
+    {
+      "id": "elevacao-pelvica-chao",
+      "group": "gluteos",
+      "name": "Elevação pélvica no chão com anilha",
+      "description": "Deitado no chão, colocar a anilha sobre o quadril. Elevar a pelve até contrair completamente os glúteos e retornar lentamente.",
+      "sets": "4",
+      "reps": "10-15",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "anilha"
       ]
     },
     {
@@ -766,7 +828,7 @@
       "id": "panturrilha-em-pe",
       "group": "panturrilha",
       "name": "Elevação de panturrilha em pé",
-      "description": "Pontas dos pés num degrau (pode segurar halteres para aumentar a carga). Suba o máximo possível, segure 1 segundo e desça até alongar.",
+      "description": "Em pé, segurando os halteres (ou só com o peso do corpo), elevar os calcanhares o máximo possível. Fazer uma pausa na contração e descer controladamente.",
       "sets": "4",
       "reps": "15-20",
       "rest": "45s",
@@ -779,7 +841,7 @@
       "id": "panturrilha-unilateral",
       "group": "panturrilha",
       "name": "Elevação de panturrilha unilateral",
-      "description": "Em uma perna só num degrau, com ou sem halter. Suba na ponta do pé, segure e desça devagar.",
+      "description": "Realizar a elevação da panturrilha com uma perna por vez, buscando máxima amplitude e controlando a descida.",
       "sets": "3",
       "reps": "12-15 cada perna",
       "rest": "45s",
