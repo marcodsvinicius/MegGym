@@ -427,6 +427,8 @@
   $("login-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     if (state.busy) return;
+    const button = $("login-form").querySelector("button[type=submit]");
+    button.textContent = "Entrando…";
     setBusy(true);
     try {
       await signIn($("login-email").value.trim(), $("login-password").value);
@@ -436,6 +438,7 @@
       return;
     } finally {
       setBusy(false);
+      button.textContent = "Entrar";
     }
     await enter();
   });
