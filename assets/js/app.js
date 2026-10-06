@@ -306,7 +306,11 @@
     if (weekCount === 0) return { emoji: "alarm", title: "Bora começar a semana?", text: "Ainda dá tempo! Um treino hoje já faz diferença." };
     if (streakDays >= 2) return { emoji: "local_fire_department", title: `${streakDays} dias seguidos`, text: "Não deixe a sequência parar. Treine hoje!" };
     if (weekCount >= 4) return { emoji: "emoji_events", title: "Semana de campeão!", text: `Você já treinou ${weekCount} vezes nesta semana. Incrível!` };
-    return { emoji: "bolt", title: `Já são ${weekCount} ${weekCount === 1 ? "treino" : "treinos"} na semana`, text: "Bom ritmo! Que tal mais um hoje?" };
+    return {
+      emoji: "bolt",
+      title: weekCount === 1 ? "Primeiro treino da semana feito" : `Já são ${weekCount} treinos na semana`,
+      text: "Bom ritmo! Que tal mais um hoje?",
+    };
   }
 
   function homeStructureCard() {
@@ -1599,19 +1603,11 @@
     const theme = window.MegTheme ? window.MegTheme.get() : "auto";
     app.innerHTML = `
       <section class="settings-group">
-        <h2 class="settings-title">Aparência</h2>
-        <div class="segmented" role="radiogroup" aria-label="Tema" id="theme-picker">
-          ${[
-            ["auto", "brightness_auto", "Automático"],
-            ["light", "light_mode", "Claro"],
-            ["dark", "dark_mode", "Escuro"],
-          ]
-            .map(
-              ([value, iconName, label]) =>
-                `<button type="button" role="radio" data-theme-choice="${value}" aria-checked="${theme === value}">${icon(iconName)}${label}</button>`
-            )
-            .join("")}
-        </div>
+        <h2 class="settings-title">Personalização</h2>
+        <p class="meta" style="margin:0 0 10px">Estilo do app</p>
+        <form id="style-form">${stylePickerHtml(user.style || "suave", "set")}</form>
+        <p class="meta" style="margin:16px 0 10px">Modo</p>
+        ${modePickerHtml(theme, "theme-picker")}
         <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
       </section>
 
@@ -1640,6 +1636,12 @@
       if (!btn || !window.MegTheme) return;
       window.MegTheme.set(btn.dataset.themeChoice);
       renderSettings();
+    });
+    $("style-form").addEventListener("change", (e) => {
+      if (e.target.name !== "set-style-choice") return;
+      user = Store.updateUser(user.id, { style: e.target.value });
+      window.MegTheme?.setStyle(e.target.value);
+      toast(`Estilo ${STYLE_INFO.find(([id]) => id === e.target.value)[1]} aplicado.`, "success");
     });
     $("logout-btn").addEventListener("click", () => {
       if (!confirm("Sair deste perfil?")) return;
@@ -1845,7 +1847,7 @@
   }
 
   function stepDots(step) {
-    return `<div class="steps" aria-label="Passo ${step} de 3">${[1, 2, 3]
+    return `<div class="steps" aria-label="Passo ${step} de 4">${[1, 2, 3, 4]
       .map((n) => `<span class="step-dot ${n === step ? "active" : n < step ? "done" : ""}"></span>`)
       .join("")}</div>`;
   }
@@ -1907,34 +1909,113 @@
       return;
     }
 
-    // step 3
+    if (step === 3) {
+      box.innerHTML = `
+        <form class="onboarding-step form-stack" id="ob-equipment" novalidate>
+          ${stepDots(3)}
+          <div>
+            <h1>Quais equipamentos você tem em casa?</h1>
+            <p class="page-subtitle">Marque todos que tiver. Vamos mostrar os exercícios que você consegue fazer.</p>
+          </div>
+          ${equipmentPickerHtml(values.equipment)}
+          <p class="meta">Não tem nenhum? Sem problema: exercícios com o peso do corpo sempre aparecem.</p>
+          <div class="onboarding-actions">
+            <button class="btn btn-ghost" type="button" data-ob="back">Voltar</button>
+            <button class="btn btn-primary btn-lg" type="submit">Continuar</button>
+          </div>
+        </form>`;
+      $("ob-equipment").addEventListener("submit", (e) => {
+        e.preventDefault();
+        values.equipment = readEquipment(e.target);
+        onboarding.step = 4;
+        renderOnboarding();
+      });
+      return;
+    }
+
+    // step 4: personalização
+    if (!values.style) values.style = window.MegTheme ? window.MegTheme.getStyle() : "suave";
+    if (!values.mode) values.mode = window.MegTheme ? window.MegTheme.get() : "auto";
     box.innerHTML = `
-      <form class="onboarding-step form-stack" id="ob-equipment" novalidate>
-        ${stepDots(3)}
+      <form class="onboarding-step form-stack" id="ob-style" novalidate>
+        ${stepDots(4)}
         <div>
-          <h1>Quais equipamentos você tem em casa?</h1>
-          <p class="page-subtitle">Marque todos que tiver. Vamos mostrar os exercícios que você consegue fazer.</p>
+          <p class="eyebrow-text">Personalização</p>
+          <h1>Deixe a sua cara</h1>
+          <p class="page-subtitle">Escolha o estilo do app. Dá para trocar depois em Configurações.</p>
         </div>
-        ${equipmentPickerHtml(values.equipment)}
-        <p class="meta">Não tem nenhum? Sem problema: exercícios com o peso do corpo sempre aparecem.</p>
+        ${stylePickerHtml(values.style, "ob")}
+        <div class="field">
+          <span class="label">Modo</span>
+          ${modePickerHtml(values.mode, "ob-mode")}
+        </div>
         <div class="onboarding-actions">
           <button class="btn btn-ghost" type="button" data-ob="back">Voltar</button>
           <button class="btn btn-primary btn-lg" type="submit">Concluir</button>
         </div>
       </form>`;
-    $("ob-equipment").addEventListener("submit", (e) => {
-      e.preventDefault();
-      values.equipment = readEquipment(e.target);
-      if (existing) {
-        user = Store.updateUser(existing.id, { name: values.name, age: values.age, sex: values.sex, equipment: values.equipment, onboarded: true });
-      } else {
-        user = Store.createUser(values);
+    const form = $("ob-style");
+    form.addEventListener("change", (e) => {
+      if (e.target.name === "ob-style-choice") {
+        values.style = e.target.value;
+        window.MegTheme?.setStyle(values.style); // prévia ao vivo
       }
+    });
+    $("ob-mode").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-theme-choice]");
+      if (!btn) return;
+      values.mode = btn.dataset.themeChoice;
+      window.MegTheme?.set(values.mode);
+      $("ob-mode").querySelectorAll("[data-theme-choice]").forEach((b) => b.setAttribute("aria-checked", String(b === btn)));
+    });
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const profile = { name: values.name, age: values.age, sex: values.sex, equipment: values.equipment, style: values.style, onboarded: true };
+      user = existing ? Store.updateUser(existing.id, profile) : Store.createUser(profile);
       onboarding = null;
       toast(`Tudo pronto, ${user.name.split(" ")[0]}!`, "success");
       if (!location.hash || location.hash === "#/") location.replace("#/inicio");
       enterApp();
     });
+  }
+
+  const STYLE_INFO = [
+    ["suave", "Suave", "Claro, tons pastel, formas arredondadas"],
+    ["energia", "Energia", "Escuro, números grandes, foco em performance"],
+    ["esportivo", "Esportivo", "Pôster esportivo, linhas fortes"],
+  ];
+
+  function stylePickerHtml(selected, prefix) {
+    return `
+      <div class="style-options" role="radiogroup" aria-label="Estilo do app">
+        ${STYLE_INFO.map(
+          ([id, name, desc]) => `
+          <label class="style-option">
+            <input type="radio" name="${prefix}-style-choice" value="${id}" ${selected === id ? "checked" : ""}>
+            <span class="style-card">
+              <span class="mini mini-${id}" aria-hidden="true"><i class="t"></i><i class="h"></i><span class="r"><i></i><i></i></span><span class="n"><i></i><i></i><i></i><i></i></span></span>
+              <span class="style-name">${name}${id === "suave" ? " (padrão)" : ""}</span>
+              <span class="style-desc">${desc}</span>
+            </span>
+          </label>`
+        ).join("")}
+      </div>`;
+  }
+
+  function modePickerHtml(selected, id) {
+    return `
+      <div class="segmented" role="radiogroup" aria-label="Modo claro ou escuro" id="${id}">
+        ${[
+          ["auto", "brightness_auto", "Automático"],
+          ["light", "light_mode", "Claro"],
+          ["dark", "dark_mode", "Escuro"],
+        ]
+          .map(
+            ([value, iconName, label]) =>
+              `<button type="button" role="radio" data-theme-choice="${value}" aria-checked="${selected === value}">${icon(iconName)}${label}</button>`
+          )
+          .join("")}
+      </div>`;
   }
 
   $("onboarding").addEventListener("click", (e) => {
@@ -1943,9 +2024,13 @@
       if (nav.dataset.ob === "back") {
         const form = $("onboarding").querySelector("form");
         if (onboarding.step === 3 && form) onboarding.values.equipment = readEquipment(form);
+        if (onboarding.step === 4 && form) {
+          const chosen = form.querySelector('input[name="ob-style-choice"]:checked');
+          if (chosen) onboarding.values.style = chosen.value;
+        }
         onboarding.step = Math.max(1, onboarding.step - 1);
       } else {
-        onboarding.step = Math.min(3, onboarding.step + 1);
+        onboarding.step = Math.min(4, onboarding.step + 1);
       }
       renderOnboarding();
       return;
@@ -1962,6 +2047,7 @@
       startProfileCompletion(user);
       return;
     }
+    window.MegTheme?.setStyle(user.style || window.MegTheme.DEFAULT_STYLE);
     $("login-screen").classList.add("hidden");
     $("onboarding").innerHTML = ""; // evita campos com o mesmo id escondidos na página
     $("app-shell").classList.remove("hidden");

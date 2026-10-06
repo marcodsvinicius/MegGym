@@ -10,7 +10,8 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 
 - **Onboarding:** boas-vindas → nome, idade e sexo → equipamentos que tem em casa (perfis ficam no aparelho).
 - **Filtro de equipamentos:** a lista de exercícios e a montagem de treino mostram só o que dá para fazer com os equipamentos do perfil (dá para ver todos).
-- **Configurações** (Atividade → ⚙): tema claro/escuro/automático, editar perfil, equipamentos e sair.
+- **Personalização:** 3 estilos (Suave — padrão, Energia, Esportivo), cada um com modo claro/escuro/automático. Escolhido no onboarding (passo "Deixe a sua cara") e em Configurações; fica salvo no perfil.
+- **Configurações** (Atividade → ⚙): estilo e modo, editar perfil, equipamentos e sair.
 - **Menu inferior:** Início · Treinos · Exercícios · Atividade.
 - **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
 - **Treinos:** nome, descrição e exercícios (com séries × repetições). Os grupos musculares do treino são calculados a partir dos exercícios. Todos os perfis do aparelho veem todos os treinos.
@@ -96,11 +97,11 @@ insert into public.admins (email) values ('email@dela.com');
 index.html            app (login, treinos, exercícios, atividade)
 assets/js/store.js    dados salvos no aparelho (perfis, treinos, histórico)
 assets/js/pwa.js      instalação do app e registro do service worker
-assets/js/theme.js    tema claro/escuro (automático ou escolhido em Atividade)
+assets/js/theme.js    estilo (suave/energia/esportivo) e modo claro/escuro, aplicados antes de desenhar
 sw.js                 service worker (cache/offline)
 manifest.webmanifest  nome, ícones e cores do app instalado
 assets/icons/         ícones do app (instalação)
-assets/fonts/         fonte de ícones Material Symbols (só os usados)
+assets/fonts/         ícones Material Symbols + fontes de cada estilo (só baixa a do estilo em uso)
 data/workouts.json    treinos que vêm com o app
 tools/update-icons.py gera a fonte de ícones
 admin.html            área de cadastro

@@ -66,6 +66,7 @@
       age: profile.age ?? null,
       sex: profile.sex || "",
       equipment: profile.equipment || [],
+      style: profile.style || "suave",
       onboarded: true,
       createdAt: new Date().toISOString(),
     };

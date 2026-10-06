@@ -12,6 +12,16 @@
   --success: #1f9d55;
   --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 12px rgba(16, 24, 40, .06);
   --shadow-hover: 0 6px 24px rgba(16, 24, 40, .12);
+  --done: #1f9d55;
+  --on-done: #ffffff;
+  --accent-container: #ffe7dd;
+  --on-accent-container: #5a1a03;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-body);
+  --display-transform: none;
+  --display-tracking: -.01em;
+  --display-weight: 800;
+  --btn-radius: var(--radius-sm);
   --c-iniciante: #1f9d55;
   --c-intermediario: #b87700;
   --c-avancado: #d7263d;
@@ -65,7 +75,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
   min-height: 100vh;
   display: flex;
@@ -765,7 +775,7 @@ body.backend-supabase .github-only { display: none !important; }
 }
 .run-progress-text { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; }
 .progress { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
-.progress-bar { height: 100%; width: 0; background: var(--success); border-radius: inherit; transition: width .25s; }
+.progress-bar { height: 100%; width: 0; background: var(--done); border-radius: inherit; transition: width .25s; }
 
 .run-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .run-item {
@@ -777,7 +787,7 @@ body.backend-supabase .github-only { display: none !important; }
   border: 1px solid var(--border);
   transition: background .2s, border-color .2s;
 }
-.run-item.done { background: color-mix(in srgb, var(--success) 8%, var(--surface)); border-color: color-mix(in srgb, var(--success) 45%, var(--border)); }
+.run-item.done { background: color-mix(in srgb, var(--done) 10%, var(--surface)); border-color: color-mix(in srgb, var(--done) 50%, var(--border)); }
 .run-item.done .item-title { text-decoration: line-through; color: var(--text-muted); }
 .run-check {
   flex: none;
@@ -792,7 +802,7 @@ body.backend-supabase .github-only { display: none !important; }
   cursor: pointer;
   transition: all .15s;
 }
-.run-check[aria-pressed="true"] { background: var(--success); border-color: var(--success); color: #fff; }
+.run-check[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--on-done); }
 .run-sets { font-size: 1.25rem; font-weight: 800; margin-top: 2px; }
 .run-details { margin-top: 8px; }
 .run-details summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
@@ -1030,12 +1040,12 @@ body.sheet-open { overflow: hidden; }
   border: 2px solid var(--border);
   color: var(--text-muted);
 }
-.week-day.done .week-day-dot { background: var(--success); border-color: var(--success); color: #fff; font-size: 1rem; }
+.week-day.done .week-day-dot { background: var(--done); border-color: var(--done); color: var(--on-done); font-size: 1rem; }
 .week-day.missed .week-day-dot { border-style: dashed; opacity: .7; }
 .week-day.future .week-day-dot { opacity: .45; }
 .week-day.is-today .week-day-label { color: var(--accent); }
 .week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent); }
-.week-day.is-today.done .week-day-dot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 30%, transparent); }
+.week-day.is-today.done .week-day-dot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--done) 35%, transparent); }
 
 .last-workout {
   display: flex;
@@ -1123,7 +1133,7 @@ body.sheet-open { overflow: hidden; }
 .history-hero .meta { margin: 2px 0 0; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .detail-grid .stat-tile-value { font-size: 1.35rem; }
-.done-index { background: var(--success); color: #fff; }
+.done-index { background: var(--done); color: var(--on-done); }
 
 /* ---------- Ícones Material Symbols ----------
    Fonte guardada no repositório só com os ícones usados (assets/fonts).
@@ -1282,3 +1292,424 @@ body.sheet-open { overflow: hidden; }
 .confirm-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .btn-danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
 .btn-danger-solid:hover { background: var(--danger); filter: brightness(1.08); }
+
+/* =====================================================================
+   Estilos do app (Configurações → Aparência): suave (padrão), energia, esportivo.
+   Cada estilo define as variáveis nos modos claro e escuro; os componentes usam só variáveis.
+   ===================================================================== */
+@font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("../fonts/plus-jakarta-sans.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("../fonts/manrope.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/barlow-condensed-700.woff2") format("woff2"); }
+@font-face { font-family: "Anton"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/anton.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 400 800; font-display: swap; src: url("../fonts/archivo.woff2") format("woff2"); }
+
+:root[data-style="suave"] {
+  --radius: 22px;
+  --radius-sm: 14px;
+  --btn-radius: 999px;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --display-transform: none;
+  --display-tracking: -.02em;
+  --display-weight: 800;
+  --bg: #fbf6f3;
+  --surface: #ffffff;
+  --surface-2: #f4ebe6;
+  --text: #221a16;
+  --text-muted: #76665e;
+  --border: #eadcd5;
+  --accent: #a8361a;
+  --accent-contrast: #ffffff;
+  --accent-container: #ffdccc;
+  --on-accent-container: #3b0f02;
+  --success: #2e7d4f;
+  --done: #a8361a;
+  --on-done: #ffffff;
+  --shadow: 0 1px 2px rgba(60,30,20,.05), 0 6px 18px rgba(60,30,20,.06);
+  --shadow-hover: 0 10px 28px rgba(60,30,20,.12);
+  --c-iniciante: #2e7d4f;
+  --c-intermediario: #9a6200;
+  --c-avancado: #b3261e;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+:root[data-style="suave"]:not([data-theme="light"]) {
+    --bg: #1a1411;
+    --surface: #251e1a;
+    --surface-2: #302722;
+    --text: #f3e9e4;
+    --text-muted: #b6a69e;
+    --border: #3d322c;
+    --accent: #ffb59a;
+    --accent-contrast: #5c1a04;
+    --accent-container: #73290f;
+    --on-accent-container: #ffdbcd;
+    --success: #7fd8a4;
+    --done: #ffb59a;
+    --on-done: #5c1a04;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-hover: 0 10px 28px rgba(0,0,0,.5);
+    --c-iniciante: #7fd8a4;
+    --c-intermediario: #ffcf70;
+    --c-avancado: #ffb4ab;
+    color-scheme: dark;
+  }
+}
+
+:root[data-style="suave"][data-theme="dark"] {
+  --bg: #1a1411;
+  --surface: #251e1a;
+  --surface-2: #302722;
+  --text: #f3e9e4;
+  --text-muted: #b6a69e;
+  --border: #3d322c;
+  --accent: #ffb59a;
+  --accent-contrast: #5c1a04;
+  --accent-container: #73290f;
+  --on-accent-container: #ffdbcd;
+  --success: #7fd8a4;
+  --done: #ffb59a;
+  --on-done: #5c1a04;
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-hover: 0 10px 28px rgba(0,0,0,.5);
+  --c-iniciante: #7fd8a4;
+  --c-intermediario: #ffcf70;
+  --c-avancado: #ffb4ab;
+  color-scheme: dark;
+}
+
+:root[data-style="suave"][data-theme="light"] {
+  --bg: #fbf6f3;
+  --surface: #ffffff;
+  --surface-2: #f4ebe6;
+  --text: #221a16;
+  --text-muted: #76665e;
+  --border: #eadcd5;
+  --accent: #a8361a;
+  --accent-contrast: #ffffff;
+  --accent-container: #ffdccc;
+  --on-accent-container: #3b0f02;
+  --success: #2e7d4f;
+  --done: #a8361a;
+  --on-done: #ffffff;
+  --shadow: 0 1px 2px rgba(60,30,20,.05), 0 6px 18px rgba(60,30,20,.06);
+  --shadow-hover: 0 10px 28px rgba(60,30,20,.12);
+  --c-iniciante: #2e7d4f;
+  --c-intermediario: #9a6200;
+  --c-avancado: #b3261e;
+  color-scheme: light;
+}
+
+:root[data-style="energia"] {
+  --radius: 18px;
+  --radius-sm: 12px;
+  --btn-radius: 999px;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --display-transform: uppercase;
+  --display-tracking: .01em;
+  --display-weight: 700;
+  --bg: #f2f3f5;
+  --surface: #ffffff;
+  --surface-2: #e9ebef;
+  --text: #0f1013;
+  --text-muted: #5b616b;
+  --border: #e1e4e8;
+  --accent: #f04e14;
+  --accent-contrast: #ffffff;
+  --accent-container: #ffe4d8;
+  --on-accent-container: #5a1a03;
+  --success: #3f7d00;
+  --done: #b6e62a;
+  --on-done: #0d0e10;
+  --shadow: 0 1px 2px rgba(15,16,19,.05);
+  --shadow-hover: 0 8px 24px rgba(15,16,19,.10);
+  --c-iniciante: #3f7d00;
+  --c-intermediario: #a85d00;
+  --c-avancado: #d0302a;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+:root[data-style="energia"]:not([data-theme="light"]) {
+    --bg: #0d0e10;
+    --surface: #17191d;
+    --surface-2: #1f2227;
+    --text: #f3f4f6;
+    --text-muted: #9aa0a9;
+    --border: #23262b;
+    --accent: #ff5a1f;
+    --accent-contrast: #ffffff;
+    --accent-container: #3a1a0d;
+    --on-accent-container: #ffd9c9;
+    --success: #c6f432;
+    --done: #c6f432;
+    --on-done: #0d0e10;
+    --shadow: none;
+    --shadow-hover: 0 8px 24px rgba(0,0,0,.6);
+    --c-iniciante: #c6f432;
+    --c-intermediario: #ffb84d;
+    --c-avancado: #ff6b7d;
+    color-scheme: dark;
+  }
+}
+
+:root[data-style="energia"][data-theme="dark"] {
+  --bg: #0d0e10;
+  --surface: #17191d;
+  --surface-2: #1f2227;
+  --text: #f3f4f6;
+  --text-muted: #9aa0a9;
+  --border: #23262b;
+  --accent: #ff5a1f;
+  --accent-contrast: #ffffff;
+  --accent-container: #3a1a0d;
+  --on-accent-container: #ffd9c9;
+  --success: #c6f432;
+  --done: #c6f432;
+  --on-done: #0d0e10;
+  --shadow: none;
+  --shadow-hover: 0 8px 24px rgba(0,0,0,.6);
+  --c-iniciante: #c6f432;
+  --c-intermediario: #ffb84d;
+  --c-avancado: #ff6b7d;
+  color-scheme: dark;
+}
+
+:root[data-style="energia"][data-theme="light"] {
+  --bg: #f2f3f5;
+  --surface: #ffffff;
+  --surface-2: #e9ebef;
+  --text: #0f1013;
+  --text-muted: #5b616b;
+  --border: #e1e4e8;
+  --accent: #f04e14;
+  --accent-contrast: #ffffff;
+  --accent-container: #ffe4d8;
+  --on-accent-container: #5a1a03;
+  --success: #3f7d00;
+  --done: #b6e62a;
+  --on-done: #0d0e10;
+  --shadow: 0 1px 2px rgba(15,16,19,.05);
+  --shadow-hover: 0 8px 24px rgba(15,16,19,.10);
+  --c-iniciante: #3f7d00;
+  --c-intermediario: #a85d00;
+  --c-avancado: #d0302a;
+  color-scheme: light;
+}
+
+:root[data-style="esportivo"] {
+  --radius: 2px;
+  --radius-sm: 0px;
+  --btn-radius: 0px;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-display: "Anton", Impact, "Arial Narrow", sans-serif;
+  --display-transform: uppercase;
+  --display-tracking: .01em;
+  --display-weight: 400;
+  --bg: #f2f2ee;
+  --surface: #ffffff;
+  --surface-2: #e6e6e0;
+  --text: #111111;
+  --text-muted: #4f4f4f;
+  --border: #111111;
+  --accent: #ff5a1f;
+  --accent-contrast: #111111;
+  --accent-container: #111111;
+  --on-accent-container: #f2f2ee;
+  --success: #1f7a3d;
+  --done: #ff5a1f;
+  --on-done: #111111;
+  --shadow: none;
+  --shadow-hover: none;
+  --c-iniciante: #1f7a3d;
+  --c-intermediario: #8a5200;
+  --c-avancado: #c0261c;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+:root[data-style="esportivo"]:not([data-theme="light"]) {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #222222;
+    --text: #f2f2ee;
+    --text-muted: #a8a8a2;
+    --border: #f2f2ee;
+    --accent: #ff5a1f;
+    --accent-contrast: #111111;
+    --accent-container: #ff5a1f;
+    --on-accent-container: #111111;
+    --success: #7bd88f;
+    --done: #ff5a1f;
+    --on-done: #111111;
+    --shadow: none;
+    --shadow-hover: none;
+    --c-iniciante: #7bd88f;
+    --c-intermediario: #ffbf5e;
+    --c-avancado: #ff8a80;
+    color-scheme: dark;
+  }
+}
+
+:root[data-style="esportivo"][data-theme="dark"] {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #222222;
+  --text: #f2f2ee;
+  --text-muted: #a8a8a2;
+  --border: #f2f2ee;
+  --accent: #ff5a1f;
+  --accent-contrast: #111111;
+  --accent-container: #ff5a1f;
+  --on-accent-container: #111111;
+  --success: #7bd88f;
+  --done: #ff5a1f;
+  --on-done: #111111;
+  --shadow: none;
+  --shadow-hover: none;
+  --c-iniciante: #7bd88f;
+  --c-intermediario: #ffbf5e;
+  --c-avancado: #ff8a80;
+  color-scheme: dark;
+}
+
+:root[data-style="esportivo"][data-theme="light"] {
+  --bg: #f2f2ee;
+  --surface: #ffffff;
+  --surface-2: #e6e6e0;
+  --text: #111111;
+  --text-muted: #4f4f4f;
+  --border: #111111;
+  --accent: #ff5a1f;
+  --accent-contrast: #111111;
+  --accent-container: #111111;
+  --on-accent-container: #f2f2ee;
+  --success: #1f7a3d;
+  --done: #ff5a1f;
+  --on-done: #111111;
+  --shadow: none;
+  --shadow-hover: none;
+  --c-iniciante: #1f7a3d;
+  --c-intermediario: #8a5200;
+  --c-avancado: #c0261c;
+  color-scheme: light;
+}
+
+
+/* ---------- Tipografia de destaque (números e títulos) ---------- */
+.page-title, .app-title, .onboarding-step h1, .stat-tile-value, .week-stat-value, .run-timer-value,
+.structure-progress-value strong, .home-structure-count strong, .history-hero h2, .sheet-head h2,
+.motivation h2, .subsection-title, .week-head h2, .structure-progress h2, .group-name, .run-sets {
+  font-family: var(--font-display);
+  text-transform: var(--display-transform);
+  letter-spacing: var(--display-tracking);
+  font-weight: var(--display-weight);
+}
+.btn { border-radius: var(--btn-radius); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+.motivation { background: var(--accent-container); color: var(--on-accent-container); }
+.motivation .mi { color: var(--accent); }
+.badge-live { background: var(--accent-container); color: var(--on-accent-container); }
+.resume-banner { background: var(--accent-container); color: var(--on-accent-container); }
+
+/* ---------- Suave: superfícies tingidas, formas grandes, pílula no menu ---------- */
+:root[data-style="suave"] .app-header { background: var(--bg); border-bottom-color: transparent; }
+:root[data-style="suave"] .bottom-nav { background: var(--surface-2); border-top-color: transparent; }
+:root[data-style="suave"] .bottom-nav a.active { color: var(--text); }
+:root[data-style="suave"] .bottom-nav a svg { box-sizing: content-box; padding: 4px 18px; border-radius: 999px; transition: background .2s; }
+:root[data-style="suave"] .bottom-nav a.active svg { background: var(--accent-container); color: var(--on-accent-container); }
+:root[data-style="suave"] .exercise-card, :root[data-style="suave"] .workout-card, :root[data-style="suave"] .week-card,
+:root[data-style="suave"] .stat-tile, :root[data-style="suave"] .group-card, :root[data-style="suave"] .item-row,
+:root[data-style="suave"] .run-item, :root[data-style="suave"] .last-workout, :root[data-style="suave"] .home-structure,
+:root[data-style="suave"] .structure-progress, :root[data-style="suave"] .settings-list { border-color: transparent; }
+:root[data-style="suave"] .structure-card { background: var(--accent-container); color: var(--on-accent-container); border-color: transparent; border-radius: var(--radius) var(--radius) var(--radius) 8px; }
+:root[data-style="suave"] .structure-card .meta, :root[data-style="suave"] .structure-card .exercise-desc { color: inherit; opacity: .8; }
+:root[data-style="suave"] .motivation { border-radius: var(--radius) var(--radius) var(--radius) 8px; }
+:root[data-style="suave"] .week-day-dot { border-radius: 12px; }
+:root[data-style="suave"] .run-check { border-radius: 14px; }
+:root[data-style="suave"] .stat-tile:nth-child(2n) { background: color-mix(in srgb, #8fa8ff 18%, var(--surface)); }
+
+/* ---------- Energia: escuro de performance, números condensados ---------- */
+:root[data-style="energia"] .app-header { background: var(--bg); border-bottom-color: var(--border); }
+:root[data-style="energia"] .bottom-nav { background: var(--bg); }
+:root[data-style="energia"] .exercise-card, :root[data-style="energia"] .workout-card, :root[data-style="energia"] .week-card,
+:root[data-style="energia"] .stat-tile, :root[data-style="energia"] .group-card, :root[data-style="energia"] .item-row,
+:root[data-style="energia"] .run-item, :root[data-style="energia"] .last-workout, :root[data-style="energia"] .home-structure,
+:root[data-style="energia"] .structure-progress, :root[data-style="energia"] .settings-list { border-color: transparent; box-shadow: none; }
+:root[data-style="energia"] .motivation, :root[data-style="energia"] .structure-card { background: linear-gradient(135deg, #ff5a1f, #ff8a3d); color: #ffffff; border-color: transparent; }
+:root[data-style="energia"] .motivation .mi { color: #ffffff; }
+:root[data-style="energia"] .structure-card .meta, :root[data-style="energia"] .structure-card .exercise-desc { color: rgba(255,255,255,.9); }
+:root[data-style="energia"] .structure-card .progress { background: rgba(0,0,0,.25); }
+:root[data-style="energia"] .structure-card .letter-chip { background: #0d0e10; color: #ffffff; }
+:root[data-style="energia"] .run-timer-value { font-size: 3.2rem; line-height: .95; }
+:root[data-style="energia"] .run-sets { color: var(--accent); }
+:root[data-style="energia"] .stat-tile-value, :root[data-style="energia"] .week-stat-value { font-size: 2rem; }
+
+/* ---------- Esportivo: linhas grossas, cantos retos, pôster ---------- */
+:root[data-style="esportivo"] .app-header { background: #111111; color: #f2f2ee; border-bottom: 3px solid var(--accent); }
+:root[data-style="esportivo"] .app-header .icon-btn { color: #f2f2ee; }
+:root[data-style="esportivo"] .app-header .btn { background: transparent; color: #f2f2ee; border: 2px solid #f2f2ee; }
+:root[data-style="esportivo"] .app-header .btn-primary { background: var(--accent); color: #111111; border-color: var(--accent); }
+:root[data-style="esportivo"] .bottom-nav { background: #111111; border-top: 0; }
+:root[data-style="esportivo"] .bottom-nav a { color: #8a8a85; }
+:root[data-style="esportivo"] .bottom-nav a.active { color: var(--accent); }
+:root[data-style="esportivo"] .exercise-card, :root[data-style="esportivo"] .workout-card, :root[data-style="esportivo"] .week-card,
+:root[data-style="esportivo"] .stat-tile, :root[data-style="esportivo"] .group-card, :root[data-style="esportivo"] .item-row,
+:root[data-style="esportivo"] .run-item, :root[data-style="esportivo"] .last-workout, :root[data-style="esportivo"] .home-structure,
+:root[data-style="esportivo"] .structure-progress, :root[data-style="esportivo"] .settings-list, :root[data-style="esportivo"] .structure-card,
+:root[data-style="esportivo"] .input, :root[data-style="esportivo"] .select, :root[data-style="esportivo"] .textarea { border: 2px solid var(--border); box-shadow: none; }
+:root[data-style="esportivo"] .btn { border-width: 2px; text-transform: uppercase; letter-spacing: .04em; font-weight: 800; }
+:root[data-style="esportivo"] .btn:not(.btn-primary):not(.btn-ghost) { border-color: var(--border); }
+:root[data-style="esportivo"] .chip { border: 2px solid var(--border); border-radius: 0; text-transform: uppercase; font-size: .78rem; }
+:root[data-style="esportivo"] .chip[aria-pressed="true"] { background: var(--text); color: var(--accent); }
+:root[data-style="esportivo"] .motivation { transform: rotate(-.6deg); }
+:root[data-style="esportivo"] .structure-card { background: var(--surface); }
+:root[data-style="esportivo"] .letter-chip, :root[data-style="esportivo"] .letter-index { border-radius: 0; background: var(--text); color: var(--accent); }
+:root[data-style="esportivo"] .group-chip, :root[data-style="esportivo"] .equip-chip, :root[data-style="esportivo"] .badge { border-radius: 0; }
+:root[data-style="esportivo"] .week-day-dot, :root[data-style="esportivo"] .run-check, :root[data-style="esportivo"] .avatar, :root[data-style="esportivo"] .item-index { border-radius: 0; }
+:root[data-style="esportivo"] .run-item.done { background: var(--surface); }
+:root[data-style="esportivo"] .run-timer-value { font-size: 3rem; }
+:root[data-style="esportivo"] .group-card::before { height: 6px; }
+
+/* ---------- Escolha de estilo (onboarding e configurações) ---------- */
+.style-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.style-option { position: relative; cursor: pointer; }
+.style-option input { position: absolute; opacity: 0; pointer-events: none; }
+.style-option .style-card { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 16px; border: 2px solid var(--border); background: var(--surface); }
+.style-option input:checked + .style-card { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.style-option input:focus-visible + .style-card { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
+.style-name { font-weight: 800; font-size: .85rem; text-align: center; color: var(--text); }
+.style-desc { font-size: .7rem; text-align: center; color: var(--text-muted); line-height: 1.3; }
+/* Mini prévia com cores fixas de cada estilo (não muda com o tema atual) */
+.mini { height: 112px; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+.mini i { display: block; border-radius: 4px; }
+.mini .t { height: 10px; width: 60%; }
+.mini .h { height: 30px; }
+.mini .r { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.mini .r i { height: 22px; }
+.mini .n { height: 10px; margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mini-suave { background: #fbf6f3; }
+.mini-suave .t { background: #221a16; }
+.mini-suave .h { background: #ffdccc; border-radius: 12px 12px 12px 3px; }
+.mini-suave .r i { background: #ffffff; border-radius: 8px; }
+.mini-suave .r i + i { background: #e4ecff; }
+.mini-suave .n i { background: #e9d6cc; border-radius: 99px; }
+.mini-suave .n i:first-child { background: #a8361a; }
+.mini-energia { background: #0d0e10; }
+.mini-energia .t { background: #f3f4f6; width: 45%; height: 12px; }
+.mini-energia .h { background: linear-gradient(135deg, #ff5a1f, #ff8a3d); border-radius: 8px; }
+.mini-energia .r i { background: #17191d; border-radius: 6px; }
+.mini-energia .r i + i { background: #c6f432; }
+.mini-energia .n i { background: #2a2d33; }
+.mini-energia .n i:first-child { background: #ff5a1f; }
+.mini-esportivo { background: #f2f2ee; }
+.mini-esportivo .t { background: #111111; height: 14px; width: 70%; border-radius: 0; }
+.mini-esportivo .h { background: #111111; border-radius: 0; border-bottom: 4px solid #ff5a1f; }
+.mini-esportivo .r i { background: #ffffff; border: 2px solid #111111; border-radius: 0; }
+.mini-esportivo .r i + i { background: #ff5a1f; }
+.mini-esportivo .n i { background: #111111; border-radius: 0; }
+.mini-esportivo .n i:first-child { background: #ff5a1f; }
+@media (max-width: 360px) { .style-options { gap: 6px; } .style-desc { display: none; } }
+.eyebrow-text { margin: 0 0 4px; font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
