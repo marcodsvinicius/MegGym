@@ -1,7 +1,7 @@
 # MegGym
 academia em casa
 
-Site responsivo para escolher um **grupo muscular** e ver os exercícios sugeridos (nome, descrição, séries, repetições, descanso, dificuldade, imagem/GIF e vídeo). Os exercícios são cadastrados por uma **área de admin** com login e ficam salvos no **Supabase**. O site roda no **GitHub Pages**, sem custo.
+Site responsivo para escolher um **grupo muscular** e ver os exercícios sugeridos (nome, descrição, séries, repetições, descanso, dificuldade, imagem/GIF e vídeo). Os exercícios são cadastrados por uma **área de admin** e ficam salvos no próprio repositório (modo GitHub) ou no **Supabase** (modo banco). O site roda no **GitHub Pages**, sem custo.
 
 - **Site:** `https://marcodsvinicius.github.io/MegGym/`
 - **Admin:** `https://marcodsvinicius.github.io/MegGym/admin.html`
@@ -12,6 +12,28 @@ Site responsivo para escolher um **grupo muscular** e ver os exercícios sugerid
 2. No GitHub, abra o repositório → **Settings → Pages**.
 3. Em **Build and deployment → Source**, escolha **Deploy from a branch**, branch **`main`**, pasta **`/ (root)`** e clique em **Save**.
 4. Em 1–2 minutos o site fica no ar no endereço acima.
+
+## Onde os dados ficam: GitHub ou Supabase
+
+Em [`assets/js/config.js`](assets/js/config.js), a opção `BACKEND` escolhe o modo:
+
+| `BACKEND` | Dados | Admin |
+|---|---|---|
+| `"github"` (atual) | `data/exercises.json` no repositório | token pessoal do GitHub; cada salvamento vira um commit (site atualiza em ~1 min) |
+| `"supabase"` | banco Supabase | login com e-mail/senha, cadastro por convite, aba Acesso |
+
+Para trocar, edite essa linha e faça commit. Toda a configuração do Supabase (URL, chave pública e os arquivos `supabase/*.sql`) continua guardada no repositório.
+
+### Modo GitHub: criar o token
+1. GitHub → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token** (atalho: https://github.com/settings/personal-access-tokens/new).
+2. **Repository access:** *Only select repositories* → `MegGym`.
+3. **Permissions → Contents:** *Read and write*.
+4. Abra `admin.html`, cole o token e clique em **Conectar**.
+
+### Voltar para o Supabase depois
+1. Se o projeto ficou parado, abra o painel do Supabase e clique em **Restore project** (projetos gratuitos pausam após ~7 dias sem uso).
+2. Se você cadastrou exercícios no modo GitHub e quer levá-los para o banco, peça para gerar um SQL a partir do `data/exercises.json`.
+3. Troque `BACKEND` para `"supabase"` em `assets/js/config.js`.
 
 ## Banco de dados (Supabase)
 
@@ -46,11 +68,12 @@ admin.html            área de cadastro
 supabase/schema.sql   tabelas, segurança e dados iniciais do banco
 data/exercises.json   cópia de reserva dos dados (usada se o Supabase falhar)
 assets/css/style.css  estilos (responsivo, tema claro/escuro)
-assets/js/config.js   URL e chave pública do Supabase
+assets/js/config.js   modo (BACKEND), URL e chave pública do Supabase
 assets/js/supabase.js cliente da API do Supabase (banco, login, imagens)
 assets/js/common.js   funções compartilhadas
 assets/js/app.js      lógica do site
-assets/js/admin.js    lógica do admin
+assets/js/admin.js    lógica do admin (modo Supabase)
+assets/js/admin-github.js  lógica do admin (modo GitHub)
 ```
 
 ### Formato de um exercício

@@ -118,9 +118,10 @@
     return normalizeData(await res.json());
   }
 
-  // Lê do Supabase; se ele estiver fora do ar (ou ainda não configurado), usa o JSON do repositório.
+  // No modo "supabase", lê do banco e usa o JSON do repositório como reserva se ele falhar.
+  // No modo "github", lê só o JSON.
   async function loadData() {
-    if (window.Supa) {
+    if (window.MEGGYM_CONFIG?.BACKEND === "supabase" && window.Supa) {
       try {
         const data = await loadFromSupabase();
         if (data.groups.length) return data;

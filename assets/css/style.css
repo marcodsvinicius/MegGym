@@ -492,3 +492,7 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -.01em; margin: 0; }
   gap: 4px;
 }
 .invite-code-big { font-size: 1.6rem; }
+
+/* ============ Modo de armazenamento (config.js → BACKEND) ============ */
+body.backend-github .supabase-only,
+body.backend-supabase .github-only { display: none !important; }
