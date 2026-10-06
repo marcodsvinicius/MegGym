@@ -107,6 +107,69 @@
     return `<a class="fab" href="${href}"><span aria-hidden="true">＋</span> ${label}</a>`;
   }
 
+  /* ================= Instalar o app ================= */
+
+  const PWA = window.MegPWA;
+  const DISMISS_KEY = "meggym.installDismissed";
+
+  function installCard(context) {
+    if (!PWA) return "";
+    const status = PWA.status();
+    if (status === "installed" || status === "unavailable") return "";
+    let dismissed = false;
+    try {
+      dismissed = context === "home" && localStorage.getItem(DISMISS_KEY) === "1";
+    } catch {
+      /* sem localStorage */
+    }
+    if (dismissed) return "";
+    const body =
+      status === "prompt"
+        ? `<p>Instale no celular para abrir em tela cheia, direto da tela inicial, mesmo sem internet.</p>
+           <div class="install-actions">
+             <button class="btn btn-primary" type="button" data-install>Instalar app</button>
+             ${context === "home" ? `<button class="btn btn-ghost" type="button" data-install-dismiss>Agora não</button>` : ""}
+           </div>`
+        : `<p>Para instalar no iPhone, no <strong>Safari</strong>:</p>
+           <ol class="install-steps">
+             <li>Toque em <strong>Compartilhar</strong> <span class="ios-share" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span> na barra do navegador.</li>
+             <li>Escolha <strong>Adicionar à Tela de Início</strong>.</li>
+             <li>Toque em <strong>Adicionar</strong>.</li>
+           </ol>
+           ${context === "home" ? `<div class="install-actions"><button class="btn btn-ghost" type="button" data-install-dismiss>Entendi</button></div>` : ""}`;
+    return `
+      <section class="install-card">
+        <img src="assets/icons/icon-192.png" alt="" width="48" height="48">
+        <div class="install-body">
+          <h2>Instale o MegGym</h2>
+          ${body}
+        </div>
+      </section>`;
+  }
+
+  function refreshInstallSlot() {
+    const slot = $("install-slot");
+    if (slot) slot.innerHTML = installCard(slot.dataset.context);
+  }
+
+  if (PWA) PWA.onChange(refreshInstallSlot);
+
+  app.addEventListener("click", async (e) => {
+    if (e.target.closest("[data-install]")) {
+      const accepted = await PWA.install();
+      if (accepted) toast("App instalado! 🎉", "success");
+      refreshInstallSlot();
+    }
+    if (e.target.closest("[data-install-dismiss]")) {
+      try {
+        localStorage.setItem(DISMISS_KEY, "1");
+      } catch {
+        /* sem localStorage */
+      }
+      refreshInstallSlot();
+    }
+  });
+
   /* ================= Início ================= */
 
   function renderHome() {
@@ -117,6 +180,7 @@
         <p class="page-subtitle">Olá,</p>
         <h2 class="page-title">${escapeHtml(user.name)} 👋</h2>
       </div>
+      <div id="install-slot" data-context="home">${installCard("home")}</div>
       ${empty("🚧", "Em breve novidades por aqui.")}`;
   }
 
@@ -778,6 +842,7 @@
           <button class="link-btn" type="button" id="rename-btn">Alterar nome</button>
         </div>
       </section>
+      <div id="install-slot" data-context="activity">${installCard("activity")}</div>
       <div class="stat-tiles">
         <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
         <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>

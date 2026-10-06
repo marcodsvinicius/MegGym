@@ -8,14 +8,19 @@
   <meta name="theme-color" content="#ff5a1f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-  <link rel="stylesheet" href="assets/css/style.css?v=7">
+  <meta name="apple-mobile-web-app-title" content="MegGym">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=8">
 </head>
 <body class="app-body">
   <!-- Entrada: nome do usuário -->
   <section class="login-screen hidden" id="login-screen" aria-labelledby="login-title">
     <div class="login-box">
-      <span class="brand-mark brand-mark-lg">🏋️</span>
+      <img class="brand-logo" src="assets/icons/icon-192.png" alt="" width="72" height="72">
       <h1 id="login-title">MegGym</h1>
       <p class="page-subtitle">Como podemos te chamar?</p>
       <form id="name-form" class="login-form" novalidate>
@@ -76,10 +81,11 @@
 
   <div class="toast hidden" id="toast" role="status"></div>
 
-  <script src="assets/js/config.js?v=7"></script>
-  <script src="assets/js/supabase.js?v=7"></script>
-  <script src="assets/js/common.js?v=7"></script>
-  <script src="assets/js/store.js?v=7"></script>
-  <script src="assets/js/app.js?v=7"></script>
+  <script src="assets/js/config.js?v=8"></script>
+  <script src="assets/js/supabase.js?v=8"></script>
+  <script src="assets/js/common.js?v=8"></script>
+  <script src="assets/js/store.js?v=8"></script>
+  <script src="assets/js/pwa.js?v=8"></script>
+  <script src="assets/js/app.js?v=8"></script>
 </body>
 </html>

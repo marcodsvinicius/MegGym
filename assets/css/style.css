@@ -907,3 +907,31 @@ body.backend-supabase .github-only { display: none !important; }
 }
 .group-detail .group-icon { width: 44px; height: 44px; font-size: 1.4rem; flex: none; }
 body.sheet-open { overflow: hidden; }
+
+/* ---------- Instalar app ---------- */
+.brand-logo { width: 72px; height: 72px; border-radius: 20px; margin-bottom: 8px; }
+.install-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  box-shadow: var(--shadow);
+}
+.install-card img { border-radius: 12px; flex: none; }
+.install-body { flex: 1; min-width: 0; }
+.install-body h2 { font-size: 1.05rem; font-weight: 800; }
+.install-body p { margin: 6px 0 0; color: var(--text-muted); font-size: .92rem; }
+.install-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.install-steps { margin: 8px 0 0; padding-left: 20px; font-size: .92rem; display: flex; flex-direction: column; gap: 4px; }
+.ios-share { display: inline-grid; place-items: center; width: 22px; height: 22px; vertical-align: -5px; color: #007aff; }
+.ios-share svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* App instalado: sem rolagem "elástica" e sem seleção acidental de texto nos botões */
+@media (display-mode: standalone) {
+  body { overscroll-behavior-y: none; }
+  .bottom-nav a, .btn, .chip { user-select: none; -webkit-user-select: none; }
+}

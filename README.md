@@ -17,6 +17,15 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 
 > Por enquanto, perfis, treinos, histórico e exercícios cadastrados no app ficam salvos **só no navegador do aparelho** (localStorage). Os exercícios base vêm de `data/exercises.json`.
 
+## Instalar como app (PWA)
+
+O MegGym pode ser instalado pelo navegador e abre em tela cheia, como um app, inclusive sem internet.
+
+- **Android (Chrome):** em Início ou Atividade aparece o botão **Instalar app** (ou menu ⋮ → *Instalar app*).
+- **iPhone (Safari):** Compartilhar → **Adicionar à Tela de Início**. O app mostra essas instruções.
+
+> **Ao publicar mudanças no app**, aumente `VERSION` em `sw.js` e o `?v=` dos arquivos no `index.html` (e na lista `CORE` do `sw.js`). Assim o celular baixa a versão nova em vez de usar a guardada.
+
 ## Como publicar (uma vez só)
 
 1. Faça o merge deste código na branch `main`.
@@ -76,6 +85,10 @@ insert into public.admins (email) values ('email@dela.com');
 ```
 index.html            app (login, treinos, exercícios, atividade)
 assets/js/store.js    dados salvos no aparelho (perfis, treinos, histórico)
+assets/js/pwa.js      instalação do app e registro do service worker
+sw.js                 service worker (cache/offline)
+manifest.webmanifest  nome, ícones e cores do app instalado
+assets/icons/         ícones do app
 admin.html            área de cadastro
 supabase/schema.sql   tabelas, segurança e dados iniciais do banco
 data/exercises.json   cópia de reserva dos dados (usada se o Supabase falhar)
