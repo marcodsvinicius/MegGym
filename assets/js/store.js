@@ -214,6 +214,24 @@
     return value;
   }
 
+  // Séries registradas durante o treino: sets[index do item] = [{ reps, weight, done }].
+  function saveSets(userId, index, sets) {
+    const value = session(userId);
+    if (!value) return null;
+    value.sets = { ...(value.sets || {}), [index]: sets };
+    write(KEY.session + userId, value);
+    return value;
+  }
+
+  function setDone(userId, index, done) {
+    const value = session(userId);
+    if (!value) return null;
+    if (done) value.done[index] = true;
+    else delete value.done[index];
+    write(KEY.session + userId, value);
+    return value;
+  }
+
   function cancelSession(userId) {
     write(KEY.session + userId, null);
   }
@@ -367,6 +385,8 @@
     session,
     startSession,
     toggleDone,
+    saveSets,
+    setDone,
     cancelSession,
     history,
     note,

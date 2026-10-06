@@ -681,6 +681,7 @@
     app.innerHTML = `<article class="exercise-page">${exerciseDetailHtml(ex, {}, { titleId: "exercise-page-title" })}</article>`;
     bindPersonalNote();
     bindLoadFields();
+    bindSetsTable();
   }
 
   function renderExerciseForm(editId, presetGroup) {
@@ -1204,9 +1205,10 @@
             name: editing.name,
             description: editing.description || "",
             notes: editing.notes || "",
+            restSeconds: restSecondsOf(editing),
             items: editing.items.map((i) => ({ load: "", rir: "", rest: "", ...i })),
           }
-        : { id: null, name: "", description: "", notes: "", items: [] };
+        : { id: null, name: "", description: "", notes: "", restSeconds: DEFAULT_REST, items: [] };
     }
     const back = editing ? `#/treinos/${encodeURIComponent(editing.id)}` : "#/treinos";
     setHeader(editing ? "Editar treino" : "Novo treino", { back });
@@ -1228,6 +1230,11 @@
         <div class="field">
           <label for="w-notes">Observações do treino</label>
           <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas… (todos veem)">${escapeHtml(draft.notes || "")}</textarea>
+        </div>
+        <div class="field">
+          <label for="w-rest">Descanso entre séries (segundos)</label>
+          <input class="input" id="w-rest" type="number" inputmode="numeric" min="10" max="600" step="5" value="${escapeHtml(draft.restSeconds || DEFAULT_REST)}">
+          <p class="meta">O temporizador começa ao marcar cada série. Padrão: 60s.</p>
         </div>
         <div class="field">
           <span class="label">Grupos musculares trabalhados</span>
@@ -1265,6 +1272,7 @@
     $("w-name").addEventListener("input", (e) => (draft.name = e.target.value));
     $("w-description").addEventListener("input", (e) => (draft.description = e.target.value));
     $("w-notes").addEventListener("input", (e) => (draft.notes = e.target.value));
+    $("w-rest").addEventListener("input", (e) => (draft.restSeconds = e.target.value));
     $("picker-search").addEventListener("input", renderPicker);
     $("picker-group").addEventListener("change", renderPicker);
 
@@ -1315,6 +1323,7 @@
           name: draft.name,
           description: draft.description,
           notes: String(draft.notes || "").trim(),
+          restSeconds: Math.min(Math.max(parseInt(draft.restSeconds, 10) || DEFAULT_REST, 10), 600),
           items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest }) => ({
             exerciseId,
             sets: String(sets).trim(),
@@ -1446,7 +1455,8 @@
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}${item.rest || ex.rest ? ` · descanso ${escapeHtml(item.rest || ex.rest)}` : ""}</div>
               ${loadPreview(ex)}
               ${notePreview(ex.id)}
-              <div class="meta link-text">Ver execução e anotar ›</div>
+              <div class="run-sets-done" data-sets-summary="${i}">${escapeHtml(setsSummary(session.sets?.[i]))}</div>
+              <div class="meta link-text">Registrar séries ›</div>
             </div>
           </li>`;
       })
@@ -1461,6 +1471,7 @@
         <div class="run-progress-text"><span id="run-count"></span></div>
         <div class="progress"><div class="progress-bar" id="run-bar"></div></div>
       </div>
+      <p class="meta run-rest-info">${icon("timer", "mi-inline")} Descanso entre séries: ${restSecondsOf(w)}s</p>
       <ol class="run-list">${items}</ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
       <div class="sticky-cta">
@@ -1481,6 +1492,21 @@
       btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `Faltam ${total - done}`;
     }
 
+    const onRunChanged = (e) => {
+      if (!$("run-count")) return document.removeEventListener("meggym:run-changed", onRunChanged);
+      session = e.detail.session || Store.session(user.id);
+      app.querySelectorAll(".run-item").forEach((row) => {
+        const i = Number(row.dataset.index);
+        const done = Boolean(session.done[i]);
+        row.classList.toggle("done", done);
+        row.querySelector("[data-toggle]").setAttribute("aria-pressed", String(done));
+        const sum = row.querySelector("[data-sets-summary]");
+        if (sum) sum.textContent = setsSummary(session.sets?.[i]);
+      });
+      updateProgress();
+    };
+    document.addEventListener("meggym:run-changed", onRunChanged);
+
     app.querySelector(".run-list").addEventListener("click", (e) => {
       const btn = e.target.closest("[data-toggle]");
       if (!btn) return;
@@ -1498,7 +1524,7 @@
       const snapshot = valid.map((i) => {
         const item = w.items[i];
         const ex = findExercise(item.exerciseId);
-        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id), myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex) };
+        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id), myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex), setLog: (session.sets?.[i] || []).filter((s) => s.done) };
       });
       const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
@@ -1531,6 +1557,14 @@
     timer = setInterval(tick, 1000);
 
     updateProgress();
+  }
+
+  // "3 séries: 12×10 kg · 10×10 kg · 8×10 kg"
+  function setsSummary(sets) {
+    const done = (sets || []).filter((s) => s.done);
+    if (!done.length) return "";
+    const parts = done.map((s) => [s.reps ? `${s.reps} reps` : "—", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × "));
+    return `${done.length} ${done.length === 1 ? "série" : "séries"}: ${parts.join(" · ")}`;
   }
 
   function formatClock(ms) {
@@ -1631,7 +1665,7 @@
           return ex ? { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "" } : null;
         }).filter(Boolean);
     const groupsDone = [...new Set(list.map((e) => e.group))].map(findGroup).filter(Boolean);
-    const totalSets = list.reduce((sum, e) => sum + (parseInt(e.sets, 10) || 0), 0);
+    const totalSets = list.reduce((sum, e) => sum + (e.setLog?.length || parseInt(e.sets, 10) || 0), 0);
     const sameWorkoutCount = Store.history(user.id).filter((x) => x.workoutId === h.workoutId).length;
 
     app.innerHTML = `
@@ -1668,6 +1702,7 @@
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
                         <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                        ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog))}</div>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
                         ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
                       </div>
@@ -2157,6 +2192,163 @@
   let sheetReturnFocus = null;
 
   // Conteúdo de detalhes do exercício (usado na tela cheia e no bottom sheet).
+  /* ---------- Séries e descanso (durante o treino) ---------- */
+
+  const DEFAULT_REST = 60;
+
+  function restSecondsOf(w) {
+    const n = parseInt(w?.restSeconds, 10);
+    return n > 0 ? n : DEFAULT_REST;
+  }
+
+  // Exercício aberto a partir da tela de execução: índice do item + treino em andamento.
+  function runContext(prescription) {
+    if (prescription.runIndex === undefined || prescription.runIndex === "") return null;
+    const session = Store.session(user.id);
+    const w = session && Store.getWorkout(session.workoutId);
+    if (!w) return null;
+    const index = Number(prescription.runIndex);
+    return { index, workout: w, restSeconds: restSecondsOf(w), sets: session.sets?.[index] || [] };
+  }
+
+  function setsTableHtml(ex, run, setsText, repsText) {
+    const count = Math.min(Math.max(parseInt(setsText, 10) || 3, 1), 12);
+    const weight = usesWeight(ex);
+    const myWeight = Store.exerciseLoad(user.id, ex.id).weight;
+    const rows = Array.from({ length: Math.max(count, run.sets.length) }, (_, i) => {
+      const s = run.sets[i] || {};
+      return `
+        <li class="set-row ${s.done ? "done" : ""}" data-set="${i}">
+          <span class="set-num">${i + 1}</span>
+          <label class="set-field"><span class="visually-hidden">Repetições da série ${i + 1}</span>
+            <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">reps</span></label>
+          ${
+            weight
+              ? `<label class="set-field"><span class="visually-hidden">Peso da série ${i + 1}</span>
+                  <input class="input input-sm" data-set-field="weight" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
+              : ""
+          }
+          <button type="button" class="set-check" data-set-check aria-pressed="${Boolean(s.done)}" aria-label="Concluir série ${i + 1}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </button>
+        </li>`;
+    }).join("");
+    return `
+      <section class="sheet-section sets-log" data-sets-index="${run.index}" data-sets-exercise="${escapeHtml(ex.id)}">
+        <h3>Séries</h3>
+        <ol class="set-list">${rows}</ol>
+        <p class="meta">Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.</p>
+      </section>`;
+  }
+
+  function bindSetsTable() {
+    document.querySelectorAll("[data-tip]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const tip = $(`tip-${btn.dataset.tip}`);
+        const open = tip.classList.toggle("hidden") === false;
+        btn.setAttribute("aria-expanded", String(open));
+      })
+    );
+    document.querySelectorAll("[data-rest-start]").forEach((btn) =>
+      btn.addEventListener("click", () => startRest(Number(btn.dataset.restStart)))
+    );
+    const box = $("sheet-content").querySelector("[data-sets-index]");
+    if (!box) return;
+    const index = Number(box.dataset.setsIndex);
+    const exId = box.dataset.setsExercise;
+    const read = () =>
+      [...box.querySelectorAll("[data-set]")].map((row) => {
+        const w = row.querySelector('[data-set-field="weight"]');
+        return {
+          reps: row.querySelector('[data-set-field="reps"]').value.trim(),
+          weight: w ? w.value.trim().replace(".", ",") : "",
+          done: row.classList.contains("done"),
+        };
+      });
+    const save = () => {
+      const sets = read();
+      Store.saveSets(user.id, index, sets);
+      // Todas as séries feitas → exercício concluído na lista.
+      const session = Store.setDone(user.id, index, sets.every((s) => s.done));
+      document.dispatchEvent(new CustomEvent("meggym:run-changed", { detail: { session, exerciseId: exId } }));
+    };
+    box.addEventListener("input", (e) => {
+      if (e.target.dataset.setField === "reps") e.target.value = e.target.value.replace(/\D/g, "");
+      if (e.target.dataset.setField === "weight") e.target.value = e.target.value.replace(/[^\d.,]/g, "");
+      save();
+    });
+    box.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-set-check]");
+      if (!btn) return;
+      const row = btn.closest("[data-set]");
+      const done = !row.classList.contains("done");
+      row.classList.toggle("done", done);
+      btn.setAttribute("aria-pressed", String(done));
+      // Ao concluir com o campo vazio, usa o sugerido (se for um número).
+      if (done) {
+        row.querySelectorAll("[data-set-field]").forEach((input) => {
+          if (!input.value && /^\d+([.,]\d+)?$/.test(input.placeholder) && input.placeholder !== "0") input.value = input.placeholder;
+        });
+        if (navigator.vibrate) navigator.vibrate(30);
+      }
+      save();
+      if (done) startRest(restSecondsOf(Store.getWorkout(Store.session(user.id)?.workoutId)));
+    });
+  }
+
+  // Temporizador de descanso: barra fixa acima de tudo, continua com o painel fechado.
+  let restEnd = 0;
+  let restTotal = 0;
+  let restTick = null;
+  const restBar = document.createElement("div");
+  restBar.className = "rest-bar hidden";
+  restBar.setAttribute("role", "timer");
+  restBar.innerHTML = `
+    <div class="rest-fill" id="rest-fill"></div>
+    <span class="rest-label">${icon("timer", "mi-inline")} Descanso</span>
+    <span class="rest-time" id="rest-time">1:00</span>
+    <button type="button" class="btn btn-sm" data-rest="-15" aria-label="Menos 15 segundos">−15</button>
+    <button type="button" class="btn btn-sm" data-rest="15" aria-label="Mais 15 segundos">+15</button>
+    <button type="button" class="btn btn-sm btn-primary" data-rest="skip">Pular</button>`;
+  document.body.appendChild(restBar);
+  restBar.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-rest]");
+    if (!btn) return;
+    if (btn.dataset.rest === "skip") return stopRest();
+    const delta = Number(btn.dataset.rest) * 1000;
+    restEnd = Math.max(Date.now() + 1000, restEnd + delta);
+    restTotal = Math.max(restTotal + delta, 1000);
+    updateRest();
+  });
+
+  function startRest(seconds) {
+    restTotal = seconds * 1000;
+    restEnd = Date.now() + restTotal;
+    restBar.classList.remove("hidden");
+    clearInterval(restTick);
+    restTick = setInterval(updateRest, 250);
+    updateRest();
+  }
+
+  function updateRest() {
+    const left = restEnd - Date.now();
+    if (left <= 0) {
+      stopRest();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      toast("Descanso acabou! Próxima série.", "success");
+      return;
+    }
+    const sec = Math.ceil(left / 1000);
+    $("rest-time").textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+    $("rest-fill").style.width = `${Math.min(100, (left / restTotal) * 100)}%`;
+  }
+
+  function stopRest() {
+    clearInterval(restTick);
+    restTick = null;
+    restBar.classList.add("hidden");
+  }
+
   function exerciseDetailHtml(ex, prescription = {}, { titleId = "sheet-title" } = {}) {
     const g = findGroup(ex.group);
     const img = safeUrl(ex.image);
@@ -2164,16 +2356,29 @@
     const videoUrl = safeUrl(ex.video);
     const sets = prescription.sets || ex.sets;
     const reps = prescription.reps || ex.reps;
+    const run = runContext(prescription);
+    const restLabel = run ? `${run.restSeconds}s` : prescription.rest || ex.rest;
     const stats = [
       ["Séries", sets],
       ["Repetições", reps],
-      ["Descanso", prescription.rest || ex.rest],
-      ["RIR", prescription.rir],
       ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
+      .concat(
+        restLabel
+          ? run
+            ? `<button type="button" class="stat stat-btn" data-rest-start="${run.restSeconds}" aria-label="Iniciar descanso de ${run.restSeconds} segundos"><span class="stat-label">Descanso</span><span class="stat-value">${icon("timer", "mi-inline")} ${escapeHtml(restLabel)}</span></button>`
+            : `<div class="stat"><span class="stat-label">Descanso</span><span class="stat-value">${icon("timer", "mi-inline")} ${escapeHtml(restLabel)}</span></div>`
+          : "",
+        prescription.rir
+          ? `<div class="stat stat-rir"><span class="stat-label">RIR <button type="button" class="tip-btn" data-tip="rir" aria-expanded="false" aria-label="O que é RIR?">${icon("help", "mi-inline")}</button></span><span class="stat-value">${escapeHtml(prescription.rir)}</span></div>`
+          : ""
+      )
       .join("");
+    const rirTip = prescription.rir
+      ? `<p class="tip hidden" id="tip-rir" role="note"><strong>RIR (repetições na reserva):</strong> quantas repetições você ainda conseguiria fazer quando termina a série. RIR ${escapeHtml(prescription.rir)} = pare quando sentir que faltam cerca de ${escapeHtml(prescription.rir)} para não conseguir mais. RIR 0 = até a falha.</p>`
+      : "";
     const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
@@ -2184,6 +2389,11 @@
         ${difficultyBadge(ex.difficulty)}
       </div>
       ${stats ? `<div class="stats">${stats}</div>` : ""}
+      ${rirTip}
+
+      ${loadFieldsHtml(ex)}
+
+      ${run ? setsTableHtml(ex, run, sets, reps) : ""}
 
       <section class="sheet-section">
         <h3>Execução</h3>
@@ -2196,8 +2406,6 @@
         }
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
-
-      ${loadFieldsHtml(ex)}
 
       ${personalNoteHtml(ex.id)}
 
@@ -2230,6 +2438,7 @@
     $("sheet-content").innerHTML = exerciseDetailHtml(ex, prescription);
     bindPersonalNote();
     bindLoadFields();
+    bindSetsTable();
 
     sheetReturnFocus = document.activeElement;
     sheet.classList.remove("hidden");
@@ -2324,6 +2533,7 @@
         load: target.dataset.load,
         rir: target.dataset.rir,
         rest: target.dataset.rest,
+        runIndex: target.closest(".run-item")?.dataset.index,
       });
   });
   app.addEventListener("keydown", (e) => {

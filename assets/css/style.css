@@ -1740,3 +1740,36 @@ body.sheet-open { overflow: hidden; }
 .ex-load-preview { display: inline-flex; gap: 4px; align-items: center; margin-top: 6px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: .82rem; font-weight: 700; color: var(--text); }
 .ex-load-preview .mi { color: var(--accent); }
 .ex-load-preview.hidden { display: none; }
+
+/* ---------- Séries, descanso e dicas ---------- */
+.stat-btn { font: inherit; color: inherit; border: 1px solid var(--accent, var(--primary)); cursor: pointer; text-align: left; }
+.stat-btn .stat-value { color: var(--accent, var(--primary)); }
+.tip-btn { border: 0; background: none; padding: 0; margin-left: 2px; color: var(--text-muted); cursor: pointer; vertical-align: middle; line-height: 1; }
+.tip { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-2); font-size: .9rem; }
+.set-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.set-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: var(--radius-sm); background: var(--surface-2); }
+.set-row.done { opacity: .75; }
+.set-num { width: 24px; font-weight: 800; text-align: center; }
+.set-field { flex: 1; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.set-field .input { width: 100%; min-width: 0; text-align: center; font-weight: 700; }
+.set-unit { font-size: .8rem; color: var(--text-muted); }
+.set-check {
+  flex: none; width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--border, currentColor); background: transparent; color: transparent; cursor: pointer;
+  display: grid; place-items: center;
+}
+.set-check svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.set-row.done .set-check { background: var(--success, #2e9e44); border-color: var(--success, #2e9e44); color: #fff; }
+.run-sets-done { font-size: .85rem; font-weight: 700; color: var(--success, #2e9e44); }
+.run-sets-done:empty { display: none; }
+.rest-bar {
+  position: fixed; left: 12px; right: 12px; z-index: 80;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  max-width: 560px; margin: 0 auto; overflow: hidden;
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  border-radius: var(--radius, 16px); background: var(--surface); color: var(--text);
+  box-shadow: 0 8px 28px rgba(0,0,0,.25); border: 1px solid var(--border, transparent);
+}
+.rest-fill { position: absolute; inset: 0 auto 0 0; background: var(--surface-2); z-index: -1; transition: width .25s linear; }
+.rest-label { font-weight: 700; flex: 1; white-space: nowrap; }
+.rest-time { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
