@@ -3,7 +3,8 @@
   "use strict";
 
   const { escapeHtml, safeUrl, safeColor, uniqueId, slugify, difficultyBadge, normalizeText, loadFromSupabase } = window.MegGym;
-  const { db, signIn, signOut, uploadImage: uploadToStorage, SupabaseError } = window.Supa;
+  const { db, signIn, signUp, signOut, recoverPassword, updatePassword, consumeUrlSession, uploadImage: uploadToStorage, SupabaseError } =
+    window.Supa;
 
   const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
@@ -12,6 +13,9 @@
     editingExerciseId: null,
     editingGroupId: null,
     busy: false,
+    isAdmin: false,
+    invites: [],
+    admins: [],
   };
 
   const $ = (id) => document.getElementById(id);
@@ -68,12 +72,77 @@
     return uploadToStorage(name, file);
   }
 
-  /* ================= Login ================= */
+  /* ================= Login / cadastro ================= */
 
-  function showLogin() {
+  const ADMIN_URL = location.origin + location.pathname;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function authErrorMessage(err) {
+    const code = String(err.code || "");
+    if (err instanceof TypeError) return "Sem conexão com o servidor. Verifique a internet e tente de novo.";
+    if (code === "invalid_credentials" || /invalid login credentials/i.test(err.message))
+      return "E-mail ou senha incorretos. Confira e tente de novo, ou use “Esqueci minha senha”.";
+    if (code === "email_not_confirmed" || /email not confirmed/i.test(err.message))
+      return "Seu e-mail ainda não foi confirmado. Abra o link que enviamos para o seu e-mail e depois entre.";
+    if (code === "user_already_exists" || code === "email_exists" || /already registered/i.test(err.message))
+      return "Já existe uma conta com esse e-mail. Use “Entrar” ou “Esqueci minha senha”.";
+    if (code === "weak_password") return "Senha fraca. Use pelo menos 8 caracteres, misturando letras e números.";
+    if (code === "same_password") return "A nova senha precisa ser diferente da atual.";
+    if (code === "over_email_send_rate_limit") return "Muitos e-mails enviados em pouco tempo. Aguarde alguns minutos.";
+    if (code === "over_request_rate_limit" || err.status === 429) return "Muitas tentativas. Aguarde alguns minutos e tente de novo.";
+    if (code === "signup_disabled") return "A criação de contas está desativada no Supabase.";
+    if (code === "email_address_invalid" || code === "validation_failed") return "E-mail inválido.";
+    if (code === "otp_expired" || /expired/i.test(err.message)) return "Esse link expirou. Peça um novo.";
+    return friendlyError(err);
+  }
+
+  function authMessage(text, type = "error") {
+    const el = $("auth-message");
+    el.textContent = text || "";
+    el.className = `form-message ${type}`;
+    el.classList.toggle("hidden", !text);
+  }
+
+  function setAuthMode(mode) {
+    document.querySelectorAll("[data-auth-view]").forEach((f) => f.classList.toggle("hidden", f.dataset.authView !== mode));
+    $("auth-tabs").classList.toggle("hidden", mode === "newpass");
+    document.querySelectorAll("#auth-tabs [data-auth-mode]").forEach((t) =>
+      t.setAttribute("aria-selected", String(t.dataset.authMode === (mode === "signup" ? "signup" : "login")))
+    );
+    authMessage("");
+    const first = document.querySelector(`[data-auth-view="${mode}"] input`);
+    if (first) first.focus();
+  }
+
+  function showLogin(mode = "login") {
     $("editor").classList.add("hidden");
     $("login-panel").classList.remove("hidden");
+    setAuthMode(mode);
     setStatus("Desconectado");
+  }
+
+  // Executa uma ação do formulário de acesso com o botão em "carregando".
+  async function authAction(form, label, action) {
+    if (state.busy) return;
+    const button = form.querySelector("button[type=submit]");
+    const original = button.textContent;
+    button.textContent = label;
+    authMessage("");
+    setBusy(true);
+    try {
+      await action();
+    } catch (err) {
+      authMessage(err.userMessage || authErrorMessage(err));
+    } finally {
+      setBusy(false);
+      button.textContent = original;
+    }
+  }
+
+  function fail(message) {
+    const err = new Error(message);
+    err.userMessage = message;
+    throw err;
   }
 
   async function enter() {
@@ -85,20 +154,139 @@
       $("login-panel").classList.add("hidden");
       $("editor").classList.remove("hidden");
       const email = window.Supa.session?.email || "";
-      if (me && me.length) {
+      state.isAdmin = Boolean(me && me.some((a) => a.email.toLowerCase() === email.toLowerCase()));
+      if (state.isAdmin) {
         setStatus(email, "ok");
       } else {
         setStatus(`${email} (sem permissão)`, "err");
-        toast("Você entrou, mas seu e-mail não está na tabela admins. Não será possível salvar.", "error");
+        toast("Você entrou, mas sua conta não tem permissão para editar. Peça um código de convite.", "error");
       }
     } catch (err) {
-      toast(friendlyError(err), "error");
       if (err.status === 401) await signOut();
       showLogin();
+      authMessage(friendlyError(err));
       setStatus("Erro de conexão", "err");
     } finally {
       setBusy(false);
     }
+  }
+
+  /* ================= Acesso: convites e admins ================= */
+
+  const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // sem 0/O, 1/I/L
+
+  function generateCode() {
+    const bytes = crypto.getRandomValues(new Uint8Array(8));
+    const chars = Array.from(bytes, (b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join("");
+    return `${chars.slice(0, 4)}-${chars.slice(4)}`;
+  }
+
+  function inviteText(code) {
+    return `Seu convite para o MegGym: ${code}\nCrie sua conta em ${ADMIN_URL} (aba “Criar conta”).`;
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Copiado!", "success");
+    } catch {
+      prompt("Copie o texto:", text);
+    }
+  }
+
+  function inviteStatus(inv) {
+    if (inv.uses >= inv.max_uses) return ["Esgotado", "muted"];
+    if (inv.expires_at && new Date(inv.expires_at) <= new Date()) return ["Expirado", "muted"];
+    return ["Ativo", ""];
+  }
+
+  async function loadAccess() {
+    try {
+      const [invites, admins] = await Promise.all([
+        db("invites?select=*&order=created_at.desc", { auth: true }),
+        db("admins?select=*&order=email.asc", { auth: true }),
+      ]);
+      state.invites = invites || [];
+      state.admins = admins || [];
+      renderAccess();
+    } catch (err) {
+      const msg =
+        err.code === "42P01" || err.status === 404
+          ? "A tabela de convites ainda não existe. Rode o arquivo supabase/convites.sql no SQL Editor do Supabase."
+          : friendlyError(err);
+      $("invite-list").innerHTML = `<li class="state">${escapeHtml(msg)}</li>`;
+      $("admin-list").innerHTML = "";
+    }
+  }
+
+  function renderAccess() {
+    const me = (window.Supa.session?.email || "").toLowerCase();
+    const last = state.invites.find((inv) => inv.code === state.lastInvite);
+    $("invite-created").classList.toggle("hidden", !last);
+    if (last) $("invite-created-code").textContent = last.code;
+
+    $("invite-list").innerHTML = state.invites.length
+      ? state.invites
+          .map((inv) => {
+            const [label, cls] = inviteStatus(inv);
+            const expires = inv.expires_at ? `válido até ${new Date(inv.expires_at).toLocaleDateString("pt-BR")}` : "sem validade";
+            return `
+              <li class="admin-item">
+                <div class="admin-item-main">
+                  <div class="admin-item-title"><span class="invite-code">${escapeHtml(inv.code)}</span> <span class="${cls}">· ${label}</span></div>
+                  <div class="admin-item-meta">${inv.note ? `${escapeHtml(inv.note)} · ` : ""}${inv.uses}/${inv.max_uses} uso(s) · ${expires}</div>
+                </div>
+                <div class="admin-item-actions">
+                  <button class="btn btn-sm" type="button" data-share-invite="${escapeHtml(inv.code)}">Compartilhar</button>
+                  <button class="btn btn-sm" type="button" data-copy-invite="${escapeHtml(inv.code)}">Copiar</button>
+                  <button class="btn btn-sm btn-danger" type="button" data-delete-invite="${escapeHtml(inv.code)}">Excluir</button>
+                </div>
+              </li>`;
+          })
+          .join("")
+      : `<li class="state">Nenhum código criado ainda.</li>`;
+
+    $("admin-list").innerHTML = state.admins
+      .map((a) => {
+        const self = a.email.toLowerCase() === me;
+        const meta = self ? "você" : a.invite_code ? `entrou com o convite ${escapeHtml(a.invite_code)}` : "adicionado pelo banco";
+        return `
+          <li class="admin-item">
+            <div class="admin-item-main">
+              <div class="admin-item-title">${escapeHtml(a.email)}</div>
+              <div class="admin-item-meta">${meta}</div>
+            </div>
+            ${self ? "" : `<div class="admin-item-actions"><button class="btn btn-sm btn-danger" type="button" data-remove-admin="${escapeHtml(a.email)}">Remover acesso</button></div>`}
+          </li>`;
+      })
+      .join("");
+  }
+
+  async function accessAction(action, message) {
+    if (state.busy) return;
+    setBusy(true);
+    try {
+      await action();
+      await loadAccess();
+      if (message) toast(message, "success");
+    } catch (err) {
+      toast(friendlyError(err), "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function shareInvite(code) {
+    const text = inviteText(code);
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Convite MegGym", text });
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return;
+      }
+    }
+    copyText(text);
   }
 
   /* ================= UI: utilidades ================= */
@@ -424,23 +612,131 @@
 
   /* ================= Eventos ================= */
 
-  $("login-form").addEventListener("submit", async (event) => {
+  document.querySelectorAll("[data-auth-mode]").forEach((btn) => btn.addEventListener("click", () => setAuthMode(btn.dataset.authMode)));
+
+  document.querySelectorAll("[data-toggle-password]").forEach((box) =>
+    box.addEventListener("change", () =>
+      box.dataset.togglePassword.split(" ").forEach((id) => ($(id).type = box.checked ? "text" : "password"))
+    )
+  );
+
+  $("login-form").addEventListener("submit", (event) => {
     event.preventDefault();
-    if (state.busy) return;
-    const button = $("login-form").querySelector("button[type=submit]");
-    button.textContent = "Entrando…";
-    setBusy(true);
-    try {
-      await signIn($("login-email").value.trim(), $("login-password").value);
+    authAction(event.target, "Entrando…", async () => {
+      const email = $("login-email").value.trim();
+      const password = $("login-password").value;
+      if (!EMAIL_RE.test(email)) fail("Digite um e-mail válido.");
+      if (!password) fail("Digite sua senha.");
+      await signIn(email, password);
       $("login-password").value = "";
-    } catch (err) {
-      toast(friendlyError(err), "error");
+    }).then(() => window.Supa.session && $("editor").classList.contains("hidden") && enter());
+  });
+
+  $("signup-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    authAction(event.target, "Criando conta…", async () => {
+      const code = $("signup-code").value.trim().toUpperCase();
+      const email = $("signup-email").value.trim();
+      const password = $("signup-password").value;
+      if (!code) fail("Digite o código de convite.");
+      if (!EMAIL_RE.test(email)) fail("Digite um e-mail válido.");
+      if (password.length < 8) fail("A senha precisa ter pelo menos 8 caracteres.");
+      if (password !== $("signup-password2").value) fail("As senhas não são iguais.");
+      let result;
+      try {
+        result = await signUp(email, password, { invite_code: code }, ADMIN_URL);
+      } catch (err) {
+        // O banco recusa o cadastro (erro 500) quando o convite não vale.
+        if (err.status === 500 || err.code === "unexpected_failure") fail("Código de convite inválido, expirado ou já usado.");
+        throw err;
+      }
+      event.target.reset();
+      if (result.confirmed) {
+        toast("Conta criada!", "success");
+      } else {
+        setAuthMode("login");
+        authMessage("Conta criada! Enviamos um link de confirmação para o seu e-mail. Depois de confirmar, entre aqui.", "success");
+      }
+    }).then(() => window.Supa.session && $("editor").classList.contains("hidden") && enter());
+  });
+
+  $("forgot-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    authAction(event.target, "Enviando…", async () => {
+      const email = $("forgot-email").value.trim();
+      if (!EMAIL_RE.test(email)) fail("Digite um e-mail válido.");
+      await recoverPassword(email, ADMIN_URL);
+      authMessage("Se esse e-mail tiver conta, você vai receber um link para criar uma nova senha. Confira também o spam.", "success");
+    });
+  });
+
+  $("newpass-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    let changed = false;
+    authAction(event.target, "Salvando…", async () => {
+      const password = $("newpass-password").value;
+      if (password.length < 8) fail("A senha precisa ter pelo menos 8 caracteres.");
+      if (password !== $("newpass-password2").value) fail("As senhas não são iguais.");
+      await updatePassword(password);
+      event.target.reset();
+      changed = true;
+    }).then(() => {
+      if (!changed) return;
+      toast("Senha alterada!", "success");
+      enter();
+    });
+  });
+
+  $("invite-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const days = $("inv-days").value;
+    const custom = $("inv-code").value.trim();
+    if (custom && !/^[A-Za-z0-9-]{4,40}$/.test(custom)) {
+      toast("O código deve ter de 4 a 40 caracteres: letras, números ou hífen.", "error");
       return;
-    } finally {
-      setBusy(false);
-      button.textContent = "Entrar";
     }
-    await enter();
+    if (custom && state.invites.some((inv) => inv.code.toUpperCase() === custom.toUpperCase())) {
+      toast("Já existe um código igual.", "error");
+      return;
+    }
+    const row = {
+      code: custom || generateCode(),
+      note: $("inv-note").value.trim() || null,
+      max_uses: Math.min(10000, Math.max(1, parseInt($("inv-uses").value, 10) || 1)),
+      expires_at: days ? new Date(Date.now() + Number(days) * 86400000).toISOString() : null,
+    };
+    accessAction(async () => {
+      await db("invites", { method: "POST", body: row, auth: true });
+      event.target.reset();
+      $("inv-uses").value = "1";
+      $("inv-days").value = "7";
+      state.lastInvite = row.code;
+    }, `Código ${row.code} criado!`);
+  });
+
+  $("invite-list").addEventListener("click", (e) => {
+    const copy = e.target.closest("[data-copy-invite]");
+    if (copy) copyText(copy.dataset.copyInvite);
+    const share = e.target.closest("[data-share-invite]");
+    const del = e.target.closest("[data-delete-invite]");
+    if (share) shareInvite(share.dataset.shareInvite);
+    if (del && confirm(`Excluir o código ${del.dataset.deleteInvite}? Quem já entrou com ele continua com acesso.`)) {
+      accessAction(async () => {
+        expectRows(await db(`invites?code=eq.${encodeURIComponent(del.dataset.deleteInvite)}`, { method: "DELETE", auth: true }));
+      }, "Código excluído.");
+    }
+  });
+
+  $("invite-created-share").addEventListener("click", () => shareInvite(state.lastInvite));
+  $("invite-created-copy").addEventListener("click", () => copyText(state.lastInvite));
+
+  $("admin-list").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-admin]");
+    if (btn && confirm(`Remover o acesso de ${btn.dataset.removeAdmin}? A pessoa não poderá mais editar.`)) {
+      accessAction(async () => {
+        expectRows(await db(`admins?email=eq.${encodeURIComponent(btn.dataset.removeAdmin)}`, { method: "DELETE", auth: true }));
+      }, "Acesso removido.");
+    }
   });
 
   $("logout-btn").addEventListener("click", async () => {
@@ -455,6 +751,7 @@
     tab.addEventListener("click", () => {
       document.querySelectorAll("[data-tab]").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
       document.querySelectorAll("[data-tab-panel]").forEach((p) => p.classList.toggle("hidden", p.dataset.tabPanel !== tab.dataset.tab));
+      if (tab.dataset.tab === "access") loadAccess();
     })
   );
 
@@ -489,6 +786,21 @@
 
   /* ================= Início ================= */
 
-  if (window.Supa.session) enter();
-  else showLogin();
+  (async () => {
+    try {
+      const type = await consumeUrlSession();
+      if (type === "recovery") {
+        showLogin("newpass");
+        setStatus(window.Supa.session?.email || "", "ok");
+        return;
+      }
+      if (type) toast("E-mail confirmado!", "success");
+    } catch (err) {
+      showLogin();
+      authMessage(authErrorMessage(err));
+      return;
+    }
+    if (window.Supa.session) enter();
+    else showLogin();
+  })();
 })();

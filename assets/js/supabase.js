@@ -49,28 +49,77 @@
       /* corpo vazio */
     }
     const message = body.msg || body.message || body.error_description || body.error || `HTTP ${res.status}`;
-    return new SupabaseError(res.status, message, body.code || body.error_code || body.error);
+    // Auth usa "error_code"; o banco (PostgREST) usa "code" (ex.: "42501").
+    const code = body.error_code || (typeof body.code === "string" ? body.code : "") || body.error || "";
+    return new SupabaseError(res.status, message, code);
   }
 
-  async function authRequest(path, body) {
+  async function authRequest(path, body, { method = "POST", token } = {}) {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
-      method: "POST",
-      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      method,
+      headers: {
+        apikey: SUPABASE_KEY,
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
     });
     if (!res.ok) throw await readError(res);
-    return res.json();
+    const text = await res.text();
+    return text ? JSON.parse(text) : {};
   }
 
   async function signIn(email, password) {
-    try {
-      const data = await authRequest("token?grant_type=password", { email, password });
+    const data = await authRequest("token?grant_type=password", { email, password });
+    saveSession(toSession(data));
+    return session;
+  }
+
+  // Cria a conta. Devolve { confirmed: true } se já entrou, ou { confirmed: false }
+  // quando o Supabase exige confirmação por e-mail antes do primeiro login.
+  async function signUp(email, password, metadata, redirectTo) {
+    const query = redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : "";
+    const data = await authRequest(`signup${query}`, { email, password, data: metadata });
+    if (data.access_token) {
       saveSession(toSession(data));
-      return session;
-    } catch (err) {
-      if (err.status === 400) throw new SupabaseError(400, "E-mail ou senha incorretos.");
-      throw err;
+      return { confirmed: true };
     }
+    return { confirmed: false };
+  }
+
+  function recoverPassword(email, redirectTo) {
+    return authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, { email });
+  }
+
+  async function updatePassword(password) {
+    const token = await validToken();
+    if (!token) throw new SupabaseError(401, "Sessão expirada. Entre de novo.");
+    await authRequest("user", { password }, { method: "PUT", token });
+  }
+
+  // Links de e-mail (confirmação de conta / recuperação de senha) voltam com a sessão
+  // no endereço: #access_token=...&type=recovery. Lê, salva e limpa o endereço.
+  async function consumeUrlSession() {
+    const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+    const clean = () => history.replaceState(null, "", location.pathname + location.search);
+    if (hash.get("error") || hash.get("error_code")) {
+      clean();
+      throw new SupabaseError(400, hash.get("error_description") || "Link inválido ou expirado.", hash.get("error_code") || hash.get("error"));
+    }
+    const accessToken = hash.get("access_token");
+    if (!accessToken) return null;
+    clean();
+    const user = await authRequest("user", undefined, { method: "GET", token: accessToken });
+    saveSession(
+      toSession({
+        access_token: accessToken,
+        refresh_token: hash.get("refresh_token"),
+        expires_at: Number(hash.get("expires_at")) || undefined,
+        expires_in: Number(hash.get("expires_in")) || 3600,
+        user,
+      })
+    );
+    return hash.get("type") || "login";
   }
 
   let refreshing = null;
@@ -161,7 +210,11 @@
   window.Supa = {
     SupabaseError,
     signIn,
+    signUp,
     signOut,
+    recoverPassword,
+    updatePassword,
+    consumeUrlSession,
     get session() {
       return session;
     },

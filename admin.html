@@ -7,7 +7,7 @@
   <title>MegGym — Cadastro de exercícios</title>
   <meta name="theme-color" content="#ff5a1f">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-  <link rel="stylesheet" href="assets/css/style.css?v=3">
+  <link rel="stylesheet" href="assets/css/style.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -20,10 +20,15 @@
   <main>
     <div class="container">
 
-      <!-- ===== Login ===== -->
-      <section class="panel" id="login-panel" style="max-width:440px;margin:24px auto">
-        <h2>Entrar no admin</h2>
-        <form id="login-form" class="form-grid" autocomplete="on">
+      <!-- ===== Acesso: entrar / criar conta / recuperar senha ===== -->
+      <section class="panel auth-panel" id="login-panel">
+        <div class="tabs" role="tablist" id="auth-tabs">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-auth-mode="login">Entrar</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-auth-mode="signup">Criar conta</button>
+        </div>
+
+        <!-- Entrar -->
+        <form id="login-form" class="form-grid" data-auth-view="login" novalidate>
           <div class="field">
             <label for="login-email">E-mail</label>
             <input class="input" id="login-email" type="email" autocomplete="username" required>
@@ -32,11 +37,77 @@
             <label for="login-password">Senha</label>
             <input class="input" id="login-password" type="password" autocomplete="current-password" required>
           </div>
+          <div class="field">
+            <label class="checkbox"><input type="checkbox" data-toggle-password="login-password"> Mostrar senha</label>
+          </div>
           <div class="form-actions" style="grid-column: span 12">
-            <button class="btn btn-primary" type="submit" style="width:100%">Entrar</button>
+            <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+            <button class="btn btn-ghost btn-block" type="button" data-auth-mode="forgot">Esqueci minha senha</button>
           </div>
         </form>
-        <p class="page-subtitle" style="font-size:.85rem">O usuário é criado no painel do Supabase (Authentication → Users) e o e-mail precisa estar na tabela <code>admins</code>.</p>
+
+        <!-- Criar conta com convite -->
+        <form id="signup-form" class="form-grid hidden" data-auth-view="signup" novalidate>
+          <p class="page-subtitle" style="grid-column: span 12; margin:0">Para criar uma conta você precisa de um <strong>código de convite</strong>.</p>
+          <div class="field">
+            <label for="signup-code">Código de convite</label>
+            <input class="input" id="signup-code" autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="Ex.: K7M2-PQ9X">
+          </div>
+          <div class="field">
+            <label for="signup-email">E-mail</label>
+            <input class="input" id="signup-email" type="email" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="signup-password">Senha</label>
+            <input class="input" id="signup-password" type="password" autocomplete="new-password" minlength="8" required>
+            <span class="hint">Mínimo de 8 caracteres.</span>
+          </div>
+          <div class="field">
+            <label for="signup-password2">Repita a senha</label>
+            <input class="input" id="signup-password2" type="password" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label class="checkbox"><input type="checkbox" data-toggle-password="signup-password signup-password2"> Mostrar senha</label>
+          </div>
+          <div class="form-actions" style="grid-column: span 12">
+            <button class="btn btn-primary btn-block" type="submit">Criar conta</button>
+          </div>
+        </form>
+
+        <!-- Esqueci a senha -->
+        <form id="forgot-form" class="form-grid hidden" data-auth-view="forgot" novalidate>
+          <p class="page-subtitle" style="grid-column: span 12; margin:0">Informe seu e-mail e enviaremos um link para criar uma nova senha.</p>
+          <div class="field">
+            <label for="forgot-email">E-mail</label>
+            <input class="input" id="forgot-email" type="email" autocomplete="username" required>
+          </div>
+          <div class="form-actions" style="grid-column: span 12">
+            <button class="btn btn-primary btn-block" type="submit">Enviar link</button>
+            <button class="btn btn-ghost btn-block" type="button" data-auth-mode="login">Voltar para o login</button>
+          </div>
+        </form>
+
+        <!-- Nova senha (chegou pelo link do e-mail) -->
+        <form id="newpass-form" class="form-grid hidden" data-auth-view="newpass" novalidate>
+          <p class="page-subtitle" style="grid-column: span 12; margin:0">Escolha sua nova senha.</p>
+          <div class="field">
+            <label for="newpass-password">Nova senha</label>
+            <input class="input" id="newpass-password" type="password" autocomplete="new-password" minlength="8" required>
+            <span class="hint">Mínimo de 8 caracteres.</span>
+          </div>
+          <div class="field">
+            <label for="newpass-password2">Repita a nova senha</label>
+            <input class="input" id="newpass-password2" type="password" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label class="checkbox"><input type="checkbox" data-toggle-password="newpass-password newpass-password2"> Mostrar senha</label>
+          </div>
+          <div class="form-actions" style="grid-column: span 12">
+            <button class="btn btn-primary btn-block" type="submit">Salvar nova senha</button>
+          </div>
+        </form>
+
+        <div class="form-message hidden" id="auth-message" role="alert"></div>
       </section>
 
       <!-- ===== Editor ===== -->
@@ -56,6 +127,7 @@
         <div class="tabs" role="tablist">
           <button class="tab" role="tab" aria-selected="true" data-tab="exercises">Exercícios</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="groups">Grupos musculares</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="access">Acesso</button>
         </div>
 
         <!-- Exercícios -->
@@ -165,6 +237,56 @@
             <ul class="admin-list" id="group-list"></ul>
           </section>
         </div>
+
+        <!-- Acesso: convites e administradores -->
+        <div data-tab-panel="access" class="hidden">
+          <section class="panel">
+            <h2>Novo código de convite</h2>
+            <form id="invite-form" class="form-grid" novalidate>
+              <div class="field span-6">
+                <label for="inv-code">Código (opcional)</label>
+                <input class="input invite-code" id="inv-code" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Em branco = gerar automaticamente">
+                <span class="hint">Letras, números e hífen. Maiúsculas e minúsculas não fazem diferença.</span>
+              </div>
+              <div class="field span-6">
+                <label for="inv-note">Para quem? (opcional)</label>
+                <input class="input" id="inv-note" maxlength="60" placeholder="Ex.: Ana (personal)">
+              </div>
+              <div class="field span-3">
+                <label for="inv-uses">Quantos usos</label>
+                <input class="input" id="inv-uses" type="number" min="1" max="10000" value="1">
+              </div>
+              <div class="field span-3">
+                <label for="inv-days">Validade</label>
+                <select class="select" id="inv-days">
+                  <option value="1">1 dia</option>
+                  <option value="7" selected>7 dias</option>
+                  <option value="30">30 dias</option>
+                  <option value="">Sem validade</option>
+                </select>
+              </div>
+              <div class="form-actions" style="grid-column: span 12">
+                <button class="btn btn-primary" type="submit">Gerar código</button>
+              </div>
+            </form>
+            <div class="invite-created hidden" id="invite-created">
+              <span class="stat-label">Código criado</span>
+              <strong class="invite-code invite-code-big" id="invite-created-code"></strong>
+              <div class="form-actions" style="margin-top:8px">
+                <button class="btn btn-primary" type="button" id="invite-created-share">Compartilhar</button>
+                <button class="btn" type="button" id="invite-created-copy">Copiar</button>
+              </div>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Códigos de convite</h2>
+            <ul class="admin-list" id="invite-list"></ul>
+          </section>
+          <section class="panel">
+            <h2>Quem pode editar</h2>
+            <ul class="admin-list" id="admin-list"></ul>
+          </section>
+        </div>
       </section>
     </div>
   </main>
@@ -180,9 +302,9 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=3"></script>
-  <script src="assets/js/supabase.js?v=3"></script>
-  <script src="assets/js/common.js?v=3"></script>
-  <script src="assets/js/admin.js?v=3"></script>
+  <script src="assets/js/config.js?v=4"></script>
+  <script src="assets/js/supabase.js?v=4"></script>
+  <script src="assets/js/common.js?v=4"></script>
+  <script src="assets/js/admin.js?v=4"></script>
 </body>
 </html>

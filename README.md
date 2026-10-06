@@ -22,7 +22,12 @@ Os exercícios ficam num banco **Supabase** (plano gratuito). O site lê direto 
 2. Cole todo o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) (o e-mail de admin já está nele).
 3. Clique em **Run**. Isso cria as tabelas, as regras de segurança, o espaço para imagens e os exercícios iniciais.
 4. Em **Authentication → Users → Add user → Create new user**, crie seu usuário com o **mesmo e-mail**, uma senha e marque **Auto Confirm User**.
-5. (Recomendado) Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**.
+
+### Convites (criar conta pelo site)
+1. Rode também [`supabase/convites.sql`](supabase/convites.sql) no SQL Editor.
+2. Em **Authentication → Sign In / Providers**, deixe **Allow new users to sign up** ligado. Sem um código válido o banco recusa o cadastro.
+3. Em **Authentication → URL Configuration**, coloque em **Site URL** `https://marcodsvinicius.github.io/MegGym/admin.html` (para os links de confirmação e de nova senha voltarem ao admin).
+4. No admin, aba **Acesso**: gere códigos (aleatórios ou personalizados, com limite de usos e validade), veja quem entrou e remova acessos.
 
 ### Usar o admin
 Abra `admin.html`, entre com e-mail e senha e cadastre. Só os e-mails da tabela `admins` conseguem salvar. Para dar acesso a outra pessoa, crie o usuário dela e rode:
