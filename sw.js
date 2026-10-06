@@ -1,6 +1,6 @@
 /* Service worker do MegGym: deixa o app instalável e funcionando offline.
    Ao mudar arquivos do app, aumente VERSION (e o ?v= dos arquivos no index.html). */
-const VERSION = "v20";
+const VERSION = "v21";
 const CACHE = `meggym-${VERSION}`;
 
 const CORE = [
@@ -9,14 +9,14 @@ const CORE = [
   "./manifest.webmanifest",
   "./data/exercises.json",
   "./data/workouts.json",
-  "./assets/css/style.css?v=20",
-  "./assets/js/theme.js?v=20",
-  "./assets/js/config.js?v=20",
-  "./assets/js/supabase.js?v=20",
-  "./assets/js/common.js?v=20",
-  "./assets/js/store.js?v=20",
-  "./assets/js/pwa.js?v=20",
-  "./assets/js/app.js?v=20",
+  "./assets/css/style.css?v=21",
+  "./assets/js/theme.js?v=21",
+  "./assets/js/config.js?v=21",
+  "./assets/js/supabase.js?v=21",
+  "./assets/js/common.js?v=21",
+  "./assets/js/store.js?v=21",
+  "./assets/js/pwa.js?v=21",
+  "./assets/js/app.js?v=21",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/apple-touch-icon.png",

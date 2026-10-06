@@ -24,7 +24,7 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 
 O MegGym pode ser instalado pelo navegador e abre em tela cheia, como um app, inclusive sem internet.
 
-- **Android (Chrome):** em Início ou Atividade aparece o botão **Instalar app** (ou menu ⋮ → *Instalar app*).
+- **Cartão "Instale o MegGym"** no topo da tela inicial (some depois de instalado). O botão instala com um toque quando o navegador permite; senão abre o passo a passo do aparelho (Android, Samsung Internet, iPhone ou computador).
 - **iPhone (Safari):** Compartilhar → **Adicionar à Tela de Início**. O app mostra essas instruções.
 
 > **Ao publicar mudanças no app**, aumente `VERSION` em `sw.js` e o `?v=` dos arquivos no `index.html` (e na lista `CORE` do `sw.js`). Assim o celular baixa a versão nova em vez de usar a guardada.

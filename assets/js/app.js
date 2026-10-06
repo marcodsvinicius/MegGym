@@ -192,63 +192,69 @@
   /* ================= Instalar o app ================= */
 
   const PWA = window.MegPWA;
-  const DISMISS_KEY = "meggym.installDismissed";
 
-  function installCard(context) {
-    if (!PWA) return "";
-    const status = PWA.status();
-    if (status === "installed" || status === "unavailable") return "";
-    let dismissed = false;
-    try {
-      dismissed = context === "home" && localStorage.getItem(DISMISS_KEY) === "1";
-    } catch {
-      /* sem localStorage */
-    }
-    if (dismissed) return "";
-    const body =
-      status === "prompt"
-        ? `<p>Instale no celular para abrir em tela cheia, direto da tela inicial, mesmo sem internet.</p>
-           <div class="install-actions">
-             <button class="btn btn-primary" type="button" data-install>Instalar app</button>
-             ${context === "home" ? `<button class="btn btn-ghost" type="button" data-install-dismiss>Agora não</button>` : ""}
-           </div>`
-        : `<p>Para instalar no iPhone, no <strong>Safari</strong>:</p>
-           <ol class="install-steps">
-             <li>Toque em <strong>Compartilhar</strong> <span class="ios-share" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span> na barra do navegador.</li>
-             <li>Escolha <strong>Adicionar à Tela de Início</strong>.</li>
-             <li>Toque em <strong>Adicionar</strong>.</li>
-           </ol>
-           ${context === "home" ? `<div class="install-actions"><button class="btn btn-ghost" type="button" data-install-dismiss>Entendi</button></div>` : ""}`;
+  function installCard() {
+    if (!PWA || PWA.status() === "installed") return "";
     return `
       <section class="install-card">
-        <img src="assets/icons/icon-192.png" alt="" width="48" height="48">
+        <img src="assets/icons/icon-192.png" alt="" width="52" height="52">
         <div class="install-body">
           <h2>Instale o MegGym</h2>
-          ${body}
+          <p>Abra direto da tela inicial, em tela cheia e até sem internet.</p>
+          <div class="install-actions">
+            <button class="btn btn-primary" type="button" data-install>${icon("install_mobile", "mi-inline")} Instalar app</button>
+          </div>
         </div>
       </section>`;
   }
 
+  // Passo a passo para quando o navegador não oferece a instalação com um toque.
+  function installSteps() {
+    const ua = navigator.userAgent;
+    const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const share = `<span class="ios-share" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>`;
+    if (ios && /CriOS|FxiOS|EdgiOS/i.test(ua))
+      return { title: "Abra no Safari", steps: ["No iPhone, a instalação só funciona pelo <strong>Safari</strong>.", "Copie o endereço do app e abra no Safari.", "Depois toque em <strong>Compartilhar</strong> " + share + " → <strong>Adicionar à Tela de Início</strong>."] };
+    if (ios)
+      return { title: "Instalar no iPhone", steps: ["Toque em <strong>Compartilhar</strong> " + share + " na barra do Safari.", "Role e escolha <strong>Adicionar à Tela de Início</strong>.", "Toque em <strong>Adicionar</strong>. O ícone do MegGym aparece na sua tela inicial."] };
+    if (/SamsungBrowser/i.test(ua))
+      return { title: "Instalar no Samsung Internet", steps: ["Toque no menu <strong>☰</strong> no canto inferior.", "Escolha <strong>Adicionar página a</strong> → <strong>Tela inicial</strong>.", "Confirme em <strong>Adicionar</strong>."] };
+    if (/android/i.test(ua))
+      return { title: "Instalar no Android", steps: ["Toque no menu <strong>⋮</strong> no canto superior direito do Chrome.", "Escolha <strong>Instalar app</strong> (ou <strong>Adicionar à tela inicial</strong>).", "Confirme em <strong>Instalar</strong>."] };
+    return { title: "Instalar no computador", steps: ["No Chrome ou Edge, clique no ícone de instalar na barra de endereço.", "Ou abra o menu <strong>⋮</strong> → <strong>Instalar MegGym</strong>.", "No celular, abra este endereço e use o menu do navegador."] };
+  }
+
+  function showInstallHelp() {
+    const { title, steps } = installSteps();
+    $("sheet-content").innerHTML = `
+      <div class="install-help">
+        <img src="assets/icons/icon-192.png" alt="" width="64" height="64">
+        <h2 id="sheet-title">${title}</h2>
+        <ol class="install-steps">${steps.map((st) => `<li>${st}</li>`).join("")}</ol>
+        <button class="btn btn-primary btn-block" type="button" id="sheet-close-ok">Entendi</button>
+      </div>`;
+    sheet.classList.remove("hidden");
+    document.body.classList.add("sheet-open");
+    requestAnimationFrame(() => sheet.classList.add("open"));
+    $("sheet-close-ok").addEventListener("click", () => closeSheet());
+  }
+
   function refreshInstallSlot() {
     const slot = $("install-slot");
-    if (slot) slot.innerHTML = installCard(slot.dataset.context);
+    if (slot) slot.innerHTML = installCard();
   }
 
   if (PWA) PWA.onChange(refreshInstallSlot);
 
   app.addEventListener("click", async (e) => {
     if (e.target.closest("[data-install]")) {
-      const accepted = await PWA.install();
-      if (accepted) toast("App instalado!", "success");
-      refreshInstallSlot();
-    }
-    if (e.target.closest("[data-install-dismiss]")) {
-      try {
-        localStorage.setItem(DISMISS_KEY, "1");
-      } catch {
-        /* sem localStorage */
+      if (PWA.status() === "prompt") {
+        const accepted = await PWA.install();
+        if (accepted) toast("App instalado!", "success");
+        refreshInstallSlot();
+      } else {
+        showInstallHelp();
       }
-      refreshInstallSlot();
     }
   });
 
@@ -397,6 +403,8 @@
           : ""
       }
 
+      <div id="install-slot" data-context="home">${installCard()}</div>
+
       ${homeStructureCard()}
 
       <section class="motivation">
@@ -446,7 +454,7 @@
         }
       </section>
 
-      <div id="install-slot" data-context="home">${installCard("home")}</div>`;
+`;
   }
 
   /* ================= Exercícios ================= */
@@ -1480,7 +1488,7 @@
           <a class="link-btn" href="#/atividade/perfil">Editar perfil</a>
         </div>
       </section>
-      <div id="install-slot" data-context="activity">${installCard("activity")}</div>
+      <div id="install-slot" data-context="activity">${installCard()}</div>
       <div class="stat-tiles">
         <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
         <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>

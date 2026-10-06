@@ -1713,3 +1713,11 @@ body.sheet-open { overflow: hidden; }
 .mini-esportivo .n i:first-child { background: #ff5a1f; }
 @media (max-width: 360px) { .style-options { gap: 6px; } .style-desc { display: none; } }
 .eyebrow-text { margin: 0 0 4px; font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+
+/* ---------- Ajuda para instalar ---------- */
+.install-help { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-bottom: 8px; text-align: center; }
+.install-help img { border-radius: 16px; }
+.install-help h2 { font-size: 1.25rem; font-weight: 800; }
+.install-help .install-steps { text-align: left; align-self: stretch; font-size: .95rem; gap: 10px; }
+.install-card { align-items: center; }
+.install-card .install-actions { margin-top: 10px; }
