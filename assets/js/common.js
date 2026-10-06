@@ -10,13 +10,58 @@
     avancado: "Avançado",
   };
 
+  // Equipamentos (ids são usados nos exercícios e no perfil do usuário).
   const EQUIPMENT = {
-    elastico: "Elástico",
-    estacao: "Estação de treinos",
-    halter: "Halter",
-    kettlebell: "Kettlebell",
+    elastico: "Elásticos",
+    anilha: "Anilhas",
     banco: "Banco",
+    halter: "Halter",
+    barra: "Barra reta",
+    "barra-fixa": "Barra fixa",
+    kettlebell: "Kettlebell",
+    estacao: "Estação de treinos",
+    corda: "Corda de pular",
+    "bola-suica": "Bola suíça",
+    step: "Step",
+    caneleira: "Caneleira",
+    roldana: "Roldana de porta",
+    "roda-abdominal": "Roda abdominal",
+    "leg-press": "Máquina de leg press",
   };
+
+  // Nomes de ícones do Material Symbols (https://fonts.google.com/icons).
+  const EQUIPMENT_ICONS = {
+    elastico: "gesture",
+    anilha: "radio_button_checked",
+    banco: "weekend",
+    halter: "fitness_center",
+    barra: "horizontal_rule",
+    "barra-fixa": "door_front",
+    kettlebell: "notifications",
+    estacao: "precision_manufacturing",
+    corda: "cable",
+    "bola-suica": "sports_volleyball",
+    step: "stairs",
+    caneleira: "straighten",
+    roldana: "settings_input_component",
+    "roda-abdominal": "trip_origin",
+    "leg-press": "airline_seat_recline_extra",
+  };
+
+  // Ícone do Material Symbols. Valores que não são nomes de ícone (ex.: emoji antigo) viram texto.
+  function icon(name, cls = "") {
+    const value = String(name || "");
+    if (/^[a-z0-9_]+$/.test(value)) return `<span class="mi ${cls}" aria-hidden="true">${value}</span>`;
+    return `<span class="${cls}" aria-hidden="true">${escapeHtml(value)}</span>`;
+  }
+
+  // O usuário consegue fazer o exercício se tiver todos os equipamentos dele
+  // (exercícios sem equipamento = peso do corpo, sempre disponíveis).
+  function canDo(exercise, userEquipment) {
+    const needed = Array.isArray(exercise.equipment) ? exercise.equipment : [];
+    const has = new Set(userEquipment || []);
+    return needed.every((id) => has.has(id));
+  }
 
   function equipmentLabels(list) {
     return (Array.isArray(list) ? list : []).map((id) => EQUIPMENT[id]).filter(Boolean);
@@ -153,6 +198,9 @@
     IMAGE_DIR,
     DIFFICULTIES,
     EQUIPMENT,
+    EQUIPMENT_ICONS,
+    icon,
+    canDo,
     equipmentLabels,
     escapeHtml,
     safeUrl,

@@ -10,6 +10,7 @@
     workouts: "meggym.workouts",
     history: "meggym.history",
     session: "meggym.session.", // + id do usuário
+    seed: "meggym.workoutsSeed",
   };
 
   function read(key, fallback) {
@@ -47,17 +48,36 @@
     return users().find((u) => u.id === id) || null;
   }
 
-  // Entra com um nome. Se já existir um perfil com esse nome no aparelho, reaproveita.
-  function login(name) {
-    const clean = String(name || "").trim().replace(/\s+/g, " ");
+  function findByName(name) {
+    const clean = String(name || "").trim().replace(/\s+/g, " ").toLowerCase();
+    return users().find((u) => u.name.toLowerCase() === clean) || null;
+  }
+
+  // Cria um perfil (fim do onboarding) e entra com ele.
+  function createUser(profile) {
     const list = users();
-    let user = list.find((u) => u.name.toLowerCase() === clean.toLowerCase());
-    if (!user) {
-      user = { id: newId("u"), name: clean, createdAt: new Date().toISOString() };
-      list.push(user);
-      write(KEY.users, list);
-    }
+    const user = {
+      id: newId("u"),
+      name: String(profile.name).trim().replace(/\s+/g, " "),
+      age: profile.age ?? null,
+      sex: profile.sex || "",
+      equipment: profile.equipment || [],
+      onboarded: true,
+      createdAt: new Date().toISOString(),
+    };
+    list.push(user);
+    write(KEY.users, list);
     write(KEY.currentUser, user.id);
+    return user;
+  }
+
+  function updateUser(id, changes) {
+    const list = users();
+    const user = list.find((u) => u.id === id);
+    if (!user) return null;
+    Object.assign(user, changes);
+    if (changes.name) user.name = String(changes.name).trim().replace(/\s+/g, " ");
+    write(KEY.users, list);
     return user;
   }
 
@@ -68,11 +88,7 @@
   }
 
   function renameUser(id, name) {
-    const list = users();
-    const user = list.find((u) => u.id === id);
-    if (!user) return;
-    user.name = String(name).trim().replace(/\s+/g, " ");
-    write(KEY.users, list);
+    updateUser(id, { name });
   }
 
   function logout() {
@@ -130,6 +146,26 @@
     return saved;
   }
 
+  // Treinos que vêm com o app (data/workouts.json). Aplicado uma vez por versão.
+  // replaceExisting: apaga os treinos salvos no aparelho e deixa só os do arquivo.
+  function applySeed(seed) {
+    if (!seed || !Array.isArray(seed.workouts)) return false;
+    if (read(KEY.seed, 0) >= seed.version) return false;
+    const now = new Date().toISOString();
+    const fresh = seed.workouts.map((w) => ({ ...w, createdBy: w.createdBy || "MegGym", createdAt: now }));
+    const kept = seed.replaceExisting ? [] : workouts().filter((w) => !fresh.some((f) => f.id === w.id));
+    write(KEY.workouts, [...fresh, ...kept]);
+    if (seed.replaceExisting) {
+      // Treino em andamento de um treino apagado não faz mais sentido.
+      users().forEach((u) => {
+        const s = session(u.id);
+        if (s && !fresh.some((f) => f.id === s.workoutId)) write(KEY.session + u.id, null);
+      });
+    }
+    write(KEY.seed, seed.version);
+    return true;
+  }
+
   function deleteWorkout(id) {
     write(KEY.workouts, workouts().filter((w) => w.id !== id));
   }
@@ -167,7 +203,12 @@
       .sort((a, b) => b.finishedAt.localeCompare(a.finishedAt));
   }
 
-  function finishSession(user, workout, exerciseCount) {
+  function getHistory(id) {
+    return read(KEY.history, []).find((h) => h.id === id) || null;
+  }
+
+  // snapshot: lista dos exercícios feitos (nome, grupo, séries, repetições) no momento do treino.
+  function finishSession(user, workout, exerciseCount, snapshot = []) {
     const current = session(user.id);
     if (!current) return null;
     const record = {
@@ -177,6 +218,8 @@
       workoutId: workout.id,
       workoutName: workout.name,
       exerciseCount,
+      workoutDescription: workout.description || "",
+      exercises: snapshot,
       startedAt: current.startedAt,
       finishedAt: new Date().toISOString(),
     };
@@ -190,7 +233,9 @@
   window.MegStore = {
     users,
     currentUser,
-    login,
+    findByName,
+    createUser,
+    updateUser,
     loginById,
     renameUser,
     logout,
@@ -201,11 +246,13 @@
     getWorkout,
     saveWorkout,
     deleteWorkout,
+    applySeed,
     session,
     startSession,
     toggleDone,
     cancelSession,
     history,
+    getHistory,
     finishSession,
   };
 })();

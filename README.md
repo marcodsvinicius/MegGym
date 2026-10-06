@@ -8,7 +8,9 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 
 ## Como funciona o app
 
-- **Entrada:** cada pessoa entra digitando o nome (perfis ficam no aparelho; dá para trocar em Atividade → Sair).
+- **Onboarding:** boas-vindas → nome, idade e sexo → equipamentos que tem em casa (perfis ficam no aparelho).
+- **Filtro de equipamentos:** a lista de exercícios e a montagem de treino mostram só o que dá para fazer com os equipamentos do perfil (dá para ver todos).
+- **Configurações** (Atividade → ⚙): tema claro/escuro/automático, editar perfil, equipamentos e sair.
 - **Menu inferior:** Início · Treinos · Exercícios · Atividade.
 - **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
 - **Treinos:** nome, descrição e exercícios (com séries × repetições). Os grupos musculares do treino são calculados a partir dos exercícios. Todos os perfis do aparelho veem todos os treinos.
@@ -25,6 +27,14 @@ O MegGym pode ser instalado pelo navegador e abre em tela cheia, como um app, in
 - **iPhone (Safari):** Compartilhar → **Adicionar à Tela de Início**. O app mostra essas instruções.
 
 > **Ao publicar mudanças no app**, aumente `VERSION` em `sw.js` e o `?v=` dos arquivos no `index.html` (e na lista `CORE` do `sw.js`). Assim o celular baixa a versão nova em vez de usar a guardada.
+
+## Ícones
+
+O app usa ícones do **Material Symbols** (Google), guardados em `assets/fonts/` só com os ícones usados (≈50 KB, funciona offline). Para usar um ícone novo: escreva `icon("nome_do_icone")` no código e rode `python3 tools/update-icons.py`. Nomes em https://fonts.google.com/icons.
+
+## Treinos que vêm com o app
+
+`data/workouts.json` traz treinos prontos. Ao subir a `version`, o app aplica a lista **uma vez** em cada aparelho; com `"replaceExisting": true` ele apaga os treinos salvos no aparelho e deixa só os do arquivo (o histórico é mantido).
 
 ## Como publicar (uma vez só)
 
@@ -89,7 +99,10 @@ assets/js/pwa.js      instalação do app e registro do service worker
 assets/js/theme.js    tema claro/escuro (automático ou escolhido em Atividade)
 sw.js                 service worker (cache/offline)
 manifest.webmanifest  nome, ícones e cores do app instalado
-assets/icons/         ícones do app
+assets/icons/         ícones do app (instalação)
+assets/fonts/         fonte de ícones Material Symbols (só os usados)
+data/workouts.json    treinos que vêm com o app
+tools/update-icons.py gera a fonte de ícones
 admin.html            área de cadastro
 supabase/schema.sql   tabelas, segurança e dados iniciais do banco
 data/exercises.json   cópia de reserva dos dados (usada se o Supabase falhar)

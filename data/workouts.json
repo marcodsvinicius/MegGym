@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "replaceExisting": true,
+  "workouts": [
+    {
+      "id": "costas-biceps",
+      "name": "Treino — Costas + Bíceps",
+      "description": "Costas e bíceps com halteres.",
+      "items": [
+        { "exerciseId": "remada-unilateral", "sets": "3", "reps": "8-12", "load": "10 kg" },
+        { "exerciseId": "remada-curvada", "sets": "3", "reps": "8-12", "load": "6 kg por halter" },
+        { "exerciseId": "pullover-halter", "sets": "3", "reps": "12", "load": "" },
+        { "exerciseId": "rosca-concentrada", "sets": "3", "reps": "8-12", "load": "6 kg" },
+        { "exerciseId": "rosca-martelo-unilateral", "sets": "3", "reps": "8-12", "load": "" }
+      ]
+    }
+  ]
+}

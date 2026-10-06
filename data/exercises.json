@@ -3,95 +3,76 @@
     {
       "id": "peito",
       "name": "Peito",
-      "icon": "🛡️",
+      "icon": "accessibility_new",
       "color": "#e4572e"
     },
     {
       "id": "costas",
       "name": "Costas",
-      "icon": "🦅",
+      "icon": "rowing",
       "color": "#2e86ab"
     },
     {
       "id": "ombros",
       "name": "Ombros",
-      "icon": "🏔️",
+      "icon": "sports_gymnastics",
       "color": "#f18f01"
     },
     {
       "id": "biceps",
       "name": "Bíceps",
-      "icon": "💪",
+      "icon": "sports_mma",
       "color": "#c73e1d"
     },
     {
       "id": "triceps",
       "name": "Tríceps",
-      "icon": "🔱",
+      "icon": "front_hand",
       "color": "#6a4c93"
     },
     {
       "id": "quadriceps",
       "name": "Quadríceps",
-      "icon": "🦵",
+      "icon": "directions_run",
       "color": "#3bb273"
     },
     {
       "id": "posterior",
-      "name": "Posterior de coxa",
-      "icon": "🦿",
+      "name": "Posteriores de coxa",
+      "icon": "sprint",
       "color": "#1b998b"
     },
     {
       "id": "gluteos",
       "name": "Glúteos",
-      "icon": "🍑",
+      "icon": "airline_seat_legroom_extra",
       "color": "#ef476f"
     },
     {
       "id": "panturrilha",
-      "name": "Panturrilha",
-      "icon": "🦶",
+      "name": "Panturrilhas",
+      "icon": "directions_walk",
       "color": "#8d6a9f"
     },
     {
       "id": "abdomen",
-      "name": "Abdômen",
-      "icon": "🎯",
+      "name": "Abdômen / Core",
+      "icon": "sports_martial_arts",
       "color": "#ffb400"
     },
     {
-      "id": "antebraco",
-      "name": "Antebraço",
-      "icon": "✊",
-      "color": "#7f8c8d"
-    },
-    {
-      "id": "cardio",
-      "name": "Cardio",
-      "icon": "❤️",
-      "color": "#d7263d"
+      "id": "lombar",
+      "name": "Lombar / Core",
+      "icon": "self_improvement",
+      "color": "#5c7cfa"
     }
   ],
   "exercises": [
     {
-      "id": "flexao",
-      "group": "peito",
-      "name": "Flexão de braço",
-      "description": "Mãos um pouco mais abertas que os ombros, corpo alinhado da cabeça aos pés. Desça até o peito quase tocar o chão e empurre de volta.",
-      "sets": "4",
-      "reps": "10-15",
-      "rest": "60s",
-      "difficulty": "iniciante",
-      "image": "",
-      "video": "",
-      "equipment": []
-    },
-    {
       "id": "supino-halteres",
       "group": "peito",
-      "name": "Supino com halteres",
-      "description": "Deitado no banco (ou no chão), halteres na linha do peito. Empurre para cima sem bater um no outro e desça controlando.",
+      "name": "Supino reto com halteres",
+      "description": "Deitado no banco, halteres na linha do peito e pés firmes no chão. Empurre para cima sem bater um halter no outro e desça controlando até a altura do peito.",
       "sets": "4",
       "reps": "8-12",
       "rest": "60-90s",
@@ -104,10 +85,25 @@
       ]
     },
     {
+      "id": "supino-chao",
+      "group": "peito",
+      "name": "Supino no chão",
+      "description": "Deitado no chão com os joelhos dobrados. Desça os halteres até os cotovelos encostarem levemente no chão e empurre para cima contraindo o peito.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
       "id": "crucifixo-halteres",
       "group": "peito",
       "name": "Crucifixo com halteres",
-      "description": "Braços estendidos com leve flexão nos cotovelos. Abra em arco até sentir alongar o peito e volte contraindo.",
+      "description": "Deitado no banco, braços estendidos com leve flexão nos cotovelos. Abra em arco até sentir o peito alongar e volte contraindo, como se abraçasse uma árvore.",
       "sets": "3",
       "reps": "10-12",
       "rest": "60s",
@@ -120,14 +116,14 @@
       ]
     },
     {
-      "id": "remada-curvada",
-      "group": "costas",
-      "name": "Remada curvada com halteres",
-      "description": "Tronco inclinado à frente, coluna neutra. Puxe os halteres em direção ao quadril aproximando as escápulas.",
-      "sets": "4",
-      "reps": "8-12",
-      "rest": "60-90s",
-      "difficulty": "intermediario",
+      "id": "crucifixo-chao",
+      "group": "peito",
+      "name": "Crucifixo no chão",
+      "description": "Deitado no chão, braços acima do peito com cotovelos levemente dobrados. Abra os braços até os cotovelos tocarem o chão e volte contraindo o peito.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
       "image": "",
       "video": "",
       "equipment": [
@@ -137,8 +133,8 @@
     {
       "id": "remada-unilateral",
       "group": "costas",
-      "name": "Remada unilateral (serrote)",
-      "description": "Apoie joelho e mão no banco. Puxe o halter até a lateral do tronco, mantendo o cotovelo próximo ao corpo.",
+      "name": "Remada unilateral",
+      "description": "Apoie joelho e mão do mesmo lado no banco, coluna reta. Puxe o halter até a lateral do tronco mantendo o cotovelo junto ao corpo e desça devagar.",
       "sets": "3",
       "reps": "10-12 cada lado",
       "rest": "60s",
@@ -151,17 +147,80 @@
       ]
     },
     {
-      "id": "superman",
+      "id": "remada-curvada",
       "group": "costas",
-      "name": "Superman",
-      "description": "Deitado de bruços, eleve braços e pernas ao mesmo tempo, segure 2 segundos no alto e desça devagar.",
+      "name": "Remada curvada com 2 halteres",
+      "description": "Joelhos levemente dobrados e tronco inclinado à frente com a coluna neutra. Puxe os dois halteres em direção ao quadril aproximando as escápulas.",
+      "sets": "4",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "pullover-halter",
+      "group": "costas",
+      "name": "Pullover com halter",
+      "description": "Deitado no banco, segure um halter com as duas mãos acima do peito. Leve-o para trás da cabeça com os braços quase estendidos e volte puxando com as costas.",
       "sets": "3",
-      "reps": "12-15",
-      "rest": "45s",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "puxada-alta-roldana",
+      "group": "costas",
+      "name": "Puxada alta",
+      "description": "Com a roldana presa no alto da porta, sente ou ajoelhe de frente para ela. Puxe a alça até a altura do peito, levando os cotovelos para baixo, e volte controlando.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [
+        "roldana"
+      ]
+    },
+    {
+      "id": "remada-baixa-roldana",
+      "group": "costas",
+      "name": "Remada baixa",
+      "description": "Com a roldana presa embaixo da porta, sente com as pernas à frente. Puxe a alça em direção ao abdômen aproximando as escápulas e volte devagar.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "roldana"
+      ]
+    },
+    {
+      "id": "arnold-press",
+      "group": "ombros",
+      "name": "Arnold press",
+      "description": "Comece com os halteres na frente do rosto, palmas viradas para você. Ao empurrar para cima, gire as palmas para frente. Desça fazendo o caminho inverso.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
     },
     {
       "id": "desenvolvimento-halteres",
@@ -175,15 +234,14 @@
       "image": "",
       "video": "",
       "equipment": [
-        "halter",
-        "banco"
+        "halter"
       ]
     },
     {
       "id": "elevacao-lateral",
       "group": "ombros",
       "name": "Elevação lateral",
-      "description": "Braços ao lado do corpo, eleve os halteres lateralmente até a altura dos ombros, cotovelos levemente flexionados.",
+      "description": "Braços ao lado do corpo, cotovelos levemente dobrados. Eleve os halteres lateralmente até a altura dos ombros e desça devagar.",
       "sets": "3",
       "reps": "12-15",
       "rest": "45-60s",
@@ -195,26 +253,105 @@
       ]
     },
     {
-      "id": "flexao-pike",
+      "id": "elevacao-frontal",
       "group": "ombros",
-      "name": "Flexão pike",
-      "description": "Quadril elevado formando um V invertido. Flexione os cotovelos levando a cabeça em direção ao chão e empurre de volta.",
+      "name": "Elevação frontal",
+      "description": "Halteres à frente das coxas. Eleve os braços à frente até a altura dos ombros, sem balançar o tronco, e desça devagar.",
       "sets": "3",
-      "reps": "8-12",
-      "rest": "60s",
-      "difficulty": "avancado",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "remada-alta",
+      "group": "ombros",
+      "name": "Remada alta",
+      "description": "Halteres à frente do corpo, palmas para você. Puxe-os para cima rente ao corpo até a altura do peito, cotovelos apontando para os lados.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "crucifixo-inverso",
+      "group": "ombros",
+      "name": "Crucifixo inverso",
+      "description": "Tronco inclinado à frente (ou deitado de bruços no banco inclinado). Abra os braços para os lados até a altura dos ombros, apertando as escápulas.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
     },
     {
       "id": "rosca-direta",
       "group": "biceps",
-      "name": "Rosca direta",
-      "description": "Em pé, cotovelos colados ao tronco. Suba os halteres sem balançar o corpo e desça devagar.",
+      "name": "Rosca direta com halteres",
+      "description": "Em pé, cotovelos colados ao tronco e palmas para frente. Suba os dois halteres sem balançar o corpo e desça devagar.",
       "sets": "4",
       "reps": "10-12",
       "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "rosca-alternada",
+      "group": "biceps",
+      "name": "Rosca alternada",
+      "description": "Em pé, suba um halter de cada vez girando a palma para cima durante a subida. Alterne os braços mantendo os cotovelos parados.",
+      "sets": "3",
+      "reps": "10-12 cada braço",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "rosca-concentrada",
+      "group": "biceps",
+      "name": "Rosca concentrada unilateral",
+      "description": "Sentado no banco, apoie o cotovelo na parte interna da coxa. Suba o halter até o ombro contraindo o bíceps e desça devagar.",
+      "sets": "3",
+      "reps": "10-12 cada braço",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "rosca-martelo-unilateral",
+      "group": "biceps",
+      "name": "Rosca martelo unilateral",
+      "description": "Pegada neutra (palma virada para o corpo). Suba o halter sem mover o cotovelo e desça controlando. Faça todas as repetições de um lado e troque.",
+      "sets": "3",
+      "reps": "10-12 cada braço",
+      "rest": "45-60s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
@@ -225,8 +362,8 @@
     {
       "id": "rosca-martelo",
       "group": "biceps",
-      "name": "Rosca martelo",
-      "description": "Pegada neutra (palmas viradas uma para a outra). Suba alternando ou simultâneo, sem mover os cotovelos.",
+      "name": "Rosca martelo com 2 halteres",
+      "description": "Pegada neutra com os dois halteres. Suba ao mesmo tempo sem balançar o tronco e desça devagar.",
       "sets": "3",
       "reps": "10-12",
       "rest": "60s",
@@ -238,25 +375,25 @@
       ]
     },
     {
-      "id": "triceps-banco",
+      "id": "triceps-frances-unilateral",
       "group": "triceps",
-      "name": "Tríceps no banco",
-      "description": "Mãos apoiadas na borda do banco, pernas à frente. Desça flexionando os cotovelos até 90° e empurre de volta.",
+      "name": "Tríceps francês unilateral",
+      "description": "Halter em uma mão acima da cabeça. Desça atrás da cabeça dobrando só o cotovelo e estenda de volta, mantendo o braço parado.",
       "sets": "3",
-      "reps": "10-15",
-      "rest": "60s",
-      "difficulty": "iniciante",
+      "reps": "10-12 cada braço",
+      "rest": "45-60s",
+      "difficulty": "intermediario",
       "image": "",
       "video": "",
       "equipment": [
-        "banco"
+        "halter"
       ]
     },
     {
       "id": "triceps-frances",
       "group": "triceps",
-      "name": "Tríceps francês",
-      "description": "Halter segurado com as duas mãos acima da cabeça. Desça atrás da nuca flexionando os cotovelos e estenda.",
+      "name": "Tríceps francês com 2 mãos",
+      "description": "Segure um halter com as duas mãos acima da cabeça. Desça atrás da nuca dobrando os cotovelos e estenda de volta.",
       "sets": "3",
       "reps": "10-12",
       "rest": "60s",
@@ -268,23 +405,104 @@
       ]
     },
     {
-      "id": "agachamento-livre",
-      "group": "quadriceps",
-      "name": "Agachamento livre",
-      "description": "Pés na largura dos ombros. Desça o quadril para trás e para baixo, joelhos alinhados com a ponta dos pés, e suba empurrando o chão.",
-      "sets": "4",
+      "id": "triceps-testa",
+      "group": "triceps",
+      "name": "Tríceps testa com halteres",
+      "description": "Deitado no banco, braços estendidos acima do peito. Dobre os cotovelos levando os halteres ao lado da cabeça e estenda de volta.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "triceps-acima-cabeca",
+      "group": "triceps",
+      "name": "Tríceps acima da cabeça",
+      "description": "Sentado ou em pé, halter acima da cabeça com os cotovelos apontando para cima. Estenda e flexione os cotovelos sem abrir os braços.",
+      "sets": "3",
       "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "triceps-pushdown",
+      "group": "triceps",
+      "name": "Tríceps na roldana (pushdown)",
+      "description": "Com a roldana presa no alto da porta, cotovelos colados ao corpo. Empurre a alça para baixo até estender os braços e volte devagar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "roldana"
+      ]
+    },
+    {
+      "id": "agachamento-halteres",
+      "group": "quadriceps",
+      "name": "Agachamento com halteres",
+      "description": "Halteres ao lado do corpo, pés na largura dos ombros. Desça o quadril para trás e para baixo, joelhos alinhados com os pés, e suba empurrando o chão.",
+      "sets": "4",
+      "reps": "10-12",
       "rest": "60-90s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "goblet-squat",
+      "group": "quadriceps",
+      "name": "Goblet squat",
+      "description": "Segure um halter na vertical junto ao peito. Agache mantendo o tronco ereto e os cotovelos entre os joelhos, e suba.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "agachamento-sumo",
+      "group": "quadriceps",
+      "name": "Agachamento sumô",
+      "description": "Pés bem afastados e pontas para fora, halter(es) seguros à frente entre as pernas. Agache abrindo os joelhos e suba contraindo glúteos.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "gluteos"
+      ]
     },
     {
       "id": "agachamento-bulgaro",
       "group": "quadriceps",
       "name": "Agachamento búlgaro",
-      "description": "Pé de trás apoiado no banco. Desça o joelho de trás em direção ao chão mantendo o tronco firme.",
+      "description": "Pé de trás apoiado no banco e halteres nas mãos. Desça o joelho de trás em direção ao chão mantendo o tronco firme e suba com a perna da frente.",
       "sets": "3",
       "reps": "8-12 cada perna",
       "rest": "60-90s",
@@ -292,28 +510,85 @@
       "image": "",
       "video": "",
       "equipment": [
-        "banco",
-        "halter"
+        "halter",
+        "banco"
+      ],
+      "groups": [
+        "gluteos"
       ]
     },
     {
       "id": "afundo",
       "group": "quadriceps",
-      "name": "Afundo (passada)",
-      "description": "Dê um passo à frente e desça até os dois joelhos formarem 90°. Volte e alterne as pernas.",
+      "name": "Afundo",
+      "description": "Halteres nas mãos, um pé à frente e outro atrás. Desça até os dois joelhos formarem 90° e suba sem mover os pés.",
       "sets": "3",
       "reps": "10-12 cada perna",
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "gluteos"
+      ]
+    },
+    {
+      "id": "passada",
+      "group": "quadriceps",
+      "name": "Passada",
+      "description": "Halteres nas mãos. Dê um passo à frente, desça até os joelhos formarem 90°, volte e alterne as pernas (ou caminhe avançando).",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "gluteos"
+      ]
+    },
+    {
+      "id": "step-up",
+      "group": "quadriceps",
+      "name": "Step-up",
+      "description": "Halteres nas mãos, de frente para o banco. Suba apoiando o pé inteiro e empurrando com a perna da frente, desça devagar e alterne.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "leg-press",
+      "group": "quadriceps",
+      "name": "Leg press",
+      "description": "Sentado na máquina, pés na plataforma na largura dos ombros. Desça até os joelhos formarem cerca de 90° e empurre sem travar os joelhos.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "leg-press"
+      ]
     },
     {
       "id": "stiff-halteres",
       "group": "posterior",
       "name": "Stiff com halteres",
-      "description": "Pernas quase estendidas, leve o quadril para trás descendo os halteres rente às pernas. Suba contraindo glúteos e posterior.",
+      "description": "Pernas quase estendidas, leve o quadril para trás descendo os halteres rente às pernas. Suba contraindo glúteos e posteriores.",
       "sets": "4",
       "reps": "10-12",
       "rest": "60-90s",
@@ -325,54 +600,120 @@
       ]
     },
     {
-      "id": "ponte-unilateral",
+      "id": "rdl-halteres",
       "group": "posterior",
-      "name": "Ponte unilateral",
-      "description": "Deitado, uma perna estendida no ar. Eleve o quadril empurrando o calcanhar da perna apoiada no chão.",
-      "sets": "3",
-      "reps": "10-12 cada perna",
-      "rest": "45s",
-      "difficulty": "intermediario",
-      "image": "",
-      "video": "",
-      "equipment": []
-    },
-    {
-      "id": "elevacao-pelvica",
-      "group": "gluteos",
-      "name": "Elevação pélvica",
-      "description": "Costas apoiadas no banco, peso sobre o quadril. Eleve o quadril até alinhar com o tronco e segure 1 segundo no alto.",
+      "name": "RDL com halteres",
+      "description": "Levantamento terra romeno: joelhos levemente dobrados, empurre o quadril para trás descendo os halteres até o meio da canela, coluna neutra, e suba.",
       "sets": "4",
-      "reps": "10-15",
+      "reps": "8-12",
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
       "video": "",
       "equipment": [
-        "banco",
         "halter"
       ]
     },
     {
-      "id": "abducao-elastico",
-      "group": "gluteos",
-      "name": "Abdução com elástico",
-      "description": "Elástico acima dos joelhos. Deitado de lado ou sentado, abra as pernas contra a resistência e volte devagar.",
+      "id": "rdl-unilateral",
+      "group": "posterior",
+      "name": "RDL unilateral",
+      "description": "Em uma perna só, halter na mão oposta. Incline o tronco à frente levando a outra perna para trás, até o tronco ficar quase paralelo ao chão, e volte.",
       "sets": "3",
-      "reps": "15-20",
-      "rest": "45s",
+      "reps": "8-10 cada perna",
+      "rest": "60s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "gluteos"
+      ]
+    },
+    {
+      "id": "terra-halteres",
+      "group": "posterior",
+      "name": "Levantamento terra com halteres",
+      "description": "Halteres ao lado dos pés. Agache com a coluna reta, segure e suba estendendo quadril e joelhos ao mesmo tempo. Desça controlando.",
+      "sets": "4",
+      "reps": "8-10",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ]
+    },
+    {
+      "id": "kettlebell-rdl",
+      "group": "posterior",
+      "name": "Kettlebell RDL",
+      "description": "Segure o kettlebell com as duas mãos à frente. Empurre o quadril para trás com os joelhos levemente dobrados e suba contraindo glúteos.",
+      "sets": "4",
+      "reps": "10-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "kettlebell"
+      ]
+    },
+    {
+      "id": "elevacao-pelvica",
+      "group": "gluteos",
+      "name": "Elevação pélvica",
+      "description": "Costas apoiadas no banco, halter sobre o quadril e pés firmes. Eleve o quadril até alinhar com o tronco, segure 1 segundo e desça.",
+      "sets": "4",
+      "reps": "10-15",
+      "rest": "60-90s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
       "equipment": [
-        "elastico"
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "hip-thrust",
+      "group": "gluteos",
+      "name": "Hip thrust",
+      "description": "Parte alta das costas apoiada no banco, halter no quadril. Empurre o quadril para cima com força até o tronco ficar reto e contraia os glúteos no topo.",
+      "sets": "4",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter",
+        "banco"
+      ]
+    },
+    {
+      "id": "kettlebell-swing",
+      "group": "gluteos",
+      "name": "Kettlebell swing",
+      "description": "Pés afastados, kettlebell à frente. Leve-o entre as pernas dobrando o quadril e projete o quadril para frente, balançando o peso até a altura do peito.",
+      "sets": "4",
+      "reps": "15-20",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "kettlebell"
       ]
     },
     {
       "id": "panturrilha-em-pe",
       "group": "panturrilha",
-      "name": "Panturrilha em pé",
-      "description": "Ponta dos pés num degrau. Suba o máximo possível, segure 1 segundo e desça até alongar.",
+      "name": "Elevação de panturrilha em pé",
+      "description": "Pontas dos pés num degrau (pode segurar halteres para aumentar a carga). Suba o máximo possível, segure 1 segundo e desça até alongar.",
       "sets": "4",
       "reps": "15-20",
       "rest": "45s",
@@ -384,62 +725,113 @@
     {
       "id": "panturrilha-unilateral",
       "group": "panturrilha",
-      "name": "Panturrilha unilateral",
-      "description": "Mesmo movimento, uma perna por vez, segurando um halter para aumentar a carga.",
+      "name": "Elevação de panturrilha unilateral",
+      "description": "Em uma perna só num degrau, com ou sem halter. Suba na ponta do pé, segure e desça devagar.",
       "sets": "3",
       "reps": "12-15 cada perna",
       "rest": "45s",
       "difficulty": "intermediario",
       "image": "",
       "video": "",
+      "equipment": []
+    },
+    {
+      "id": "panturrilha-sentado",
+      "group": "panturrilha",
+      "name": "Elevação de panturrilha sentado",
+      "description": "Sentado, pontas dos pés num apoio e halteres sobre os joelhos. Eleve os calcanhares o máximo possível e desça devagar.",
+      "sets": "4",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
       "equipment": [
         "halter"
+      ]
+    },
+    {
+      "id": "abdominal-elastico",
+      "group": "abdomen",
+      "name": "Abdominal com elástico",
+      "description": "Prenda o elástico no alto e ajoelhe de frente, segurando as pontas junto à cabeça. Flexione o tronco para baixo contraindo o abdômen.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "elastico"
+      ]
+    },
+    {
+      "id": "abdominal-roldana",
+      "group": "abdomen",
+      "name": "Abdominal na roldana",
+      "description": "Com a roldana presa no alto da porta, ajoelhado, segure a corda junto à cabeça. Leve os cotovelos em direção aos joelhos contraindo o abdômen.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "roldana"
+      ]
+    },
+    {
+      "id": "ab-wheel",
+      "group": "abdomen",
+      "name": "Ab wheel",
+      "description": "Ajoelhado, segure a roda à frente. Role para frente estendendo o corpo sem deixar o quadril cair e volte puxando com o abdômen.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "60s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "roda-abdominal"
       ]
     },
     {
       "id": "prancha",
       "group": "abdomen",
       "name": "Prancha",
-      "description": "Apoio nos antebraços e pontas dos pés, corpo reto, abdômen contraído. Não deixe o quadril cair.",
+      "description": "Apoio nos antebraços e nas pontas dos pés, corpo reto e abdômen contraído. Não deixe o quadril cair nem subir demais.",
       "sets": "3",
       "reps": "30-60s",
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "groups": [
+        "lombar"
+      ]
     },
     {
-      "id": "abdominal-supra",
+      "id": "dead-bug",
       "group": "abdomen",
-      "name": "Abdominal supra",
-      "description": "Deitado, joelhos flexionados. Suba o tronco contraindo o abdômen, sem puxar o pescoço com as mãos.",
+      "name": "Dead bug",
+      "description": "Deitado de costas, braços para cima e joelhos a 90°. Estenda braço e perna opostos até quase tocar o chão, mantendo a lombar colada, e alterne.",
       "sets": "3",
-      "reps": "15-20",
+      "reps": "10-12 cada lado",
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "groups": [
+        "lombar"
+      ]
     },
     {
-      "id": "elevacao-pernas",
+      "id": "abdominal-bola-suica",
       "group": "abdomen",
-      "name": "Elevação de pernas",
-      "description": "Deitado, mãos ao lado do corpo. Eleve as pernas estendidas até 90° e desça sem encostar no chão.",
-      "sets": "3",
-      "reps": "10-15",
-      "rest": "45-60s",
-      "difficulty": "intermediario",
-      "image": "",
-      "video": "",
-      "equipment": []
-    },
-    {
-      "id": "rosca-punho",
-      "group": "antebraco",
-      "name": "Rosca de punho",
-      "description": "Antebraços apoiados na coxa, palmas para cima. Flexione apenas os punhos subindo os halteres.",
+      "name": "Abdominal com bola suíça",
+      "description": "Lombar apoiada na bola de 55 cm e pés firmes no chão. Suba o tronco contraindo o abdômen e desça devagar, sem puxar o pescoço.",
       "sets": "3",
       "reps": "15-20",
       "rest": "45s",
@@ -447,60 +839,44 @@
       "image": "",
       "video": "",
       "equipment": [
-        "halter"
+        "bola-suica"
       ]
     },
     {
-      "id": "farmer-walk",
-      "group": "antebraco",
-      "name": "Caminhada do fazendeiro",
-      "description": "Segure halteres pesados ao lado do corpo e caminhe com postura ereta pelo tempo ou distância definida.",
+      "id": "extensao-lombar",
+      "group": "lombar",
+      "name": "Extensão lombar",
+      "description": "Deitado de bruços, mãos ao lado da cabeça. Eleve o peito do chão contraindo a lombar, segure 1 segundo e desça devagar.",
       "sets": "3",
-      "reps": "30-40s",
-      "rest": "60s",
-      "difficulty": "intermediario",
-      "image": "",
-      "video": "",
-      "equipment": [
-        "halter",
-        "kettlebell"
-      ]
-    },
-    {
-      "id": "polichinelo",
-      "group": "cardio",
-      "name": "Polichinelo",
-      "description": "Salte abrindo pernas e braços ao mesmo tempo e volte à posição inicial em ritmo constante.",
-      "sets": "3",
-      "reps": "45s",
-      "rest": "30s",
+      "reps": "12-15",
+      "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
       "video": "",
       "equipment": []
     },
     {
-      "id": "burpee",
-      "group": "cardio",
-      "name": "Burpee",
-      "description": "Agache, apoie as mãos, jogue as pernas para trás, faça uma flexão, volte e salte com os braços para cima.",
-      "sets": "4",
-      "reps": "10-12",
-      "rest": "60s",
-      "difficulty": "avancado",
+      "id": "bird-dog",
+      "group": "lombar",
+      "name": "Bird dog",
+      "description": "De quatro apoios, estenda ao mesmo tempo um braço à frente e a perna oposta para trás, mantendo o tronco estável. Volte e alterne.",
+      "sets": "3",
+      "reps": "10-12 cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
       "image": "",
       "video": "",
       "equipment": []
     },
     {
-      "id": "mountain-climber",
-      "group": "cardio",
-      "name": "Mountain climber",
-      "description": "Em posição de prancha alta, leve os joelhos alternadamente em direção ao peito o mais rápido possível.",
+      "id": "superman",
+      "group": "lombar",
+      "name": "Superman",
+      "description": "Deitado de bruços, eleve braços e pernas ao mesmo tempo, segure 2 segundos no alto e desça devagar.",
       "sets": "3",
-      "reps": "30-40s",
-      "rest": "30-45s",
-      "difficulty": "intermediario",
+      "reps": "12-15",
+      "rest": "45s",
+      "difficulty": "iniciante",
       "image": "",
       "video": "",
       "equipment": []

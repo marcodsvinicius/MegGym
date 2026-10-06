@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, equipmentLabels } =
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon } =
     window.MegGym;
   const Store = window.MegStore;
 
@@ -14,6 +14,7 @@
   let draft = null; // treino sendo criado/editado
   const filters = { search: "", difficulty: "" };
   let timer = null; // cronômetro do treino em andamento
+  let equipFilter = true; // mostrar só exercícios que o usuário consegue fazer com os equipamentos dele
 
   /* ================= Dados ================= */
 
@@ -23,6 +24,31 @@
 
   function exercises() {
     return [...base.exercises, ...Store.customExercises()];
+  }
+
+  // Exercício aparece no grupo principal e nos grupos secundários (ex.: afundo em quadríceps e glúteos).
+  function inGroup(ex, groupId) {
+    return ex.group === groupId || (Array.isArray(ex.groups) && ex.groups.includes(groupId));
+  }
+
+  function available(ex) {
+    return !equipFilter || canDo(ex, user?.equipment);
+  }
+
+  function missingEquipment(ex) {
+    const has = new Set(user?.equipment || []);
+    return (ex.equipment || []).filter((id) => !has.has(id));
+  }
+
+  // Botão do filtro de equipamentos (usado na lista e ao montar treino).
+  function equipFilterHtml(hiddenCount) {
+    const mine = (user?.equipment || []).length;
+    return `
+      <div class="equip-filter">
+        <button class="chip" type="button" data-equip-filter="on" aria-pressed="${equipFilter}">${icon("home", "mi-inline")} Meus equipamentos${mine ? ` (${mine})` : ""}</button>
+        <button class="chip" type="button" data-equip-filter="off" aria-pressed="${!equipFilter}">Todos</button>
+        ${equipFilter && hiddenCount ? `<span class="meta">${hiddenCount} ocultos</span>` : ""}
+      </div>`;
   }
 
   function findExercise(id) {
@@ -74,7 +100,7 @@
 
   function groupChips(list) {
     return list
-      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}</span>`)
+      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}</span>`)
       .join("");
   }
 
@@ -88,6 +114,15 @@
     return [sets, reps].filter(Boolean).join(" × ");
   }
 
+  // "3 × 8-12 · 10 kg"
+  function prescription(item) {
+    return [setsReps(item.sets, item.reps), item.load].filter(Boolean).join(" · ");
+  }
+
+  function capitalize(text) {
+    return text ? text[0].toUpperCase() + text.slice(1) : text;
+  }
+
   function formatDateTime(iso) {
     const d = new Date(iso);
     return d.toLocaleString("pt-BR", { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -99,12 +134,12 @@
     return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}`;
   }
 
-  function empty(emoji, text, extra = "") {
-    return `<div class="state"><span class="state-emoji">${emoji}</span>${text}${extra}</div>`;
+  function empty(iconName, text, extra = "") {
+    return `<div class="state">${icon(iconName, "state-icon")}${text}${extra}</div>`;
   }
 
   function fab(href, label) {
-    return `<a class="fab" href="${href}"><span aria-hidden="true">＋</span> ${label}</a>`;
+    return `<a class="fab" href="${href}">${icon("add", "mi-inline")} ${label}</a>`;
   }
 
   /* ================= Instalar o app ================= */
@@ -157,7 +192,7 @@
   app.addEventListener("click", async (e) => {
     if (e.target.closest("[data-install]")) {
       const accepted = await PWA.install();
-      if (accepted) toast("App instalado! 🎉", "success");
+      if (accepted) toast("App instalado!", "success");
       refreshInstallSlot();
     }
     if (e.target.closest("[data-install-dismiss]")) {
@@ -218,13 +253,13 @@
   }
 
   function motivation({ weekCount, trainedToday, streakDays, todayIndex, firstName }) {
-    if (trainedToday && streakDays >= 3) return { emoji: "🔥", title: `${streakDays} dias seguidos!`, text: "Que sequência! Continue assim, a constância é o que traz resultado." };
-    if (trainedToday) return { emoji: "💪", title: "Treino de hoje feito!", text: "Missão cumprida. Agora é descansar, se hidratar e voltar amanhã." };
-    if (weekCount === 0 && todayIndex === 0) return { emoji: "🚀", title: `Semana nova, ${firstName}!`, text: "Que tal começar com o pé direito e fazer o primeiro treino hoje?" };
-    if (weekCount === 0) return { emoji: "⏰", title: "Bora começar a semana?", text: "Ainda dá tempo! Um treino hoje já faz diferença." };
-    if (streakDays >= 2) return { emoji: "🔥", title: `${streakDays} dias seguidos`, text: "Não deixe a sequência parar. Treine hoje!" };
-    if (weekCount >= 4) return { emoji: "🏆", title: "Semana de campeão!", text: `Você já treinou ${weekCount} vezes nesta semana. Incrível!` };
-    return { emoji: "👊", title: `Já são ${weekCount} ${weekCount === 1 ? "treino" : "treinos"} na semana`, text: "Bom ritmo! Que tal mais um hoje?" };
+    if (trainedToday && streakDays >= 3) return { emoji: "local_fire_department", title: `${streakDays} dias seguidos!`, text: "Que sequência! Continue assim, a constância é o que traz resultado." };
+    if (trainedToday) return { emoji: "task_alt", title: "Treino de hoje feito!", text: "Missão cumprida. Agora é descansar, se hidratar e voltar amanhã." };
+    if (weekCount === 0 && todayIndex === 0) return { emoji: "rocket_launch", title: `Semana nova, ${firstName}!`, text: "Que tal começar com o pé direito e fazer o primeiro treino hoje?" };
+    if (weekCount === 0) return { emoji: "alarm", title: "Bora começar a semana?", text: "Ainda dá tempo! Um treino hoje já faz diferença." };
+    if (streakDays >= 2) return { emoji: "local_fire_department", title: `${streakDays} dias seguidos`, text: "Não deixe a sequência parar. Treine hoje!" };
+    if (weekCount >= 4) return { emoji: "emoji_events", title: "Semana de campeão!", text: `Você já treinou ${weekCount} vezes nesta semana. Incrível!` };
+    return { emoji: "bolt", title: `Já são ${weekCount} ${weekCount === 1 ? "treino" : "treinos"} na semana`, text: "Bom ritmo! Que tal mais um hoje?" };
   }
 
   function renderHome() {
@@ -258,7 +293,7 @@
       return `
         <li class="week-day ${state} ${isToday ? "is-today" : ""}" title="${escapeHtml(title)}">
           <span class="week-day-label">${label}</span>
-          <span class="week-day-dot" aria-hidden="true">${done ? "✓" : date.getDate()}</span>
+          <span class="week-day-dot" aria-hidden="true">${done ? icon("check") : date.getDate()}</span>
           <span class="visually-hidden">${escapeHtml(title)}</span>
         </li>`;
     }).join("");
@@ -281,13 +316,13 @@
       ${
         activeWorkout
           ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
-              <span>▶ Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
+              <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
             </a>`
           : ""
       }
 
       <section class="motivation">
-        <span class="motivation-emoji" aria-hidden="true">${msg.emoji}</span>
+        ${icon(msg.emoji, "motivation-emoji")}
         <div>
           <h2>${escapeHtml(msg.title)}</h2>
           <p>${escapeHtml(msg.text)}</p>
@@ -321,14 +356,15 @@
         ${
           last
             ? `<div class="last-workout">
-                <span class="history-icon" aria-hidden="true">✅</span>
-                <div class="item-main">
+                <span class="history-icon">${icon("check_circle")}</span>
+                <a class="item-main item-link-plain" href="#/atividade/historico/${encodeURIComponent(last.id)}">
                   <div class="item-title">${escapeHtml(last.workoutName)}</div>
                   <div class="meta">${escapeHtml(formatDateTime(last.finishedAt))} · ${formatDuration(last.startedAt, last.finishedAt)} · ${last.exerciseCount} exercícios</div>
-                </div>
+                  <div class="meta link-text">Ver detalhes ›</div>
+                </a>
                 ${lastWorkout ? `<a class="btn btn-sm btn-primary" href="#/treinos/${encodeURIComponent(lastWorkout.id)}">Fazer de novo</a>` : ""}
               </div>`
-            : empty("🏁", "Você ainda não terminou nenhum treino.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Escolher um treino</a>`)
+            : empty("flag", "Você ainda não terminou nenhum treino.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Escolher um treino</a>`)
         }
       </section>
 
@@ -338,17 +374,17 @@
   /* ================= Exercícios ================= */
 
   function renderExerciseGroups() {
-    setHeader("Lista de exercícios", { action: `<a class="btn btn-sm btn-primary" href="#/exercicios/novo">＋ Novo</a>` });
+    setHeader("Lista de exercícios", { action: `<a class="btn btn-sm btn-primary" href="#/exercicios/novo">${icon("add", "mi-inline")} Novo</a>` });
     setTab("exercicios");
     filters.search = "";
     filters.difficulty = "";
     const all = exercises();
     const cards = groups()
       .map((g) => {
-        const count = all.filter((e) => e.group === g.id).length;
+        const count = all.filter((e) => inGroup(e, g.id) && available(e)).length;
         return `
           <a class="group-card" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
-            <span class="group-icon" aria-hidden="true">${escapeHtml(g.icon || "💪")}</span>
+            <span class="group-icon">${icon(g.icon || "fitness_center")}</span>
             <span>
               <span class="group-name">${escapeHtml(g.name)}</span><br>
               <span class="group-count">${count} ${count === 1 ? "exercício" : "exercícios"}</span>
@@ -356,7 +392,9 @@
           </a>`;
       })
       .join("");
+    const hidden = all.filter((e) => !available(e)).length;
     app.innerHTML = `
+      ${equipFilterHtml(hidden)}
       <p class="page-subtitle section-intro">Escolha um grupo muscular.</p>
       <nav class="group-grid" aria-label="Grupos musculares">${cards}</nav>`;
   }
@@ -383,9 +421,14 @@
           </div>
           ${stats ? `<div class="stats">${stats}</div>` : ""}
           ${equip ? `<div class="equip-chips">${equip}</div>` : ""}
+          ${
+            missingEquipment(ex).length
+              ? `<p class="missing">Você não marcou: ${escapeHtml(equipmentLabels(missingEquipment(ex)).join(", "))}</p>`
+              : ""
+          }
           ${ex.description ? `<p class="exercise-desc clamp-2">${escapeHtml(ex.description)}</p>` : ""}
           <div class="card-foot">
-            <span class="meta">${hasVideo ? "▶ Tem vídeo · " : ""}Toque para ver detalhes</span>
+            <span class="meta">${hasVideo ? `${icon("smart_display", "mi-inline")} Tem vídeo · ` : ""}Toque para ver detalhes</span>
             ${ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : ""}
           </div>
         </div>
@@ -395,16 +438,24 @@
   function renderExerciseList(group) {
     const list = $("exercise-list");
     const q = normalizeText(filters.search.trim());
-    const all = exercises().filter((e) => e.group === group.id);
+    const all = exercises().filter((e) => inGroup(e, group.id));
+    const hidden = all.filter((e) => !available(e)).length;
     const items = all.filter(
       (e) =>
+        available(e) &&
         (!filters.difficulty || e.difficulty === filters.difficulty) &&
         (!q || normalizeText(e.name).includes(q) || normalizeText(e.description).includes(q))
     );
     if (!all.length) {
-      list.innerHTML = empty("📝", `Ainda não há exercícios de ${escapeHtml(group.name)}.`);
+      list.innerHTML = empty("edit_note", `Ainda não há exercícios de ${escapeHtml(group.name)}.`);
     } else if (!items.length) {
-      list.innerHTML = empty("🔍", "Nenhum exercício encontrado com esses filtros.");
+      list.innerHTML = empty(
+        "search_off",
+        hidden && equipFilter
+          ? `Nenhum exercício com os seus equipamentos aqui.`
+          : "Nenhum exercício encontrado com esses filtros.",
+        hidden && equipFilter ? `<br><button class="btn" style="margin-top:12px" type="button" data-equip-filter="off">Mostrar todos (${hidden})</button>` : ""
+      );
     } else {
       list.innerHTML = `<div class="exercise-grid">${items.map(exerciseCard).join("")}</div>`;
     }
@@ -415,17 +466,18 @@
     setTab("exercicios");
     if (!group) {
       setHeader("Exercícios", { back: "#/exercicios" });
-      app.innerHTML = empty("🤔", "Grupo muscular não encontrado.");
+      app.innerHTML = empty("help", "Grupo muscular não encontrado.");
       return;
     }
     setHeader(group.name, {
       back: "#/exercicios",
-      action: `<a class="btn btn-sm btn-primary" href="#/exercicios/novo?grupo=${encodeURIComponent(group.id)}">＋ Novo</a>`,
+      action: `<a class="btn btn-sm btn-primary" href="#/exercicios/novo?grupo=${encodeURIComponent(group.id)}">${icon("add", "mi-inline")} Novo</a>`,
     });
     const chips = [["", "Todos"], ...Object.entries(DIFFICULTIES)]
       .map(([value, label]) => `<button class="chip" type="button" data-difficulty="${value}" aria-pressed="${filters.difficulty === value}">${label}</button>`)
       .join("");
     app.innerHTML = `
+      ${equipFilterHtml(0)}
       <div class="toolbar">
         <label class="search">
           <span class="visually-hidden">Buscar exercício</span>
@@ -453,7 +505,7 @@
     const ex = findExercise(id);
     if (!ex) {
       setHeader("Exercício", { back: "#/exercicios" });
-      app.innerHTML = empty("🤔", "Exercício não encontrado.");
+      app.innerHTML = empty("help", "Exercício não encontrado.");
       return;
     }
     setHeader(ex.name, {
@@ -468,14 +520,14 @@
     const editing = editId ? Store.customExercises().find((e) => e.id === editId) : null;
     if (editId && !editing) {
       setHeader("Exercício", { back: "#/exercicios" });
-      app.innerHTML = empty("🤔", "Exercício não encontrado.");
+      app.innerHTML = empty("help", "Exercício não encontrado.");
       return;
     }
     const ex = editing || { group: presetGroup || groups()[0]?.id || "" };
     const back = ex.group ? `#/exercicios/grupo/${encodeURIComponent(ex.group)}` : "#/exercicios";
     setHeader(editing ? "Editar exercício" : "Novo exercício", { back });
     const options = groups()
-      .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === ex.group ? "selected" : ""}>${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}</option>`)
+      .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === ex.group ? "selected" : ""}>${escapeHtml(g.name)}</option>`)
       .join("");
     const diffOptions = [["", "—"], ...Object.entries(DIFFICULTIES)]
       .map(([v, l]) => `<option value="${v}" ${ex.difficulty === v ? "selected" : ""}>${l}</option>`)
@@ -607,7 +659,7 @@
   }
 
   function renderWorkouts() {
-    setHeader("Treinos", { action: `<a class="btn btn-sm btn-primary" href="#/treinos/novo">＋ Novo</a>` });
+    setHeader("Treinos", { action: `<a class="btn btn-sm btn-primary" href="#/treinos/novo">${icon("add", "mi-inline")} Novo</a>` });
     setTab("treinos");
     const list = Store.workouts();
     const session = Store.session(user.id);
@@ -616,14 +668,14 @@
       ${
         activeWorkout
           ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
-              <span>▶ Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
+              <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
             </a>`
           : ""
       }
       ${
         list.length
           ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>`
-          : empty("🏋️", "Nenhum treino criado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos/novo">Criar meu primeiro treino</a>`)
+          : empty("fitness_center", "Nenhum treino criado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos/novo">Criar meu primeiro treino</a>`)
       }`;
   }
 
@@ -632,7 +684,7 @@
     const w = Store.getWorkout(id);
     if (!w) {
       setHeader("Treino", { back: "#/treinos" });
-      app.innerHTML = empty("🤔", "Treino não encontrado.");
+      app.innerHTML = empty("help", "Treino não encontrado.");
       return;
     }
     setHeader(w.name, { back: "#/treinos", action: `<a class="btn btn-sm" href="#/treinos/${encodeURIComponent(w.id)}/editar">Editar</a>` });
@@ -643,11 +695,11 @@
         const ex = findExercise(item.exerciseId);
         const g = ex && findGroup(ex.group);
         return `
-          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}"` : ""}>
+          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}"` : ""}>
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-              <div class="meta">${g ? `${escapeHtml(g.icon || "")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(setsReps(item.sets, item.reps))}</div>
+              <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
             </div>
             ${ex ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
           </li>`;
@@ -661,7 +713,7 @@
       <ol class="item-list">${items || `<li class="state">Nenhum exercício.</li>`}</ol>
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
-          ${activeHere ? "▶ Continuar treino" : "▶ Iniciar treino"}
+          ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
       </div>`;
     $("start-btn").addEventListener("click", () => {
@@ -683,19 +735,19 @@
     const editing = editId ? Store.getWorkout(editId) : null;
     if (editId && !editing) {
       setHeader("Treino", { back: "#/treinos" });
-      app.innerHTML = empty("🤔", "Treino não encontrado.");
+      app.innerHTML = empty("help", "Treino não encontrado.");
       return;
     }
     if (!draft || draft.id !== (editing?.id || null)) {
       draft = editing
-        ? { id: editing.id, name: editing.name, description: editing.description || "", items: editing.items.map((i) => ({ ...i })) }
+        ? { id: editing.id, name: editing.name, description: editing.description || "", items: editing.items.map((i) => ({ load: "", ...i })) }
         : { id: null, name: "", description: "", items: [] };
     }
     const back = editing ? `#/treinos/${encodeURIComponent(editing.id)}` : "#/treinos";
     setHeader(editing ? "Editar treino" : "Novo treino", { back });
 
     const groupOptions = groups()
-      .map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}</option>`)
+      .map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`)
       .join("");
 
     app.innerHTML = `
@@ -731,6 +783,7 @@
               <select class="select" id="picker-group"><option value="">Todos os grupos</option>${groupOptions}</select>
             </label>
           </div>
+          <div id="picker-filter"></div>
           <ul class="item-list" id="picker-list"></ul>
         </section>
 
@@ -767,7 +820,7 @@
       if (!btn) return;
       const ex = findExercise(btn.dataset.add);
       if (!ex) return;
-      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "" });
+      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "", load: "" });
       renderDraftItems();
       renderPicker();
       toast(`${ex.name} adicionado`);
@@ -791,7 +844,12 @@
           ...(draft.id ? { id: draft.id } : {}),
           name: draft.name,
           description: draft.description,
-          items: draft.items.map(({ exerciseId, sets, reps }) => ({ exerciseId, sets: String(sets).trim(), reps: String(reps).trim() })),
+          items: draft.items.map(({ exerciseId, sets, reps, load }) => ({
+            exerciseId,
+            sets: String(sets).trim(),
+            reps: String(reps).trim(),
+            load: String(load || "").trim(),
+          })),
           groups: workoutGroups(draft.items).map((g) => g.id),
         },
         user
@@ -830,22 +888,23 @@
                 <span class="item-index">${i + 1}</span>
                 <div class="item-main">
                   <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-                  <div class="meta">${g ? `${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}` : ""}</div>
+                  <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}</div>
                   <div class="sets-reps">
                     <label><span>Séries</span><input class="input input-sm" data-field="sets" inputmode="numeric" maxlength="10" value="${escapeHtml(item.sets)}"></label>
                     <span aria-hidden="true">×</span>
                     <label><span>Repetições</span><input class="input input-sm" data-field="reps" maxlength="20" value="${escapeHtml(item.reps)}"></label>
                   </div>
+                  <label class="load-field"><span>Carga</span><input class="input input-sm" data-field="load" maxlength="30" placeholder="Ex.: 10 kg" value="${escapeHtml(item.load || "")}"></label>
                 </div>
                 <div class="item-actions">
-                  <button class="icon-btn icon-btn-sm" type="button" data-item-action="up" aria-label="Subir" ${i === 0 ? "disabled" : ""}>↑</button>
-                  <button class="icon-btn icon-btn-sm" type="button" data-item-action="down" aria-label="Descer" ${i === draft.items.length - 1 ? "disabled" : ""}>↓</button>
-                  <button class="icon-btn icon-btn-sm icon-btn-danger" type="button" data-item-action="remove" aria-label="Remover">✕</button>
+                  <button class="icon-btn icon-btn-sm" type="button" data-item-action="up" aria-label="Subir" ${i === 0 ? "disabled" : ""}>${icon("arrow_upward")}</button>
+                  <button class="icon-btn icon-btn-sm" type="button" data-item-action="down" aria-label="Descer" ${i === draft.items.length - 1 ? "disabled" : ""}>${icon("arrow_downward")}</button>
+                  <button class="icon-btn icon-btn-sm icon-btn-danger" type="button" data-item-action="remove" aria-label="Remover">${icon("close")}</button>
                 </div>
               </li>`;
           })
           .join("")
-      : `<li class="state state-sm">Nenhum exercício ainda. Adicione abaixo 👇</li>`;
+      : `<li class="state state-sm">Nenhum exercício ainda. Adicione da lista abaixo.</li>`;
   }
 
   function renderPicker() {
@@ -853,8 +912,10 @@
     const groupFilter = $("picker-group").value;
     const chosen = new Set(draft.items.map((i) => i.exerciseId));
     const list = exercises().filter(
-      (e) => (!groupFilter || e.group === groupFilter) && (!q || normalizeText(e.name).includes(q))
+      (e) => available(e) && (!groupFilter || inGroup(e, groupFilter)) && (!q || normalizeText(e.name).includes(q))
     );
+    const hiddenCount = exercises().filter((e) => !available(e)).length;
+    $("picker-filter").innerHTML = equipFilterHtml(hiddenCount);
     $("picker-list").innerHTML = list.length
       ? list
           .map((ex) => {
@@ -862,12 +923,12 @@
             const added = chosen.has(ex.id);
             return `
               <li class="item-row">
-                <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}" aria-hidden="true">${escapeHtml(g?.icon || "💪")}</span>
+                <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}">${icon(g?.icon || "fitness_center")}</span>
                 <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}">
                   <div class="item-title">${escapeHtml(ex.name)}</div>
                   <div class="meta">${escapeHtml(g?.name || "")}${ex.sets || ex.reps ? ` · ${escapeHtml(setsReps(ex.sets, ex.reps))}` : ""}</div>
                 </div>
-                <button class="btn btn-sm ${added ? "" : "btn-primary"}" type="button" data-add="${escapeHtml(ex.id)}">${added ? "＋ De novo" : "＋ Adicionar"}</button>
+                <button class="btn btn-sm ${added ? "" : "btn-primary"}" type="button" data-add="${escapeHtml(ex.id)}">${icon("add", "mi-inline")} ${added ? "De novo" : "Adicionar"}</button>
               </li>`;
           })
           .join("")
@@ -882,7 +943,7 @@
     let session = Store.session(user.id);
     if (!w) {
       setHeader("Treino", { back: "#/treinos" });
-      app.innerHTML = empty("🤔", "Treino não encontrado.");
+      app.innerHTML = empty("help", "Treino não encontrado.");
       return;
     }
     if (!session || session.workoutId !== w.id) {
@@ -902,10 +963,10 @@
             <button class="run-check" type="button" data-toggle="${i}" aria-pressed="${done}" aria-label="${done ? "Desmarcar" : "Concluir"} ${escapeHtml(ex.name)}">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
             </button>
-            <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}">
+            <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}">
               <div class="item-title">${escapeHtml(ex.name)}</div>
-              <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}</div>
-              <div class="meta">${g ? `${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}` : ""}${ex.rest ? ` · descanso ${escapeHtml(ex.rest)}` : ""}</div>
+              <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
+              <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${ex.rest ? ` · descanso ${escapeHtml(ex.rest)}` : ""}</div>
               <div class="meta link-text">Ver execução ›</div>
             </div>
           </li>`;
@@ -937,7 +998,7 @@
       const btn = $("finish-btn");
       const complete = total > 0 && done === total;
       btn.disabled = !complete;
-      btn.textContent = complete ? "🏁 Terminar treino" : `Faltam ${total - done}`;
+      btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `Faltam ${total - done}`;
     }
 
     app.querySelector(".run-list").addEventListener("click", (e) => {
@@ -954,9 +1015,14 @@
     });
 
     $("finish-btn").addEventListener("click", () => {
-      const record = Store.finishSession(user, w, valid.length);
+      const snapshot = valid.map((i) => {
+        const item = w.items[i];
+        const ex = findExercise(item.exerciseId);
+        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "" };
+      });
+      const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
-      toast("Treino concluído! 💪", "success");
+      toast("Treino concluído!", "success");
       location.hash = `#/atividade?feito=${encodeURIComponent(record.id)}`;
     });
 
@@ -989,13 +1055,16 @@
   /* ================= Atividade ================= */
 
   function renderActivity(params) {
-    setHeader("Atividade", { action: `<button class="btn btn-sm" type="button" id="logout-btn">Sair</button>` });
+    setHeader("Atividade", {
+      action: `<a class="icon-btn" href="#/atividade/configuracoes" aria-label="Configurações" title="Configurações">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </a>`,
+    });
     setTab("atividade");
     const history = Store.history(user.id);
     const weekAgo = Date.now() - 7 * 86400000;
     const thisWeek = history.filter((h) => new Date(h.finishedAt).getTime() >= weekAgo).length;
     const highlight = params.get("feito");
-    const theme = window.MegTheme ? window.MegTheme.get() : "auto";
     const initials = user.name
       .split(" ")
       .slice(0, 2)
@@ -1008,7 +1077,8 @@
         <span class="avatar" aria-hidden="true">${escapeHtml(initials)}</span>
         <div>
           <h2 class="page-title">${escapeHtml(user.name)}</h2>
-          <button class="link-btn" type="button" id="rename-btn">Alterar nome</button>
+          <p class="meta">${[user.age ? `${user.age} anos` : "", SEXES.find(([id]) => id === user.sex)?.[1] || ""].filter(Boolean).join(" · ")}</p>
+          <a class="link-btn" href="#/atividade/perfil">Editar perfil</a>
         </div>
       </section>
       <div id="install-slot" data-context="activity">${installCard("activity")}</div>
@@ -1017,20 +1087,15 @@
         <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
       </div>
       <section class="subsection">
-        <h2 class="subsection-title">Aparência</h2>
-        <div class="segmented" role="radiogroup" aria-label="Tema" id="theme-picker">
-          ${[
-            ["auto", "📱", "Automático"],
-            ["light", "☀️", "Claro"],
-            ["dark", "🌙", "Escuro"],
-          ]
-            .map(
-              ([value, icon, label]) =>
-                `<button type="button" role="radio" data-theme-choice="${value}" aria-checked="${theme === value}"><span aria-hidden="true">${icon}</span>${label}</button>`
-            )
-            .join("")}
+        <div class="subsection-head">
+          <h2 class="subsection-title">Meus equipamentos</h2>
+          <a class="btn btn-sm" href="#/atividade/equipamentos">Editar</a>
         </div>
-        <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
+        ${
+          (user.equipment || []).length
+            ? `<div class="equip-chips">${(user.equipment || []).map((id) => `<span class="equip-chip">${icon(EQUIPMENT_ICONS[id] || "fitness_center", "mi-inline")} ${escapeHtml(EQUIPMENT[id] || id)}</span>`).join("")}</div>`
+            : `<p class="meta">Nenhum marcado — mostramos exercícios com o peso do corpo.</p>`
+        }
       </section>
       <section class="subsection">
         <h2 class="subsection-title">Histórico</h2>
@@ -1039,42 +1104,189 @@
             ? `<ul class="item-list">${history
                 .map(
                   (h) => `
-                  <li class="item-row ${h.id === highlight ? "highlight" : ""}">
-                    <span class="history-icon" aria-hidden="true">✅</span>
+                  <li><a class="item-row item-link ${h.id === highlight ? "highlight" : ""}" href="#/atividade/historico/${encodeURIComponent(h.id)}">
+                    <span class="history-icon">${icon("check_circle")}</span>
                     <div class="item-main">
                       <div class="item-title">${escapeHtml(h.workoutName)}</div>
                       <div class="meta">${escapeHtml(formatDateTime(h.finishedAt))} · ${formatDuration(h.startedAt, h.finishedAt)} · ${h.exerciseCount} exercícios</div>
                     </div>
-                  </li>`
+                    <span class="chevron" aria-hidden="true">›</span>
+                  </a></li>`
                 )
                 .join("")}</ul>`
-            : empty("📅", "Nenhum treino registrado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Ver treinos</a>`)
+            : empty("event_busy", "Nenhum treino registrado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Ver treinos</a>`)
         }
+      </section>`;
+  }
+
+  function renderHistoryDetail(id) {
+    setTab("atividade");
+    const h = Store.getHistory(id);
+    if (!h || h.userId !== user.id) {
+      setHeader("Treino feito", { back: "#/atividade" });
+      app.innerHTML = empty("help", "Registro não encontrado.");
+      return;
+    }
+    setHeader("Treino feito", { back: "#/atividade" });
+    const start = new Date(h.startedAt);
+    const end = new Date(h.finishedAt);
+    const time = (d) => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const workout = Store.getWorkout(h.workoutId);
+    // Registros antigos não têm a lista: usa a do treino atual, avisando.
+    const fromSnapshot = Array.isArray(h.exercises) && h.exercises.length;
+    const list = fromSnapshot
+      ? h.exercises
+      : (workout?.items || []).map((item) => {
+          const ex = findExercise(item.exerciseId);
+          return ex ? { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "" } : null;
+        }).filter(Boolean);
+    const groupsDone = [...new Set(list.map((e) => e.group))].map(findGroup).filter(Boolean);
+    const totalSets = list.reduce((sum, e) => sum + (parseInt(e.sets, 10) || 0), 0);
+    const sameWorkoutCount = Store.history(user.id).filter((x) => x.workoutId === h.workoutId).length;
+
+    app.innerHTML = `
+      <section class="history-hero">
+        <span class="history-hero-icon">${icon("flag")}</span>
+        <div>
+          <h2>${escapeHtml(h.workoutName)}</h2>
+          <p class="meta">${escapeHtml(capitalize(end.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })))}</p>
+        </div>
+      </section>
+      ${h.workoutDescription ? `<p class="lead">${escapeHtml(h.workoutDescription)}</p>` : ""}
+
+      <div class="detail-grid">
+        <div class="stat-tile"><span class="stat-tile-value">${formatDuration(h.startedAt, h.finishedAt)}</span><span class="stat-tile-label">duração</span></div>
+        <div class="stat-tile"><span class="stat-tile-value">${time(start)}–${time(end)}</span><span class="stat-tile-label">início e fim</span></div>
+        <div class="stat-tile"><span class="stat-tile-value">${h.exerciseCount}</span><span class="stat-tile-label">exercícios</span></div>
+        <div class="stat-tile"><span class="stat-tile-value">${totalSets || "—"}</span><span class="stat-tile-label">séries no total</span></div>
+      </div>
+
+      ${groupsDone.length ? `<section class="subsection"><h2 class="subsection-title">Músculos trabalhados</h2><div class="group-chips" style="margin-top:10px">${groupChips(groupsDone)}</div></section>` : ""}
+
+      <section class="subsection">
+        <h2 class="subsection-title">Exercícios feitos</h2>
+        ${!fromSnapshot && list.length ? `<p class="meta">Registro antigo: mostrando os exercícios atuais do treino.</p>` : ""}
+        ${
+          list.length
+            ? `<ol class="item-list">${list
+                .map((e, i) => {
+                  const g = findGroup(e.group);
+                  const exists = findExercise(e.exerciseId);
+                  return `
+                    <li class="item-row ${exists ? "tappable" : ""}" ${exists ? `data-exercise="${escapeHtml(e.exerciseId)}" data-sets="${escapeHtml(e.sets)}" data-reps="${escapeHtml(e.reps)}" data-load="${escapeHtml(e.load || "")}"` : ""}>
+                      <span class="item-index done-index">${icon("check")}</span>
+                      <div class="item-main">
+                        <div class="item-title">${escapeHtml(e.name)}</div>
+                        <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                      </div>
+                      ${exists ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
+                    </li>`;
+                })
+                .join("")}</ol>`
+            : `<p class="meta">A lista de exercícios deste registro não está disponível.</p>`
+        }
+      </section>
+
+      <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
+      ${
+        workout
+          ? `<div class="sticky-cta"><a class="btn btn-primary btn-block btn-lg" href="#/treinos/${encodeURIComponent(workout.id)}">${icon("replay", "mi-inline")} Fazer este treino de novo</a></div>`
+          : `<p class="meta">Este treino foi excluído.</p>`
+      }`;
+  }
+
+  function renderSettings() {
+    setTab("atividade");
+    setHeader("Configurações", { back: "#/atividade" });
+    const theme = window.MegTheme ? window.MegTheme.get() : "auto";
+    app.innerHTML = `
+      <section class="settings-group">
+        <h2 class="settings-title">Aparência</h2>
+        <div class="segmented" role="radiogroup" aria-label="Tema" id="theme-picker">
+          ${[
+            ["auto", "brightness_auto", "Automático"],
+            ["light", "light_mode", "Claro"],
+            ["dark", "dark_mode", "Escuro"],
+          ]
+            .map(
+              ([value, iconName, label]) =>
+                `<button type="button" role="radio" data-theme-choice="${value}" aria-checked="${theme === value}">${icon(iconName)}${label}</button>`
+            )
+            .join("")}
+        </div>
+        <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
+      </section>
+
+      <section class="settings-group">
+        <h2 class="settings-title">Conta</h2>
+        <div class="settings-list">
+          <a class="settings-item" href="#/atividade/perfil">
+            <span class="settings-icon">${icon("person")}</span>
+            <span class="item-main"><span class="item-title">Editar perfil</span><br><span class="meta">Nome, idade e sexo</span></span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </a>
+          <a class="settings-item" href="#/atividade/equipamentos">
+            <span class="settings-icon">${icon("fitness_center")}</span>
+            <span class="item-main"><span class="item-title">Meus equipamentos</span><br><span class="meta">${(user.equipment || []).length} selecionados</span></span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </a>
+          <button class="settings-item settings-danger" type="button" id="logout-btn">
+            <span class="settings-icon">${icon("logout")}</span>
+            <span class="item-main"><span class="item-title">Sair</span><br><span class="meta">Trocar de perfil neste aparelho</span></span>
+          </button>
+        </div>
       </section>`;
 
     $("theme-picker").addEventListener("click", (e) => {
       const btn = e.target.closest("[data-theme-choice]");
       if (!btn || !window.MegTheme) return;
       window.MegTheme.set(btn.dataset.themeChoice);
-      renderActivity(params);
+      renderSettings();
     });
-
     $("logout-btn").addEventListener("click", () => {
+      if (!confirm("Sair deste perfil?")) return;
       Store.logout();
       user = null;
+      location.hash = "#/inicio";
       showLogin();
     });
-    $("rename-btn").addEventListener("click", () => {
-      const name = prompt("Seu nome:", user.name);
-      if (name === null) return;
-      const clean = name.trim();
-      if (clean.length < 2) {
-        toast("O nome precisa ter pelo menos 2 letras.", "error");
-        return;
-      }
-      Store.renameUser(user.id, clean);
-      user = Store.currentUser();
-      renderActivity(params);
+  }
+
+  function renderEditProfile() {
+    setTab("atividade");
+    setHeader("Editar perfil", { back: "#/atividade/configuracoes" });
+    app.innerHTML = `
+      <form class="form-stack" id="profile-form" novalidate>
+        ${profileFieldsHtml(user)}
+        <div class="sticky-cta"><button class="btn btn-primary btn-block btn-lg" type="submit">Salvar</button></div>
+      </form>`;
+    $("profile-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const { values, errors } = readProfileFields(e.target);
+      const duplicate = Store.findByName(values.name);
+      if (!errors.length && duplicate && duplicate.id !== user.id) errors.push(["pf-name", "Já existe outro perfil com esse nome neste aparelho."]);
+      showFieldErrors(e.target, errors);
+      if (errors.length) return;
+      user = Store.updateUser(user.id, values);
+      toast("Perfil atualizado!", "success");
+      location.hash = "#/atividade/configuracoes";
+    });
+  }
+
+  function renderEditEquipment() {
+    setTab("atividade");
+    setHeader("Meus equipamentos", { back: "#/atividade/configuracoes" });
+    app.innerHTML = `
+      <form class="form-stack" id="equipment-form" novalidate>
+        <p class="page-subtitle" style="margin:0">Marque o que você tem em casa. A lista de exercícios e a montagem de treinos mostram o que dá para fazer.</p>
+        ${equipmentPickerHtml(user.equipment || [])}
+        <div class="sticky-cta"><button class="btn btn-primary btn-block btn-lg" type="submit">Salvar</button></div>
+      </form>`;
+    $("equipment-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      user = Store.updateUser(user.id, { equipment: readEquipment(e.target) });
+      toast("Equipamentos atualizados!", "success");
+      location.hash = "#/atividade";
     });
   }
 
@@ -1106,7 +1318,11 @@
         else renderExerciseGroups();
         break;
       case "atividade":
-        renderActivity(params);
+        if (parts[1] === "configuracoes") renderSettings();
+        else if (parts[1] === "perfil") renderEditProfile();
+        else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2]);
+        else if (parts[1] === "equipamentos") renderEditEquipment();
+        else renderActivity(params);
         break;
       case "inicio":
         renderHome();
@@ -1118,46 +1334,234 @@
     window.scrollTo(0, 0);
   }
 
-  /* ================= Login ================= */
+  /* ================= Perfil: campos reutilizados (onboarding e edição) ================= */
 
-  function showLogin() {
-    $("app-shell").classList.add("hidden");
-    $("login-screen").classList.remove("hidden");
-    const others = Store.users();
-    $("profiles").classList.toggle("hidden", !others.length);
-    $("profile-list").innerHTML = others
-      .map((u) => `<button class="chip" type="button" data-profile="${escapeHtml(u.id)}">${escapeHtml(u.name)}</button>`)
-      .join("");
-    $("name-input").value = "";
-    $("name-error").classList.add("hidden");
+  const SEXES = [
+    ["feminino", "Feminino"],
+    ["masculino", "Masculino"],
+    ["outro", "Outro"],
+    ["nao-informar", "Prefiro não dizer"],
+  ];
+
+  function profileFieldsHtml(values = {}) {
+    return `
+      <div class="field">
+        <label for="pf-name">Nome</label>
+        <input class="input input-lg" id="pf-name" maxlength="40" autocomplete="given-name" placeholder="Seu nome" value="${escapeHtml(values.name || "")}">
+      </div>
+      <div class="field">
+        <label for="pf-age">Idade</label>
+        <input class="input input-lg" id="pf-age" type="number" inputmode="numeric" min="10" max="100" placeholder="Ex.: 30" value="${escapeHtml(values.age ?? "")}">
+      </div>
+      <fieldset class="field fieldset">
+        <legend>Sexo</legend>
+        <div class="check-chips" role="radiogroup">
+          ${SEXES.map(
+            ([id, label]) => `
+            <label class="check-chip radio-chip">
+              <input type="radio" name="pf-sex" value="${id}" ${values.sex === id ? "checked" : ""}>
+              <span>${label}</span>
+            </label>`
+          ).join("")}
+        </div>
+      </fieldset>`;
   }
 
+  // Lê e valida os campos de perfil. Devolve { values } ou { errors }.
+  function readProfileFields(container) {
+    const name = $("pf-name").value.trim().replace(/\s+/g, " ");
+    const ageRaw = $("pf-age").value.trim();
+    const age = Number(ageRaw);
+    const sex = container.querySelector('input[name="pf-sex"]:checked')?.value || "";
+    const errors = [];
+    if (name.length < 2) errors.push(["pf-name", "Digite seu nome (pelo menos 2 letras)."]);
+    if (!ageRaw || !Number.isInteger(age) || age < 10 || age > 100) errors.push(["pf-age", "Informe uma idade entre 10 e 100."]);
+    if (!sex) errors.push(["pf-sex", "Escolha uma opção."]);
+    return { values: { name, age, sex }, errors };
+  }
+
+  function showFieldErrors(container, errors) {
+    container.querySelectorAll(".field-error:not([id])").forEach((el) => el.remove());
+    errors.forEach(([id, message]) => {
+      const target = id === "pf-sex" ? container.querySelector('input[name="pf-sex"]') : $(id);
+      const el = document.createElement("span");
+      el.className = "field-error";
+      el.textContent = message;
+      target.closest(".field").appendChild(el);
+    });
+    if (errors.length) {
+      const first = errors[0][0] === "pf-sex" ? container.querySelector('input[name="pf-sex"]') : $(errors[0][0]);
+      first.closest(".field").scrollIntoView({ behavior: "smooth", block: "center" });
+      if (first.type !== "radio") first.focus({ preventScroll: true });
+    }
+  }
+
+  function equipmentPickerHtml(selected = []) {
+    return `
+      <div class="equip-grid">
+        ${Object.entries(EQUIPMENT)
+          .map(
+            ([id, label]) => `
+            <label class="equip-option">
+              <input type="checkbox" name="pf-equipment" value="${id}" ${selected.includes(id) ? "checked" : ""}>
+              <span>${icon(EQUIPMENT_ICONS[id] || "fitness_center", "equip-option-icon")}${escapeHtml(label)}</span>
+            </label>`
+          )
+          .join("")}
+      </div>`;
+  }
+
+  function readEquipment(container) {
+    return [...container.querySelectorAll('input[name="pf-equipment"]:checked')].map((c) => c.value);
+  }
+
+  /* ================= Onboarding ================= */
+
+  // Estado do onboarding: step 1..3 e dados preenchidos. "existing" = perfil antigo completando dados.
+  let onboarding = null;
+
+  function showLogin() {
+    clearInterval(timer);
+    $("app-shell").classList.add("hidden");
+    $("login-screen").classList.remove("hidden");
+    onboarding = { step: 1, values: { equipment: [] }, existing: null };
+    renderOnboarding();
+  }
+
+  function startProfileCompletion(existingUser) {
+    $("app-shell").classList.add("hidden");
+    $("login-screen").classList.remove("hidden");
+    onboarding = {
+      step: 2,
+      values: { name: existingUser.name, age: existingUser.age, sex: existingUser.sex, equipment: existingUser.equipment || [] },
+      existing: existingUser,
+    };
+    renderOnboarding();
+  }
+
+  function stepDots(step) {
+    return `<div class="steps" aria-label="Passo ${step} de 3">${[1, 2, 3]
+      .map((n) => `<span class="step-dot ${n === step ? "active" : n < step ? "done" : ""}"></span>`)
+      .join("")}</div>`;
+  }
+
+  function renderOnboarding() {
+    const box = $("onboarding");
+    const { step, values, existing } = onboarding;
+
+    if (step === 1) {
+      const profiles = Store.users();
+      box.innerHTML = `
+        <div class="onboarding-step onboarding-welcome">
+          <img class="brand-logo brand-logo-xl" src="assets/icons/icon-192.png" alt="" width="96" height="96">
+          <h1>Seja bem-vindo ao <span class="accent">MegGym</span></h1>
+          <p class="lead">Um aplicativo de treinos em casa. Monte seus treinos com o que você tem e acompanhe sua evolução.</p>
+          <button class="btn btn-primary btn-block btn-lg" type="button" data-ob="next">Começar</button>
+          ${
+            profiles.length
+              ? `<div class="profiles">
+                  <p class="page-subtitle">Já tem perfil neste aparelho?</p>
+                  <div class="chips">${profiles
+                    .map((u) => `<button class="chip" type="button" data-profile="${escapeHtml(u.id)}">${escapeHtml(u.name)}</button>`)
+                    .join("")}</div>
+                </div>`
+              : ""
+          }
+        </div>`;
+      return;
+    }
+
+    if (step === 2) {
+      box.innerHTML = `
+        <form class="onboarding-step form-stack" id="ob-profile" novalidate>
+          ${stepDots(2)}
+          <div>
+            <h1>${existing ? "Complete seu perfil" : "Vamos nos conhecer"}</h1>
+            <p class="page-subtitle">${existing ? "Precisamos de mais alguns dados." : "Conta um pouco sobre você."}</p>
+          </div>
+          ${profileFieldsHtml(values)}
+          <div class="onboarding-actions">
+            ${existing ? "" : `<button class="btn btn-ghost" type="button" data-ob="back">Voltar</button>`}
+            <button class="btn btn-primary btn-lg" type="submit">Continuar</button>
+          </div>
+        </form>`;
+      const form = $("ob-profile");
+      if (!values.name) $("pf-name").focus();
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const { values: read, errors } = readProfileFields(form);
+        const duplicate = Store.findByName(read.name);
+        if (!errors.length && duplicate && duplicate.id !== existing?.id)
+          errors.push(["pf-name", "Já existe um perfil com esse nome neste aparelho. Use outro nome ou volte e toque nele."]);
+        showFieldErrors(form, errors);
+        if (errors.length) return;
+        Object.assign(values, read);
+        onboarding.step = 3;
+        renderOnboarding();
+      });
+      return;
+    }
+
+    // step 3
+    box.innerHTML = `
+      <form class="onboarding-step form-stack" id="ob-equipment" novalidate>
+        ${stepDots(3)}
+        <div>
+          <h1>Quais equipamentos você tem em casa?</h1>
+          <p class="page-subtitle">Marque todos que tiver. Vamos mostrar os exercícios que você consegue fazer.</p>
+        </div>
+        ${equipmentPickerHtml(values.equipment)}
+        <p class="meta">Não tem nenhum? Sem problema: exercícios com o peso do corpo sempre aparecem.</p>
+        <div class="onboarding-actions">
+          <button class="btn btn-ghost" type="button" data-ob="back">Voltar</button>
+          <button class="btn btn-primary btn-lg" type="submit">Concluir</button>
+        </div>
+      </form>`;
+    $("ob-equipment").addEventListener("submit", (e) => {
+      e.preventDefault();
+      values.equipment = readEquipment(e.target);
+      if (existing) {
+        user = Store.updateUser(existing.id, { name: values.name, age: values.age, sex: values.sex, equipment: values.equipment, onboarded: true });
+      } else {
+        user = Store.createUser(values);
+      }
+      onboarding = null;
+      toast(`Tudo pronto, ${user.name.split(" ")[0]}!`, "success");
+      if (!location.hash || location.hash === "#/") location.replace("#/inicio");
+      enterApp();
+    });
+  }
+
+  $("onboarding").addEventListener("click", (e) => {
+    const nav = e.target.closest("[data-ob]");
+    if (nav && onboarding) {
+      if (nav.dataset.ob === "back") {
+        const form = $("onboarding").querySelector("form");
+        if (onboarding.step === 3 && form) onboarding.values.equipment = readEquipment(form);
+        onboarding.step = Math.max(1, onboarding.step - 1);
+      } else {
+        onboarding.step = Math.min(3, onboarding.step + 1);
+      }
+      renderOnboarding();
+      return;
+    }
+    const profile = e.target.closest("[data-profile]");
+    if (profile) {
+      user = Store.loginById(profile.dataset.profile);
+      if (user) enterApp();
+    }
+  });
+
   function enterApp() {
+    if (!user.onboarded) {
+      startProfileCompletion(user);
+      return;
+    }
     $("login-screen").classList.add("hidden");
+    $("onboarding").innerHTML = ""; // evita campos com o mesmo id escondidos na página
     $("app-shell").classList.remove("hidden");
     route();
   }
-
-  $("name-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const name = $("name-input").value.trim();
-    const error = $("name-error");
-    if (name.length < 2) {
-      error.textContent = "Digite seu nome (pelo menos 2 letras).";
-      error.classList.remove("hidden");
-      $("name-input").focus();
-      return;
-    }
-    user = Store.login(name);
-    enterApp();
-  });
-
-  $("profile-list").addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-profile]");
-    if (!btn) return;
-    user = Store.loginById(btn.dataset.profile);
-    if (user) enterApp();
-  });
 
   $("back-btn").addEventListener("click", () => {
     const href = $("back-btn").dataset.href;
@@ -1181,12 +1585,13 @@
       ["Séries", sets],
       ["Repetições", reps],
       ["Descanso", ex.rest],
+      ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
       .join("");
     const equip = equipmentChips(ex.equipment);
-    const groupCount = g ? exercises().filter((e) => e.group === g.id).length : 0;
+    const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
     return `
       ${img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
@@ -1202,7 +1607,7 @@
           ytId
             ? `<div class="video-wrap"><iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
             : videoUrl
-              ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Abrir vídeo</a>`
+              ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
               : ""
         }
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
@@ -1218,7 +1623,7 @@
           ? `<section class="sheet-section">
               <h3>Grupo muscular</h3>
               <a class="group-detail" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
-                <span class="group-icon" aria-hidden="true">${escapeHtml(g.icon || "💪")}</span>
+                <span class="group-icon">${icon(g.icon || "fitness_center")}</span>
                 <span class="item-main">
                   <span class="item-title">${escapeHtml(g.name)}</span><br>
                   <span class="meta">${groupCount} ${groupCount === 1 ? "exercício" : "exercícios"} neste grupo · ver todos</span>
@@ -1258,6 +1663,16 @@
   }
 
   app.addEventListener("click", (e) => {
+    const toggle = e.target.closest("[data-equip-filter]");
+    if (toggle) {
+      equipFilter = toggle.dataset.equipFilter === "on";
+      if ($("picker-list")) renderPicker();
+      else route();
+      return;
+    }
+  });
+
+  app.addEventListener("click", (e) => {
     if (e.target.closest("a, button, input, select, label, textarea")) return;
     const page = e.target.closest("[data-exercise-page]");
     if (page) {
@@ -1265,7 +1680,7 @@
       return;
     }
     const target = e.target.closest("[data-exercise]");
-    if (target) openSheet(target.dataset.exercise, { sets: target.dataset.sets, reps: target.dataset.reps });
+    if (target) openSheet(target.dataset.exercise, { sets: target.dataset.sets, reps: target.dataset.reps, load: target.dataset.load });
   });
   app.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
@@ -1297,14 +1712,19 @@
 
   window.addEventListener("hashchange", route);
 
-  loadData()
-    .then((d) => {
+  const seedWorkouts = fetch("data/workouts.json", { cache: "no-cache" })
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null);
+
+  Promise.all([loadData(), seedWorkouts])
+    .then(([d, seed]) => {
       base = d;
+      Store.applySeed(seed);
       user = Store.currentUser();
       if (user) enterApp();
       else showLogin();
     })
     .catch((err) => {
-      document.body.innerHTML = `<div class="state" style="margin:24px">⚠️ ${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="location.reload()">Tentar novamente</button></div>`;
+      document.body.innerHTML = `<div class="state" style="margin:24px">${icon("error", "state-icon")}${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="location.reload()">Tentar novamente</button></div>`;
     });
 })();

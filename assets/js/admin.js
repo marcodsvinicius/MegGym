@@ -326,7 +326,7 @@
   /* ================= UI: renderização ================= */
 
   function renderGroupSelects() {
-    const groupOptions = state.data.groups.map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.icon || "")} ${escapeHtml(g.name)}</option>`).join("");
+    const groupOptions = state.data.groups.map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`).join("");
 
     const exGroup = $("ex-group");
     const current = exGroup.value;
@@ -354,7 +354,7 @@
             const meta = [groupName(e.group), [e.sets, e.reps].filter(Boolean).join(" × ")].filter(Boolean).join(" · ");
             return `
               <li class="admin-item">
-                <span class="group-icon" style="--group-color:${safeColor(g?.color)}" aria-hidden="true">${escapeHtml(g?.icon || "💪")}</span>
+                <span class="group-icon" style="--group-color:${safeColor(g?.color)}" aria-hidden="true">${window.MegGym.icon(g?.icon || "fitness_center")}</span>
                 <div class="admin-item-main">
                   <div class="admin-item-title"><span class="name">${escapeHtml(e.name)}</span>${difficultyBadge(e.difficulty)}</div>
                   <div class="admin-item-meta">${escapeHtml(meta)}</div>
@@ -376,7 +376,7 @@
             const count = state.data.exercises.filter((e) => e.group === g.id).length;
             return `
               <li class="admin-item">
-                <span class="group-icon" style="--group-color:${safeColor(g.color)}" aria-hidden="true">${escapeHtml(g.icon || "💪")}</span>
+                <span class="group-icon" style="--group-color:${safeColor(g.color)}" aria-hidden="true">${window.MegGym.icon(g.icon || "fitness_center")}</span>
                 <div class="admin-item-main">
                   <div class="admin-item-title"><span class="name">${escapeHtml(g.name)}</span></div>
                   <div class="admin-item-meta">${count} ${count === 1 ? "exercício" : "exercícios"}</div>
@@ -563,7 +563,7 @@
     clearErrors($("group-form"));
     const values = {
       name: $("gr-name").value.trim(),
-      icon: $("gr-icon").value.trim() || "💪",
+      icon: $("gr-icon").value.trim() || "fitness_center",
       color: safeColor($("gr-color").value),
     };
     if (!values.name) {

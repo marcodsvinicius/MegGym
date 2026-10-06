@@ -10,9 +10,7 @@ window.MEGGYM_CONFIG = {
   BACKEND: "github",
 
   // Imagem de fundo do topo da tela inicial (link https ou arquivo do repositório, ex.: "assets/img/fundo.jpg").
-  HOME_BACKGROUND:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq81h1Fk31bopighYvNoVIdhBGxYx-3tVVuxiONTONpIma4-eC4h_y4vQ4&s=10",
-
+  HOME_BACKGROUND: "",
   SUPABASE_URL: "https://qhfggcorskpfpbvlqadx.supabase.co",
   SUPABASE_KEY: "sb_publishable_RnRLvXlp2uNB1qco6nyJVA_-CGbBFQx",
   IMAGE_BUCKET: "exercise-images",

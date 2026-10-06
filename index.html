@@ -13,27 +13,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <script src="assets/js/theme.js?v=12"></script>
-  <link rel="stylesheet" href="assets/css/style.css?v=12">
+  <script src="assets/js/theme.js?v=14"></script>
+  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=14">
 </head>
 <body class="app-body">
-  <!-- Entrada: nome do usuário -->
-  <section class="login-screen hidden" id="login-screen" aria-labelledby="login-title">
-    <div class="login-box">
-      <img class="brand-logo" src="assets/icons/icon-192.png" alt="" width="72" height="72">
-      <h1 id="login-title">MegGym</h1>
-      <p class="page-subtitle">Como podemos te chamar?</p>
-      <form id="name-form" class="login-form" novalidate>
-        <label class="visually-hidden" for="name-input">Seu nome</label>
-        <input class="input input-lg" id="name-input" maxlength="40" autocomplete="given-name" placeholder="Seu nome" required>
-        <span class="field-error hidden" id="name-error"></span>
-        <button class="btn btn-primary btn-block btn-lg" type="submit">Entrar</button>
-      </form>
-      <div class="profiles hidden" id="profiles">
-        <p class="page-subtitle">Ou continue como:</p>
-        <div class="chips" id="profile-list"></div>
-      </div>
-    </div>
+  <!-- Onboarding / entrada -->
+  <section class="login-screen hidden" id="login-screen" aria-live="polite">
+    <div class="onboarding" id="onboarding"></div>
   </section>
 
   <!-- App -->
@@ -81,11 +68,11 @@
 
   <div class="toast hidden" id="toast" role="status"></div>
 
-  <script src="assets/js/config.js?v=12"></script>
-  <script src="assets/js/supabase.js?v=12"></script>
-  <script src="assets/js/common.js?v=12"></script>
-  <script src="assets/js/store.js?v=12"></script>
-  <script src="assets/js/pwa.js?v=12"></script>
-  <script src="assets/js/app.js?v=12"></script>
+  <script src="assets/js/config.js?v=14"></script>
+  <script src="assets/js/supabase.js?v=14"></script>
+  <script src="assets/js/common.js?v=14"></script>
+  <script src="assets/js/store.js?v=14"></script>
+  <script src="assets/js/pwa.js?v=14"></script>
+  <script src="assets/js/app.js?v=14"></script>
 </body>
 </html>

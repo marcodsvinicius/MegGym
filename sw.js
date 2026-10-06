@@ -1,6 +1,6 @@
 /* Service worker do MegGym: deixa o app instalável e funcionando offline.
    Ao mudar arquivos do app, aumente VERSION (e o ?v= dos arquivos no index.html). */
-const VERSION = "v12";
+const VERSION = "v14";
 const CACHE = `meggym-${VERSION}`;
 
 const CORE = [
@@ -8,18 +8,20 @@ const CORE = [
   "./index.html",
   "./manifest.webmanifest",
   "./data/exercises.json",
-  "./assets/css/style.css?v=12",
-  "./assets/js/theme.js?v=12",
-  "./assets/js/config.js?v=12",
-  "./assets/js/supabase.js?v=12",
-  "./assets/js/common.js?v=12",
-  "./assets/js/store.js?v=12",
-  "./assets/js/pwa.js?v=12",
-  "./assets/js/app.js?v=12",
+  "./data/workouts.json",
+  "./assets/css/style.css?v=14",
+  "./assets/js/theme.js?v=14",
+  "./assets/js/config.js?v=14",
+  "./assets/js/supabase.js?v=14",
+  "./assets/js/common.js?v=14",
+  "./assets/js/store.js?v=14",
+  "./assets/js/pwa.js?v=14",
+  "./assets/js/app.js?v=14",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/favicon-32.png",
+  "./assets/fonts/material-symbols-rounded.woff2",
 ];
 
 self.addEventListener("install", (event) => {
