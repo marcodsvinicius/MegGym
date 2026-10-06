@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon } =
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText } =
     window.MegGym;
   const Store = window.MegStore;
 
@@ -132,6 +132,86 @@
         <textarea class="textarea textarea-sm" id="ex-note" data-note-exercise="${escapeHtml(exerciseId)}" maxlength="1000" placeholder="Ex.: usei 12 kg, subir para 14 na próxima; sentir mais o peito…">${escapeHtml(Store.exerciseNote(user.id, exerciseId))}</textarea>
         <p class="meta" id="ex-note-status">Só você vê. Salva automaticamente.</p>
       </section>`;
+  }
+
+  // "Minha carga": peso (kg) e/ou cor do elástico, quando o exercício usa esses equipamentos.
+  function loadFieldsHtml(ex) {
+    const weight = usesWeight(ex);
+    const band = usesBand(ex);
+    if (!weight && !band) return "";
+    const load = Store.exerciseLoad(user.id, ex.id);
+    return `
+      <section class="sheet-section my-load" data-load-exercise="${escapeHtml(ex.id)}">
+        <h3>Minha carga</h3>
+        ${
+          weight
+            ? `<label class="weight-field">
+                <span class="visually-hidden">Peso em kg</span>
+                <input class="input" id="ex-weight" type="text" inputmode="decimal" maxlength="12" placeholder="0" value="${escapeHtml(load.weight)}">
+                <span class="weight-unit">kg</span>
+              </label>
+              <p class="meta">Peso que você usa${(ex.equipment || []).includes("halter") || (ex.equipmentAny || []).includes("halter") ? " (por halter)" : ""}.</p>`
+            : ""
+        }
+        ${
+          band
+            ? `<p class="meta band-label">Cor do elástico</p>
+              <div class="band-colors" role="radiogroup" aria-label="Cor do elástico">
+                ${Object.entries(BAND_COLORS)
+                  .map(
+                    ([id, [label, color]]) => `
+                    <button type="button" class="band" role="radio" data-band="${id}" aria-checked="${load.band === id}" title="${label}">
+                      <span class="band-dot" style="background:${color}"></span><span>${label}</span>
+                    </button>`
+                  )
+                  .join("")}
+              </div>`
+            : ""
+        }
+        <p class="meta" id="ex-load-status">Só você vê. Salva automaticamente.</p>
+      </section>`;
+  }
+
+  function loadPreview(ex) {
+    const text = loadText(Store.exerciseLoad(user.id, ex.id), ex);
+    return `<div class="ex-load-preview ${text ? "" : "hidden"}" data-load-preview="${escapeHtml(ex.id)}">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(text)}</span></div>`;
+  }
+
+  function refreshLoadPreviews(exerciseId) {
+    const ex = findExercise(exerciseId);
+    const text = ex ? loadText(Store.exerciseLoad(user.id, exerciseId), ex) : "";
+    document.querySelectorAll(`[data-load-preview="${CSS.escape(exerciseId)}"]`).forEach((el) => {
+      el.classList.toggle("hidden", !text);
+      el.querySelector("span:not(.mi)").textContent = text;
+    });
+  }
+
+  function bindLoadFields() {
+    const box = document.querySelector("[data-load-exercise]");
+    if (!box) return;
+    const id = box.dataset.loadExercise;
+    const status = $("ex-load-status");
+    const saved = () => {
+      if (status) status.textContent = "Salvo. Só você vê.";
+      refreshLoadPreviews(id);
+    };
+    const weight = $("ex-weight");
+    if (weight) {
+      weight.addEventListener("input", () => {
+        weight.value = weight.value.replace(/[^\d.,]/g, "");
+        Store.saveExerciseLoad(user.id, id, { weight: weight.value.replace(".", ",") });
+        saved();
+      });
+    }
+    box.querySelectorAll("[data-band]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const already = btn.getAttribute("aria-checked") === "true";
+        box.querySelectorAll("[data-band]").forEach((b) => b.setAttribute("aria-checked", "false"));
+        if (!already) btn.setAttribute("aria-checked", "true");
+        Store.saveExerciseLoad(user.id, id, { band: already ? "" : btn.dataset.band });
+        saved();
+      })
+    );
   }
 
   // Prévia da observação embaixo do exercício (detalhe do treino e execução).
@@ -600,6 +680,7 @@
     });
     app.innerHTML = `<article class="exercise-page">${exerciseDetailHtml(ex, {}, { titleId: "exercise-page-title" })}</article>`;
     bindPersonalNote();
+    bindLoadFields();
   }
 
   function renderExerciseForm(editId, presetGroup) {
@@ -802,6 +883,7 @@
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
+              ${ex ? loadPreview(ex) : ""}
               ${ex ? notePreview(ex.id) : ""}
             </div>
             ${ex ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
@@ -1362,6 +1444,7 @@
               <div class="item-title">${escapeHtml(ex.name)}</div>
               <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}${item.rest || ex.rest ? ` · descanso ${escapeHtml(item.rest || ex.rest)}` : ""}</div>
+              ${loadPreview(ex)}
               ${notePreview(ex.id)}
               <div class="meta link-text">Ver execução e anotar ›</div>
             </div>
@@ -1415,7 +1498,7 @@
       const snapshot = valid.map((i) => {
         const item = w.items[i];
         const ex = findExercise(item.exerciseId);
-        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id) };
+        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id), myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex) };
       });
       const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
@@ -1585,6 +1668,7 @@
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
                         <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                        ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
                         ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
                       </div>
                       ${exists ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
@@ -2113,6 +2197,8 @@
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
 
+      ${loadFieldsHtml(ex)}
+
       ${personalNoteHtml(ex.id)}
 
       <section class="sheet-section">
@@ -2143,6 +2229,7 @@
     if (!ex) return;
     $("sheet-content").innerHTML = exerciseDetailHtml(ex, prescription);
     bindPersonalNote();
+    bindLoadFields();
 
     sheetReturnFocus = document.activeElement;
     sheet.classList.remove("hidden");

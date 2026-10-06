@@ -65,6 +65,43 @@
     return needed.every((id) => has.has(id)) && (!any.length || any.some((id) => has.has(id)));
   }
 
+  // Equipamentos em que faz sentido registrar o peso usado.
+  const WEIGHTED = ["halter", "anilha", "kettlebell", "barra", "caneleira", "roldana", "leg-press", "estacao"];
+
+  // Cores comuns de elástico (da mais leve à mais pesada, varia por marca).
+  const BAND_COLORS = {
+    amarelo: ["Amarelo", "#f2c500"],
+    laranja: ["Laranja", "#f07c1a"],
+    vermelho: ["Vermelho", "#d93025"],
+    rosa: ["Rosa", "#e85a9b"],
+    verde: ["Verde", "#2e9e44"],
+    azul: ["Azul", "#1e66d0"],
+    roxo: ["Roxo", "#7b3fbf"],
+    preto: ["Preto", "#222222"],
+    cinza: ["Cinza", "#8a8a8a"],
+  };
+
+  function exerciseEquipment(ex) {
+    return [...(ex.equipment || []), ...(ex.equipmentAny || [])];
+  }
+
+  function usesWeight(ex) {
+    return exerciseEquipment(ex).some((id) => WEIGHTED.includes(id));
+  }
+
+  function usesBand(ex) {
+    return exerciseEquipment(ex).includes("elastico");
+  }
+
+  // "12 kg · elástico vermelho"
+  function loadText(load, ex) {
+    if (!load) return "";
+    const parts = [];
+    if (load.weight && (!ex || usesWeight(ex))) parts.push(`${load.weight} kg`);
+    if (load.band && BAND_COLORS[load.band] && (!ex || usesBand(ex))) parts.push(`elástico ${BAND_COLORS[load.band][0].toLowerCase()}`);
+    return parts.join(" · ");
+  }
+
   function equipmentLabels(list) {
     return (Array.isArray(list) ? list : []).map((id) => EQUIPMENT[id]).filter(Boolean);
   }
@@ -203,6 +240,10 @@
     EQUIPMENT_ICONS,
     icon,
     canDo,
+    BAND_COLORS,
+    usesWeight,
+    usesBand,
+    loadText,
     equipmentLabels,
     escapeHtml,
     safeUrl,

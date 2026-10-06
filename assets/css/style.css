@@ -1721,3 +1721,22 @@ body.sheet-open { overflow: hidden; }
 .install-help .install-steps { text-align: left; align-self: stretch; font-size: .95rem; gap: 10px; }
 .install-card { align-items: center; }
 .install-card .install-actions { margin-top: 10px; }
+
+/* ---------- Minha carga ---------- */
+.weight-field { display: flex; align-items: center; gap: 8px; max-width: 200px; }
+.weight-field .input { font-size: 1.4rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.weight-unit { font-weight: 800; color: var(--text-muted); }
+.band-label { margin: 12px 0 8px; }
+.band-colors { display: flex; flex-wrap: wrap; gap: 6px; }
+.band {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 6px 6px; border-radius: 999px;
+  border: 2px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+.band-dot { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.band[aria-checked="true"] { border-color: var(--accent); background: var(--accent-container); color: var(--on-accent-container); }
+:root[data-style="esportivo"] .band, :root[data-style="esportivo"] .band-dot { border-radius: 0; }
+.ex-load-preview { display: inline-flex; gap: 4px; align-items: center; margin-top: 6px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: .82rem; font-weight: 700; color: var(--text); }
+.ex-load-preview .mi { color: var(--accent); }
+.ex-load-preview.hidden { display: none; }

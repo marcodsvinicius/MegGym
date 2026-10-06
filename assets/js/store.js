@@ -13,6 +13,7 @@
     seed: "meggym.workoutsSeed",
     notes: "meggym.notes.", // (antigo) + id do usuário → { [workoutId]: texto }
     exerciseNotes: "meggym.exnotes.", // + id do usuário → { [exerciseId]: texto }
+    exerciseLoads: "meggym.exloads.", // + id do usuário → { [exerciseId]: { weight, band } }
     structures: "meggym.structures",
     plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
@@ -290,6 +291,20 @@
     write(KEY.exerciseNotes + userId, all);
   }
 
+  // Carga que o usuário usa em cada exercício: peso (kg) e/ou cor do elástico.
+  function exerciseLoad(userId, exerciseId) {
+    return read(KEY.exerciseLoads + userId, {})[exerciseId] || { weight: "", band: "" };
+  }
+
+  function saveExerciseLoad(userId, exerciseId, changes) {
+    const all = read(KEY.exerciseLoads + userId, {});
+    const next = { ...(all[exerciseId] || { weight: "", band: "" }), ...changes };
+    next.weight = String(next.weight || "").trim();
+    if (!next.weight && !next.band) delete all[exerciseId];
+    else all[exerciseId] = { ...next, updatedAt: new Date().toISOString() };
+    write(KEY.exerciseLoads + userId, all);
+  }
+
   /* ---------- Histórico ---------- */
 
   function history(userId) {
@@ -358,6 +373,8 @@
     saveNote,
     exerciseNote,
     saveExerciseNote,
+    exerciseLoad,
+    saveExerciseLoad,
     getHistory,
     finishSession,
   };
