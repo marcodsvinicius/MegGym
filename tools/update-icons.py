@@ -17,7 +17,7 @@ names = set(EXTRA)
 for f in ["assets/js/app.js", "assets/js/common.js"]:
     s = (ROOT / f).read_text(encoding="utf-8")
     names |= set(re.findall(r'(?:icon|empty)\(\s*"([a-z0-9_]+)"', s))
-    names |= set(re.findall(r'emoji: "([a-z0-9_]+)"', s))
+    names |= set(re.findall(r'(?:emoji|icon): "([a-z0-9_]+)"', s))
     names |= set(re.findall(r'\["(?:auto|light|dark)", "([a-z0-9_]+)"', s))
     names |= set(re.findall(r'^\s*"([a-z]+_[a-z_]+)",\s*$', s, re.M))
 common = (ROOT / "assets/js/common.js").read_text(encoding="utf-8")

@@ -1267,3 +1267,18 @@ body.sheet-open { overflow: hidden; }
 .home-structure-count { font-size: .95rem; color: var(--text-muted); }
 .home-structure-count strong { font-size: 1.6rem; color: var(--text); }
 .home-structure .meta { margin: 0; }
+.ex-note-preview { display: flex; gap: 4px; align-items: flex-start; margin-top: 6px; padding: 6px 10px; border-radius: 8px; background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); font-size: .85rem; color: var(--text); white-space: pre-line; }
+.ex-note-preview .mi { color: var(--accent); }
+.ex-note-preview.hidden { display: none; }
+.my-note h3 label { cursor: pointer; }
+
+/* ---------- Confirmação em bottom sheet ---------- */
+.confirm-sheet { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 4px 0 8px; }
+.confirm-sheet h2 { font-size: 1.3rem; font-weight: 800; }
+.confirm-sheet p { margin: 0; color: var(--text-muted); }
+.confirm-icon { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.confirm-icon .mi { font-size: 32px; }
+.confirm-icon.danger { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+.confirm-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.btn-danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-danger-solid:hover { background: var(--danger); filter: brightness(1.08); }

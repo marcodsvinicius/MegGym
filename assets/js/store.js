@@ -11,7 +11,8 @@
     history: "meggym.history",
     session: "meggym.session.", // + id do usuário
     seed: "meggym.workoutsSeed",
-    notes: "meggym.notes.", // + id do usuário → { [workoutId]: texto }
+    notes: "meggym.notes.", // (antigo) + id do usuário → { [workoutId]: texto }
+    exerciseNotes: "meggym.exnotes.", // + id do usuário → { [exerciseId]: texto }
     structures: "meggym.structures",
     plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
@@ -276,6 +277,18 @@
     write(KEY.notes + userId, all);
   }
 
+  function exerciseNote(userId, exerciseId) {
+    return read(KEY.exerciseNotes + userId, {})[exerciseId] || "";
+  }
+
+  function saveExerciseNote(userId, exerciseId, text) {
+    const all = read(KEY.exerciseNotes + userId, {});
+    const clean = String(text || "").trim();
+    if (clean) all[exerciseId] = clean;
+    else delete all[exerciseId];
+    write(KEY.exerciseNotes + userId, all);
+  }
+
   /* ---------- Histórico ---------- */
 
   function history(userId) {
@@ -301,7 +314,6 @@
       exerciseCount,
       workoutDescription: workout.description || "",
       exercises: snapshot,
-      note: note(user.id, workout.id),
       startedAt: current.startedAt,
       finishedAt: new Date().toISOString(),
     };
@@ -343,6 +355,8 @@
     history,
     note,
     saveNote,
+    exerciseNote,
+    saveExerciseNote,
     getHistory,
     finishSession,
   };

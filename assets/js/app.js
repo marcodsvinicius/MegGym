@@ -124,34 +124,47 @@
     return [setsReps(item.sets, item.reps), item.rir ? `RIR ${item.rir}` : "", item.load].filter(Boolean).join(" · ");
   }
 
-  // Bloco "Minhas observações" (salvo só para o usuário, automaticamente).
-  function personalNoteHtml(workoutId) {
+  // "Minhas observações" de um exercício: salvas só para o usuário, automaticamente.
+  function personalNoteHtml(exerciseId) {
     return `
-      <section class="subsection my-note">
-        <label class="subsection-title" for="my-note">${icon("edit_note", "mi-inline")} Minhas observações</label>
-        <textarea class="textarea textarea-sm" id="my-note" data-note-workout="${escapeHtml(workoutId)}" maxlength="2000" placeholder="Ex.: aumentar carga da remada, sentir mais o peito no crucifixo…">${escapeHtml(Store.note(user.id, workoutId))}</textarea>
-        <p class="meta" id="my-note-status">Só você vê. Salva automaticamente.</p>
+      <section class="sheet-section my-note">
+        <h3><label for="ex-note">Minhas observações</label></h3>
+        <textarea class="textarea textarea-sm" id="ex-note" data-note-exercise="${escapeHtml(exerciseId)}" maxlength="1000" placeholder="Ex.: usei 12 kg, subir para 14 na próxima; sentir mais o peito…">${escapeHtml(Store.exerciseNote(user.id, exerciseId))}</textarea>
+        <p class="meta" id="ex-note-status">Só você vê. Salva automaticamente.</p>
       </section>`;
+  }
+
+  // Prévia da observação embaixo do exercício (detalhe do treino e execução).
+  function notePreview(exerciseId) {
+    const text = Store.exerciseNote(user.id, exerciseId);
+    return `<div class="ex-note-preview ${text ? "" : "hidden"}" data-note-preview="${escapeHtml(exerciseId)}">${icon("edit_note", "mi-inline")} <span>${escapeHtml(text)}</span></div>`;
   }
 
   let noteTimer;
   function bindPersonalNote() {
-    const area = $("my-note");
+    const area = $("ex-note");
     if (!area) return;
     const save = () => {
-      Store.saveNote(user.id, area.dataset.noteWorkout, area.value);
-      const status = $("my-note-status");
+      const id = area.dataset.noteExercise;
+      Store.saveExerciseNote(user.id, id, area.value);
+      const status = $("ex-note-status");
       if (status) status.textContent = "Salvo. Só você vê.";
+      document.querySelectorAll(`[data-note-preview="${CSS.escape(id)}"]`).forEach((el) => {
+        const text = Store.exerciseNote(user.id, id);
+        el.classList.toggle("hidden", !text);
+        el.querySelector("span:not(.mi)").textContent = text;
+      });
     };
     area.addEventListener("input", () => {
       clearTimeout(noteTimer);
-      noteTimer = setTimeout(save, 500);
+      noteTimer = setTimeout(save, 400);
     });
     area.addEventListener("blur", () => {
       clearTimeout(noteTimer);
       save();
     });
   }
+
 
   function capitalize(text) {
     return text ? text[0].toUpperCase() + text.slice(1) : text;
@@ -574,6 +587,7 @@
       action: ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : "",
     });
     app.innerHTML = `<article class="exercise-page">${exerciseDetailHtml(ex, {}, { titleId: "exercise-page-title" })}</article>`;
+    bindPersonalNote();
   }
 
   function renderExerciseForm(editId, presetGroup) {
@@ -776,6 +790,7 @@
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
+              ${ex ? notePreview(ex.id) : ""}
             </div>
             ${ex ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
           </li>`;
@@ -788,13 +803,11 @@
       <p class="meta">${w.items.length} exercícios · você fez este treino ${doneCount} ${doneCount === 1 ? "vez" : "vezes"}</p>
       <ol class="item-list">${items || `<li class="state">Nenhum exercício.</li>`}</ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
-      ${personalNoteHtml(w.id)}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
           ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
       </div>`;
-    bindPersonalNote();
     $("start-btn").addEventListener("click", () => startWorkout(w));
   }
 
@@ -1337,7 +1350,8 @@
               <div class="item-title">${escapeHtml(ex.name)}</div>
               <div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}${item.rest || ex.rest ? ` · descanso ${escapeHtml(item.rest || ex.rest)}` : ""}</div>
-              <div class="meta link-text">Ver execução ›</div>
+              ${notePreview(ex.id)}
+              <div class="meta link-text">Ver execução e anotar ›</div>
             </div>
           </li>`;
       })
@@ -1354,13 +1368,11 @@
       </div>
       <ol class="run-list">${items}</ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
-      ${personalNoteHtml(w.id)}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="finish-btn"></button>
         <button class="btn btn-ghost btn-block" type="button" id="cancel-run">Cancelar treino</button>
       </div>`;
 
-    bindPersonalNote();
     const valid = w.items.map((item, i) => (findExercise(item.exerciseId) ? i : null)).filter((i) => i !== null);
 
     function updateProgress() {
@@ -1391,19 +1403,27 @@
       const snapshot = valid.map((i) => {
         const item = w.items[i];
         const ex = findExercise(item.exerciseId);
-        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "" };
+        return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id) };
       });
-      const area = $("my-note");
-      if (area) Store.saveNote(user.id, w.id, area.value);
       const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
       toast("Treino concluído!", "success");
       location.hash = `#/atividade?feito=${encodeURIComponent(record.id)}`;
     });
 
-    $("cancel-run").addEventListener("click", () => {
-      if (!confirm("Cancelar este treino? O progresso não será registrado.")) return;
+    $("cancel-run").addEventListener("click", async () => {
+      const done = valid.filter((i) => session.done[i]).length;
+      const ok = await confirmSheet({
+        icon: "cancel",
+        title: "Cancelar treino?",
+        text: `Você fez ${done} de ${valid.length} exercícios em ${$("run-timer").textContent}. Ao cancelar, este treino não será registrado no seu histórico.`,
+        confirmLabel: "Cancelar treino",
+        cancelLabel: "Continuar treinando",
+        danger: true,
+      });
+      if (!ok) return;
       Store.cancelSession(user.id);
+      toast("Treino cancelado.");
       location.hash = `#/treinos/${encodeURIComponent(w.id)}`;
     });
 
@@ -1553,6 +1573,7 @@
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
                         <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                        ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
                       </div>
                       ${exists ? `<span class="chevron" aria-hidden="true">›</span>` : ""}
                     </li>`;
@@ -1562,7 +1583,7 @@
         }
       </section>
 
-      ${h.note ? `<section class="subsection"><h2 class="subsection-title">${icon("edit_note", "mi-inline")} Minhas observações</h2><p class="note-box">${escapeHtml(h.note)}</p></section>` : ""}
+      ${h.note ? `<section class="subsection"><h2 class="subsection-title">${icon("edit_note", "mi-inline")} Observações do treino</h2><p class="note-box">${escapeHtml(h.note)}</p></section>` : ""}
 
       <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
       ${
@@ -1998,6 +2019,8 @@
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
 
+      ${personalNoteHtml(ex.id)}
+
       <section class="sheet-section">
         <h3>Equipamentos</h3>
         ${equip ? `<div class="equip-chips">${equip}</div>` : `<p class="meta">Nenhum — peso do corpo.</p>`}
@@ -2025,6 +2048,7 @@
     const ex = findExercise(exerciseId);
     if (!ex) return;
     $("sheet-content").innerHTML = exerciseDetailHtml(ex, prescription);
+    bindPersonalNote();
 
     sheetReturnFocus = document.activeElement;
     sheet.classList.remove("hidden");
@@ -2034,8 +2058,49 @@
     $("sheet-content").scrollTop = 0;
   }
 
+  // Confirmação em bottom sheet. Resolve true (confirmou) ou false.
+  let pendingConfirm = null;
+  function confirmSheet({ icon: iconName = "help", title, text = "", confirmLabel = "Confirmar", cancelLabel = "Voltar", danger = false }) {
+    if (pendingConfirm) pendingConfirm(false);
+    $("sheet-content").innerHTML = `
+      <div class="confirm-sheet">
+        <span class="confirm-icon ${danger ? "danger" : ""}">${icon(iconName)}</span>
+        <h2 id="sheet-title">${escapeHtml(title)}</h2>
+        ${text ? `<p>${escapeHtml(text)}</p>` : ""}
+        <div class="confirm-actions">
+          <button class="btn ${danger ? "btn-danger-solid" : "btn-primary"} btn-block btn-lg" type="button" data-confirm="yes">${escapeHtml(confirmLabel)}</button>
+          <button class="btn btn-block btn-lg" type="button" data-confirm="no">${escapeHtml(cancelLabel)}</button>
+        </div>
+      </div>`;
+    sheetReturnFocus = document.activeElement;
+    sheet.classList.remove("hidden");
+    document.body.classList.add("sheet-open");
+    requestAnimationFrame(() => sheet.classList.add("open"));
+    sheet.querySelector('[data-confirm="no"]').focus({ preventScroll: true });
+    return new Promise((resolve) => {
+      pendingConfirm = (value) => {
+        pendingConfirm = null;
+        resolve(value);
+      };
+    });
+  }
+
+  $("sheet-content").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-confirm]");
+    if (!btn || !pendingConfirm) return;
+    const answer = pendingConfirm;
+    answer(btn.dataset.confirm === "yes");
+    closeSheet();
+  });
+
   function closeSheet(immediate = false) {
     if (sheet.classList.contains("hidden")) return;
+    if (pendingConfirm) pendingConfirm(false);
+    const area = $("ex-note");
+    if (area && sheet.contains(area)) {
+      clearTimeout(noteTimer);
+      area.dispatchEvent(new Event("blur"));
+    }
     sheet.classList.remove("open");
     document.body.classList.remove("sheet-open");
     const finish = () => {
