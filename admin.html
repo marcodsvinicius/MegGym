@@ -20,44 +20,23 @@
   <main>
     <div class="container">
 
-      <!-- ===== Conexão com o GitHub ===== -->
-      <section class="panel" id="config-panel">
-        <div class="panel-head">
-          <h2>Conexão com o GitHub</h2>
-          <button class="btn btn-sm hidden" type="button" id="config-toggle">Fechar</button>
-        </div>
-        <div class="notice">
-          Os exercícios ficam salvos no arquivo <code>data/exercises.json</code> do seu repositório.
-          Para salvar daqui, crie um <strong>token pessoal</strong>:
-          <ol>
-            <li>GitHub → <em>Settings → Developer settings → Personal access tokens → Fine-grained tokens</em> → <em>Generate new token</em>.</li>
-            <li>Em <em>Repository access</em>, escolha <em>Only select repositories</em> e selecione este repositório.</li>
-            <li>Em <em>Permissions → Repository permissions</em>, deixe <strong>Contents: Read and write</strong>.</li>
-            <li>Gere, copie e cole abaixo. O token fica salvo só neste navegador.</li>
-          </ol>
-        </div>
-        <form id="config-form" class="form-grid" autocomplete="off">
-          <div class="field span-4">
-            <label for="cfg-owner">Usuário/organização</label>
-            <input class="input" id="cfg-owner" required>
-          </div>
-          <div class="field span-4">
-            <label for="cfg-repo">Repositório</label>
-            <input class="input" id="cfg-repo" required>
-          </div>
-          <div class="field span-4">
-            <label for="cfg-branch">Branch publicada</label>
-            <input class="input" id="cfg-branch" required>
+      <!-- ===== Login ===== -->
+      <section class="panel" id="login-panel" style="max-width:440px;margin:24px auto">
+        <h2>Entrar no admin</h2>
+        <form id="login-form" class="form-grid" autocomplete="on">
+          <div class="field">
+            <label for="login-email">E-mail</label>
+            <input class="input" id="login-email" type="email" autocomplete="username" required>
           </div>
           <div class="field">
-            <label for="cfg-token">Token pessoal</label>
-            <input class="input" id="cfg-token" type="password" placeholder="github_pat_…" required>
+            <label for="login-password">Senha</label>
+            <input class="input" id="login-password" type="password" autocomplete="current-password" required>
           </div>
           <div class="form-actions" style="grid-column: span 12">
-            <button class="btn btn-primary" type="submit">Conectar</button>
-            <button class="btn btn-danger" type="button" id="cfg-forget">Esquecer token</button>
+            <button class="btn btn-primary" type="submit" style="width:100%">Entrar</button>
           </div>
         </form>
+        <p class="page-subtitle" style="font-size:.85rem">O usuário é criado no painel do Supabase (Authentication → Users) e o e-mail precisa estar na tabela <code>admins</code>.</p>
       </section>
 
       <!-- ===== Editor ===== -->
@@ -65,11 +44,11 @@
         <div class="panel-head">
           <div>
             <h1 class="page-title">Cadastro</h1>
-            <p class="page-subtitle">Cada alteração salva vira um commit. O site atualiza em cerca de 1 minuto.</p>
+            <p class="page-subtitle">As alterações aparecem no site na hora.</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-sm" type="button" id="reload-btn">↻ Recarregar</button>
-            <button class="btn btn-sm" type="button" id="config-open">⚙ Conexão</button>
+            <button class="btn btn-sm" type="button" id="logout-btn">Sair</button>
             <a class="btn btn-sm" href="./" target="_blank" rel="noopener">Ver site ↗</a>
           </div>
         </div>
@@ -192,6 +171,8 @@
 
   <div class="toast hidden" id="toast" role="status"></div>
 
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase.js"></script>
   <script src="assets/js/common.js"></script>
   <script src="assets/js/admin.js"></script>
 </body>

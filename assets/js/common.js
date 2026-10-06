@@ -84,11 +84,51 @@
     };
   }
 
-  async function loadData() {
-    // "cache: no-cache" faz o navegador revalidar, então cadastros novos aparecem logo após o deploy.
+  // Linhas do banco (group_id) → formato usado pelas telas (group).
+  function fromRows(groups, exercises) {
+    return {
+      groups: (groups || []).map(({ id, name, icon, color, position }) => ({ id, name, icon, color, position })),
+      exercises: (exercises || []).map((e) => ({
+        id: e.id,
+        group: e.group_id,
+        name: e.name,
+        description: e.description || "",
+        sets: e.sets || "",
+        reps: e.reps || "",
+        rest: e.rest || "",
+        difficulty: e.difficulty || "",
+        image: e.image || "",
+        video: e.video || "",
+        position: e.position,
+      })),
+    };
+  }
+
+  async function loadFromSupabase() {
+    const [groups, exercises] = await Promise.all([
+      window.Supa.db("groups?select=*&order=position.asc,name.asc"),
+      window.Supa.db("exercises?select=*&order=position.asc,created_at.asc"),
+    ]);
+    return fromRows(groups, exercises);
+  }
+
+  async function loadFromJson() {
     const res = await fetch(DATA_PATH, { cache: "no-cache" });
     if (!res.ok) throw new Error(`Não foi possível carregar os exercícios (HTTP ${res.status}).`);
     return normalizeData(await res.json());
+  }
+
+  // Lê do Supabase; se ele estiver fora do ar (ou ainda não configurado), usa o JSON do repositório.
+  async function loadData() {
+    if (window.Supa) {
+      try {
+        const data = await loadFromSupabase();
+        if (data.groups.length) return data;
+      } catch (err) {
+        console.warn("Supabase indisponível, usando data/exercises.json:", err.message);
+      }
+    }
+    return loadFromJson();
   }
 
   function normalizeText(text) {
@@ -109,5 +149,7 @@
     normalizeData,
     normalizeText,
     loadData,
+    loadFromSupabase,
+    fromRows,
   };
 })();
