@@ -935,3 +935,8 @@ body.sheet-open { overflow: hidden; }
   body { overscroll-behavior-y: none; }
   .bottom-nav a, .btn, .chip { user-select: none; -webkit-user-select: none; }
 }
+
+/* ---------- Exercício em tela cheia ---------- */
+.exercise-page { display: flex; flex-direction: column; gap: 16px; }
+.exercise-page .sheet-image { max-height: 320px; }
+.exercise-page .sheet-head h2 { font-size: 1.5rem; }

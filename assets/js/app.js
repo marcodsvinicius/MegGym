@@ -223,7 +223,7 @@
     const equip = equipmentChips(ex.equipment);
     const hasVideo = Boolean(youtubeId(ex.video) || safeUrl(ex.video));
     return `
-      <article class="exercise-card tappable" data-exercise="${escapeHtml(ex.id)}" tabindex="0" role="button" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
+      <article class="exercise-card tappable" data-exercise-page="${escapeHtml(ex.id)}" tabindex="0" role="link" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
         ${img ? `<div class="exercise-media"><img src="${escapeHtml(img)}" alt="" loading="lazy"></div>` : ""}
         <div class="exercise-body">
           <div class="exercise-title">
@@ -295,6 +295,21 @@
       })
     );
     renderExerciseList(group);
+  }
+
+  function renderExercisePage(id) {
+    setTab("exercicios");
+    const ex = findExercise(id);
+    if (!ex) {
+      setHeader("Exercício", { back: "#/exercicios" });
+      app.innerHTML = empty("🤔", "Exercício não encontrado.");
+      return;
+    }
+    setHeader(ex.name, {
+      back: `#/exercicios/grupo/${encodeURIComponent(ex.group)}`,
+      action: ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : "",
+    });
+    app.innerHTML = `<article class="exercise-page">${exerciseDetailHtml(ex, {}, { titleId: "exercise-page-title" })}</article>`;
   }
 
   function renderExerciseForm(editId, presetGroup) {
@@ -394,7 +409,9 @@
       if (errors.length) return;
       Store.saveExercise(editing ? { ...values, id: editing.id } : values, user);
       toast(editing ? "Exercício atualizado!" : "Exercício cadastrado!", "success");
-      location.hash = `#/exercicios/grupo/${encodeURIComponent(values.group)}`;
+      location.hash = editing
+        ? `#/exercicios/ver/${encodeURIComponent(editing.id)}`
+        : `#/exercicios/grupo/${encodeURIComponent(values.group)}`;
     });
 
     if (editing) {
@@ -910,6 +927,7 @@
         if (parts[1] === "novo") renderExerciseForm(null, params.get("grupo"));
         else if (parts[1] === "editar") renderExerciseForm(parts[2]);
         else if (parts[1] === "grupo") renderExerciseGroup(parts[2]);
+        else if (parts[1] === "ver") renderExercisePage(parts[2]);
         else renderExerciseGroups();
         break;
       case "atividade":
@@ -976,9 +994,8 @@
   const sheet = $("sheet");
   let sheetReturnFocus = null;
 
-  function openSheet(exerciseId, prescription = {}) {
-    const ex = findExercise(exerciseId);
-    if (!ex) return;
+  // Conteúdo de detalhes do exercício (usado na tela cheia e no bottom sheet).
+  function exerciseDetailHtml(ex, prescription = {}, { titleId = "sheet-title" } = {}) {
     const g = findGroup(ex.group);
     const img = safeUrl(ex.image);
     const ytId = youtubeId(ex.video);
@@ -996,10 +1013,10 @@
     const equip = equipmentChips(ex.equipment);
     const groupCount = g ? exercises().filter((e) => e.group === g.id).length : 0;
 
-    $("sheet-content").innerHTML = `
+    return `
       ${img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
       <div class="sheet-head">
-        <h2 id="sheet-title">${escapeHtml(ex.name)}</h2>
+        <h2 id="${titleId}">${escapeHtml(ex.name)}</h2>
         ${difficultyBadge(ex.difficulty)}
       </div>
       ${stats ? `<div class="stats">${stats}</div>` : ""}
@@ -1037,6 +1054,12 @@
           : ""
       }
       ${ex.custom && ex.createdBy ? `<p class="meta">Cadastrado por ${escapeHtml(ex.createdBy)}</p>` : ""}`;
+  }
+
+  function openSheet(exerciseId, prescription = {}) {
+    const ex = findExercise(exerciseId);
+    if (!ex) return;
+    $("sheet-content").innerHTML = exerciseDetailHtml(ex, prescription);
 
     sheetReturnFocus = document.activeElement;
     sheet.classList.remove("hidden");
@@ -1061,15 +1084,20 @@
 
   app.addEventListener("click", (e) => {
     if (e.target.closest("a, button, input, select, label, textarea")) return;
+    const page = e.target.closest("[data-exercise-page]");
+    if (page) {
+      location.hash = `#/exercicios/ver/${encodeURIComponent(page.dataset.exercisePage)}`;
+      return;
+    }
     const target = e.target.closest("[data-exercise]");
     if (target) openSheet(target.dataset.exercise, { sets: target.dataset.sets, reps: target.dataset.reps });
   });
   app.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
-    const target = e.target.closest("[data-exercise][tabindex]");
+    const target = e.target.closest("[data-exercise-page][tabindex]");
     if (!target || e.target !== target) return;
     e.preventDefault();
-    openSheet(target.dataset.exercise);
+    location.hash = `#/exercicios/ver/${encodeURIComponent(target.dataset.exercisePage)}`;
   });
   sheet.addEventListener("click", (e) => {
     if (e.target === sheet || e.target.closest("#sheet-close")) closeSheet();
