@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>MegGym — Cadastro de exercícios</title>
-  <meta name="theme-color" content="#ff5a1f">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-  <link rel="stylesheet" href="assets/css/style.css?v=4">
+  <script src="assets/js/theme.js?v=10"></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=10">
 </head>
 <body>
   <header class="site-header">
@@ -344,7 +344,7 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=9"></script>
+  <script src="assets/js/config.js?v=10"></script>
   <script>
     // Carrega o admin do modo escolhido em config.js (BACKEND: "github" ou "supabase").
     (function () {
@@ -355,7 +355,7 @@
         : ["common.js", "admin-github.js"];
       files.forEach(function (name) {
         var el = document.createElement("script");
-        el.src = "assets/js/" + name + "?v=9";
+        el.src = "assets/js/" + name + "?v=10";
         el.async = false; // mantém a ordem
         document.body.appendChild(el);
       });

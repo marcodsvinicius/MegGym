@@ -844,6 +844,7 @@
     const weekAgo = Date.now() - 7 * 86400000;
     const thisWeek = history.filter((h) => new Date(h.finishedAt).getTime() >= weekAgo).length;
     const highlight = params.get("feito");
+    const theme = window.MegTheme ? window.MegTheme.get() : "auto";
     const initials = user.name
       .split(" ")
       .slice(0, 2)
@@ -865,6 +866,22 @@
         <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
       </div>
       <section class="subsection">
+        <h2 class="subsection-title">Aparência</h2>
+        <div class="segmented" role="radiogroup" aria-label="Tema" id="theme-picker">
+          ${[
+            ["auto", "📱", "Automático"],
+            ["light", "☀️", "Claro"],
+            ["dark", "🌙", "Escuro"],
+          ]
+            .map(
+              ([value, icon, label]) =>
+                `<button type="button" role="radio" data-theme-choice="${value}" aria-checked="${theme === value}"><span aria-hidden="true">${icon}</span>${label}</button>`
+            )
+            .join("")}
+        </div>
+        <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
+      </section>
+      <section class="subsection">
         <h2 class="subsection-title">Histórico</h2>
         ${
           history.length
@@ -883,6 +900,13 @@
             : empty("📅", "Nenhum treino registrado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Ver treinos</a>`)
         }
       </section>`;
+
+    $("theme-picker").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-theme-choice]");
+      if (!btn || !window.MegTheme) return;
+      window.MegTheme.set(btn.dataset.themeChoice);
+      renderActivity(params);
+    });
 
     $("logout-btn").addEventListener("click", () => {
       Store.logout();

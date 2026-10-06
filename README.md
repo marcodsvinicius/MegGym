@@ -86,6 +86,7 @@ insert into public.admins (email) values ('email@dela.com');
 index.html            app (login, treinos, exercícios, atividade)
 assets/js/store.js    dados salvos no aparelho (perfis, treinos, histórico)
 assets/js/pwa.js      instalação do app e registro do service worker
+assets/js/theme.js    tema claro/escuro (automático ou escolhido em Atividade)
 sw.js                 service worker (cache/offline)
 manifest.webmanifest  nome, ícones e cores do app instalado
 assets/icons/         ícones do app
