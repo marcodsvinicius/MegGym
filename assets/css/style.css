@@ -1782,3 +1782,49 @@ body.sheet-open { overflow: hidden; }
 .wbar.latest .wbar-fill { background: var(--accent); }
 .wbar-value { font-size: .75rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .wbar-date { font-size: .7rem; color: var(--text-muted); white-space: nowrap; }
+
+/* ---------- Backup ---------- */
+.restore-box { margin-top: 20px; display: grid; gap: 8px; }
+
+/* ---------- Ações em bottom sheet ---------- */
+.action-sheet { display: grid; gap: 10px; padding-bottom: 8px; }
+.action-sheet h2 { font-size: 1.15rem; }
+.action-sheet .settings-item { width: 100%; text-align: left; font: inherit; color: inherit; background: none; cursor: pointer; }
+
+/* ---------- Execução: pular, trocar, reordenar ---------- */
+.run-menu { align-self: flex-start; flex: none; }
+.run-item.skipped { opacity: .6; border-style: dashed; }
+.run-item.skipped .item-title { text-decoration: line-through; }
+.run-skip-icon { display: grid; place-items: center; color: var(--text-muted); }
+.run-tag { font-size: .8rem; font-weight: 700; color: var(--text-muted); }
+
+/* ---------- Última vez em cada série ---------- */
+.set-row { flex-wrap: wrap; }
+.set-prev { flex-basis: 100%; padding-left: 32px; font-size: .75rem; color: var(--text-muted); }
+
+/* ---------- Alternador (segmentado) e cabeçalho de gráfico ---------- */
+.chart-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface-2); }
+.seg button { border: 0; background: none; font: inherit; font-size: .8rem; font-weight: 700; color: var(--text-muted); padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.chart-note { font-size: .75rem; }
+
+/* ---------- Músculos trabalhados ---------- */
+.hbars { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.hbars li { display: grid; grid-template-columns: 9.5em 1fr 2.5em; align-items: center; gap: 8px; font-size: .9rem; }
+.hbar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbar-track { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.hbar-fill { display: block; height: 100%; border-radius: 999px; background: var(--group-color, var(--accent)); }
+.hbar-value { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.progress-pill { display: flex; flex-direction: column; align-items: flex-end; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.progress-pill small { font-size: .75rem; color: var(--text-muted); }
+.progress-pill.up small { color: var(--success); }
+
+/* ---------- Treino de hoje ---------- */
+.today-card { display: grid; gap: 8px; padding: 16px; border-radius: var(--radius, 16px); background: var(--surface); border: 2px solid var(--accent); }
+.today-card h2 { font-size: 1.3rem; margin: 0; }
+.today-card .meta { margin: 0; }
+.today-actions { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; margin-top: 4px; }
+.today-card.done { grid-template-columns: auto 1fr; align-items: center; border-color: var(--success); }
+.today-card.done .today-icon { color: var(--success); font-size: 2rem; }

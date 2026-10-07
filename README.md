@@ -16,7 +16,11 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 - **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
 - **Treinos:** nome, descrição e exercícios (com séries × repetições). Os grupos musculares do treino são calculados a partir dos exercícios. Todos os perfis do aparelho veem todos os treinos.
 - **Executar:** "Iniciar treino" abre a lista para marcar cada exercício; com todos marcados, "Terminar treino" registra dia, horário e duração.
-- **Atividade:** nome, resumo e histórico de treinos de cada pessoa.
+- **Treino de hoje:** no Início, sugere o próximo treino (da estrutura seguida ou o que vem depois do último feito).
+- **Durante o treino:** séries com repetições e peso (mostra o que foi feito da última vez), temporizador de descanso por treino (padrão 60s, continua certo com a tela apagada, bipe e vibração no fim) e menu ⋮ em cada exercício para pular, trocar por outro do mesmo grupo ou mudar a ordem.
+- **Atividade:** perfil, evolução das últimas 8 semanas (treinos, tempo ou volume), músculos trabalhados em 30 dias, cargas por exercício e histórico.
+- **Evolução por exercício:** gráfico de barras com alternador Peso/Repetições, salvo por usuário.
+- **Backup:** Configurações → Exportar/Importar backup (arquivo .json com perfil, histórico, pesos, anotações e data/hora do backup). Na tela de boas-vindas dá para restaurar um backup.
 
 > Por enquanto, perfis, treinos, histórico e exercícios cadastrados no app ficam salvos **só no navegador do aparelho** (localStorage). Os exercícios base vêm de `data/exercises.json`.
 

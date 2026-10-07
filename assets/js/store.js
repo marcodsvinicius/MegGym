@@ -16,6 +16,7 @@
     exerciseLoads: "meggym.exloads.", // + id do usuário → { [exerciseId]: { weight, band } }
     weightLog: "meggym.wlog.", // + id do usuário → { [exerciseId]: [{ date: "AAAA-MM-DD", weight }] }
     structures: "meggym.structures",
+    rest: "meggym.rest.", // + id do usuário → fim do descanso em andamento { end, total }
     plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
 
@@ -233,6 +234,23 @@
     return value;
   }
 
+  // Ordem, pulos e trocas do treino em andamento (chaves = índice original do item).
+  function updateSession(userId, changes) {
+    const value = session(userId);
+    if (!value) return null;
+    Object.assign(value, changes);
+    write(KEY.session + userId, value);
+    return value;
+  }
+
+  function restState(userId) {
+    return read(KEY.rest + userId, null);
+  }
+
+  function saveRest(userId, value) {
+    write(KEY.rest + userId, value);
+  }
+
   function cancelSession(userId) {
     write(KEY.session + userId, null);
   }
@@ -379,7 +397,68 @@
     return record;
   }
 
+  /* ---------- Backup (arquivo .json com tudo do usuário) ---------- */
+
+  const PER_USER = ["session", "notes", "exerciseNotes", "exerciseLoads", "weightLog", "plan", "rest"];
+
+  function exportBackup(userId) {
+    const user = users().find((u) => u.id === userId);
+    if (!user) return null;
+    const perUser = {};
+    PER_USER.forEach((k) => (perUser[k] = read(KEY[k] + userId, null)));
+    const createdAt = new Date().toISOString();
+    updateUser(userId, { lastBackupAt: createdAt });
+    return {
+      app: "MegGym",
+      kind: "backup",
+      version: 1,
+      createdAt,
+      user: { ...user, lastBackupAt: createdAt },
+      history: read(KEY.history, []).filter((h) => h.userId === userId),
+      perUser,
+      // Treinos, estruturas e exercícios criados ficam junto para o histórico fazer sentido em outro aparelho.
+      workouts: workouts(),
+      structures: structures(),
+      customExercises: customExercises(),
+    };
+  }
+
+  function isBackup(data) {
+    return Boolean(data && data.app === "MegGym" && data.kind === "backup" && data.user && data.user.id && data.user.name);
+  }
+
+  // Restaura: o perfil e os dados dele são substituídos pelos do arquivo; treinos/estruturas/exercícios
+  // que não existem no aparelho são adicionados (os que já existem ficam como estão).
+  function importBackup(data) {
+    if (!isBackup(data)) throw new Error("Arquivo inválido: não é um backup do MegGym.");
+    const u = data.user;
+    const list = users().filter((x) => x.id !== u.id);
+    list.push({ ...u, onboarded: u.onboarded !== false });
+    write(KEY.users, list);
+
+    const others = read(KEY.history, []).filter((h) => h.userId !== u.id);
+    write(KEY.history, [...others, ...(Array.isArray(data.history) ? data.history : [])]);
+
+    PER_USER.forEach((k) => write(KEY[k] + u.id, data.perUser?.[k] ?? null));
+
+    const merge = (key, items) => {
+      if (!Array.isArray(items)) return;
+      const current = read(key, []);
+      const ids = new Set(current.map((x) => x.id));
+      write(key, [...current, ...items.filter((x) => x && x.id && !ids.has(x.id))]);
+    };
+    merge(KEY.workouts, data.workouts);
+    merge(KEY.structures, data.structures);
+    merge(KEY.customExercises, data.customExercises);
+
+    write(KEY.currentUser, u.id);
+    return currentUser();
+  }
+
   window.MegStore = {
+    exportBackup,
+    importBackup,
+    isBackup,
     users,
     currentUser,
     findByName,
@@ -407,6 +486,9 @@
     startSession,
     toggleDone,
     saveSets,
+    updateSession,
+    restState,
+    saveRest,
     setDone,
     cancelSession,
     history,
