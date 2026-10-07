@@ -341,7 +341,7 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "",
+      "video": "https://youtu.be/GjfwIHrfgSw",
       "equipment": [],
       "equipmentAny": [
         "roldana",
@@ -437,7 +437,7 @@
       "rest": "45-60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "",
+      "video": "https://youtube.com/shorts/mfXokM_VnMY",
       "equipment": [
         "halter"
       ]
@@ -452,7 +452,7 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "",
+      "video": "https://youtube.com/shorts/mfXokM_VnMY",
       "equipment": [
         "halter"
       ]
@@ -491,16 +491,18 @@
     {
       "id": "triceps-pushdown",
       "group": "triceps",
-      "name": "Tríceps na roldana (extensão para baixo)",
+      "name": "Tríceps na roldana/elástico (extensão para baixo)",
       "description": "Manter os cotovelos próximos ao corpo e estender os braços para baixo, contraindo o tríceps. Retornar lentamente sem deixar os cotovelos avançarem.",
       "sets": "3",
       "reps": "12-15",
       "rest": "45-60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": "",
-      "equipment": [
-        "roldana"
+      "video": "https://youtube.com/shorts/m2sXmPwWV3Y",
+      "equipment": [],
+      "equipmentAny": [
+        "roldana",
+        "elastico"
       ]
     },
     {
