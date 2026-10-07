@@ -147,3 +147,13 @@ python3 -m http.server 8000
 ```
 
 (Abrir o `index.html` direto com duplo clique não funciona, porque o navegador bloqueia o carregamento do JSON em `file://`.)
+
+## Testes automáticos
+
+`tests/` tem testes com Playwright: dados (`exercises.json`, `workouts.json`, versão de cache) e os fluxos do app (onboarding, treino com séries/descanso/pular/trocar, gráficos, backup e todas as telas abrindo sem erro). Rodam sozinhos no GitHub a cada envio (aba **Actions**).
+
+```bash
+npm install
+npx playwright install chromium
+npm test            # MOTION=1 npm test roda com as animações ligadas
+```

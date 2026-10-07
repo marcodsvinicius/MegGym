@@ -1764,7 +1764,7 @@ body.sheet-open { overflow: hidden; }
 .run-sets-done:empty { display: none; }
 .rest-bar {
   position: fixed; left: 12px; right: 12px; z-index: 80;
-  bottom: calc(12px + env(safe-area-inset-bottom));
+  bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom));
   max-width: 560px; margin: 0 auto; overflow: hidden;
   display: flex; align-items: center; gap: 8px; padding: 10px 12px;
   border-radius: var(--radius, 16px); background: var(--surface); color: var(--text);
@@ -1828,3 +1828,86 @@ body.sheet-open { overflow: hidden; }
 .today-actions { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; margin-top: 4px; }
 .today-card.done { grid-template-columns: auto 1fr; align-items: center; border-color: var(--success); }
 .today-card.done .today-icon { color: var(--success); font-size: 2rem; }
+
+/* ================= Animações e transições ================= */
+:root { --ease-out: cubic-bezier(.22, 1, .36, 1); --ease-spring: cubic-bezier(.34, 1.56, .64, 1); }
+
+/* Troca de tela */
+@keyframes page-forward { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+@keyframes page-back { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+@keyframes page-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.app-main.page-forward { animation: page-forward .32s var(--ease-out); }
+.app-main.page-back { animation: page-back .32s var(--ease-out); }
+.app-main.page-fade { animation: page-fade .3s var(--ease-out); }
+
+/* Itens em cascata */
+@keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+.stagger { animation: rise .42s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 35ms + 40ms); }
+
+/* Onboarding: cada passo entra deslizando */
+.onboarding-step { animation: page-forward .4s var(--ease-out); }
+
+/* Toque: botões e cartões afundam um pouco */
+.btn, .icon-btn, .chip, .settings-item, .item-link, .tappable, .group-card, .seg button, .stat-btn, .band, .run-check, .set-check {
+  transition: transform .15s var(--ease-out), background-color .2s, border-color .2s, color .2s, box-shadow .2s, opacity .2s;
+}
+.btn:active, .icon-btn:active, .chip:active, .settings-item:active, .item-link:active, .group-card:active, .seg button:active, .stat-btn:active, .band:active { transform: scale(.96); }
+.tappable:active { transform: scale(.985); }
+
+/* Check com "pop" */
+@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+.pop { animation: pop .35s var(--ease-spring); }
+.run-check svg path, .set-check svg path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .3s var(--ease-out) .05s; }
+.run-item.done .run-check svg path, .set-row.done .set-check svg path, .run-check[aria-pressed="true"] svg path { stroke-dashoffset: 0; }
+.run-item, .set-row { transition: background .25s, border-color .25s, opacity .25s; }
+
+/* Gráficos crescem */
+@keyframes grow-up { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes grow-right { from { transform: scaleX(0); } to { transform: none; } }
+.wbar-fill { transform-origin: bottom; animation: grow-up .6s var(--ease-out) both; }
+.wchart .wbar:nth-child(1) .wbar-fill { animation-delay: 0ms; }
+.wchart .wbar:nth-child(2) .wbar-fill { animation-delay: 40ms; }
+.wchart .wbar:nth-child(3) .wbar-fill { animation-delay: 80ms; }
+.wchart .wbar:nth-child(4) .wbar-fill { animation-delay: 120ms; }
+.wchart .wbar:nth-child(5) .wbar-fill { animation-delay: 160ms; }
+.wchart .wbar:nth-child(6) .wbar-fill { animation-delay: 200ms; }
+.wchart .wbar:nth-child(7) .wbar-fill { animation-delay: 240ms; }
+.wchart .wbar:nth-child(8) .wbar-fill { animation-delay: 280ms; }
+.wchart .wbar:nth-child(n+9) .wbar-fill { animation-delay: 320ms; }
+.wbar-value { animation: rise .4s var(--ease-out) .3s both; }
+.hbar-fill { transform-origin: left; animation: grow-right .7s var(--ease-out) .15s both; }
+.progress-bar { transition: width .45s var(--ease-out); }
+
+/* Alternador: conteúdo novo aparece suave */
+[data-weight-chart] > *, #evolution > * { animation: page-fade .3s var(--ease-out) both; }
+
+/* Menu inferior: ícone ativo pula */
+.bottom-nav a svg { transition: transform .25s var(--ease-spring); }
+.bottom-nav a.active svg { transform: translateY(-2px) scale(1.12); }
+
+/* Toast e barra de descanso entram de baixo */
+@keyframes slide-up { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.toast:not(.hidden) { animation: slide-up .3s var(--ease-spring); }
+@keyframes slide-up-bar { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.rest-bar:not(.hidden) { animation: slide-up-bar .35s var(--ease-spring); }
+.rest-time { transition: color .2s; }
+
+/* Cartão de hoje e resumo de séries */
+.run-sets-done:not(:empty) { animation: page-fade .3s var(--ease-out); }
+.tip:not(.hidden) { animation: page-fade .25s var(--ease-out); }
+
+/* Confete */
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+.confetti i { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; animation: confetti-fall linear forwards; }
+@keyframes confetti-fall {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--drift), 105vh) rotate(var(--rot)); opacity: .9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }
+}
+
+/* Com o descanso na tela, os botões fixos sobem para não ficarem embaixo da barra */
+body.resting .sticky-cta { bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 84px); transition: bottom .3s var(--ease-out); }
+body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }

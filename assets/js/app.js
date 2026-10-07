@@ -79,6 +79,8 @@
   function toast(message, type = "") {
     const el = $("toast");
     el.textContent = message;
+    el.className = "toast hidden";
+    void el.offsetWidth;
     el.className = `toast ${type}`;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.add("hidden"), 3000);
@@ -1670,6 +1672,7 @@
       row.classList.toggle("done", done);
       btn.setAttribute("aria-pressed", String(done));
       if (navigator.vibrate && done) navigator.vibrate(30);
+      if (done) pop(btn);
       updateProgress();
     });
 
@@ -1697,6 +1700,7 @@
       if (!record) return;
       stopRest();
       toast("Treino concluído!", "success");
+      celebrate();
       location.hash = `#/atividade?feito=${encodeURIComponent(record.id)}`;
     });
 
@@ -1751,8 +1755,9 @@
   function setsSummary(sets) {
     const done = (sets || []).filter((s) => s.done);
     if (!done.length) return "";
-    const parts = done.map((s) => [s.reps ? `${s.reps} reps` : "—", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × "));
-    return `${done.length} ${done.length === 1 ? "série" : "séries"}: ${parts.join(" · ")}`;
+    const parts = done.map((s) => [s.reps ? `${s.reps} reps` : "", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × ")).filter(Boolean);
+    const label = `${done.length} ${done.length === 1 ? "série feita" : "séries feitas"}`;
+    return parts.length ? `${label}: ${parts.join(" · ")}` : label;
   }
 
   function formatClock(ms) {
@@ -2200,6 +2205,84 @@
         return;
     }
     window.scrollTo(0, 0);
+    animatePage(parts);
+  }
+
+  /* ================= Animações ================= */
+
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let lastRoute = null;
+
+  // Transição entre telas: entrar numa tela mais "funda" desliza da direita, voltar desliza da esquerda,
+  // trocar de aba sobe suave. Depois os itens das listas aparecem em cascata.
+  function animatePage(parts) {
+    const tab = parts[0] || "inicio";
+    const depth = parts.length;
+    let dir = "fade";
+    if (lastRoute && lastRoute.tab === tab) dir = depth > lastRoute.depth ? "forward" : depth < lastRoute.depth ? "back" : "fade";
+    lastRoute = { tab, depth };
+    if (reduceMotion()) return;
+    app.classList.remove("page-forward", "page-back", "page-fade");
+    void app.offsetWidth; // reinicia a animação
+    app.classList.add(`page-${dir}`);
+    stagger(app);
+    countUp(app);
+  }
+
+  function stagger(root) {
+    root
+      .querySelectorAll(
+        ".item-list > li, .run-list > li, .set-list > li, .group-grid > *, .card-grid > *, .stat-tiles > *, .detail-grid > *, .settings-group, .today-card, .home-structure, .motivation, .week-card, .subsection, .hbars > li, .exercise-grid > *, .equip-grid > *"
+      )
+      .forEach((el, i) => {
+        el.classList.add("stagger");
+        el.style.setProperty("--i", Math.min(i, 14));
+      });
+  }
+
+  // Números grandes contam do zero até o valor.
+  function countUp(root) {
+    root.querySelectorAll(".stat-tile-value, .week-stat-value").forEach((el) => {
+      const node = [...el.childNodes].find((n) => n.nodeType === 3 && /^\s*\d+\s*$/.test(n.textContent));
+      if (!node) return;
+      const target = parseInt(node.textContent, 10);
+      if (!(target > 1)) return;
+      const start = performance.now();
+      const dur = Math.min(900, 300 + target * 40);
+      const step = (t) => {
+        const k = Math.min(1, (t - start) / dur);
+        node.textContent = String(Math.round(target * (1 - Math.pow(1 - k, 3))));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  // Confete ao terminar o treino.
+  function celebrate() {
+    if (reduceMotion()) return;
+    const colors = ["var(--accent)", "var(--success)", "#f2c500", "#1e66d0", "#e85a9b"];
+    const box = document.createElement("div");
+    box.className = "confetti";
+    box.setAttribute("aria-hidden", "true");
+    box.innerHTML = Array.from({ length: 40 }, (_, i) => {
+      const x = Math.round(Math.random() * 100);
+      const delay = Math.round(Math.random() * 300);
+      const dur = 1400 + Math.round(Math.random() * 900);
+      const rot = Math.round(Math.random() * 720 - 360);
+      const drift = Math.round(Math.random() * 120 - 60);
+      return `<i style="left:${x}%;background:${colors[i % colors.length]};animation-delay:${delay}ms;animation-duration:${dur}ms;--rot:${rot}deg;--drift:${drift}px"></i>`;
+    }).join("");
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 2800);
+  }
+
+  // "Pop" em botões de check.
+  function pop(el) {
+    if (!el || reduceMotion()) return;
+    el.classList.remove("pop");
+    void el.offsetWidth;
+    el.classList.add("pop");
   }
 
   /* ================= Perfil: campos reutilizados (onboarding e edição) ================= */
@@ -2788,6 +2871,7 @@
           if (!input.value && /^\d+([.,]\d+)?$/.test(input.placeholder) && input.placeholder !== "0") input.value = input.placeholder;
         });
         if (navigator.vibrate) navigator.vibrate(30);
+        pop(btn);
       }
       save();
       if (done) startRest(restSecondsOf(Store.getWorkout(Store.session(user.id)?.workoutId)));
@@ -2826,6 +2910,7 @@
     restEnd = end;
     if (user) Store.saveRest(user.id, { end: restEnd, total: restTotal });
     restBar.classList.remove("hidden");
+    document.body.classList.add("resting");
     clearInterval(restTick);
     restTick = setInterval(updateRest, 250);
     unlockAudio();
@@ -2902,6 +2987,7 @@
     clearInterval(restTick);
     restTick = null;
     restBar.classList.add("hidden");
+    document.body.classList.remove("resting");
     if (user) Store.saveRest(user.id, null);
   }
 
