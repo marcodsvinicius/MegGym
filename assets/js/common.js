@@ -55,6 +55,56 @@
     return `<span class="${cls}" aria-hidden="true">${escapeHtml(value)}</span>`;
   }
 
+  /* Ícone de grupo muscular: silhueta do corpo com o músculo destacado (frente ou costas).
+     Desenhado aqui (SVG), funciona offline e segue a cor de cada grupo. viewBox 0 0 48 64. */
+  const BODY = {
+    head: '<circle cx="24" cy="7" r="5.2"/>',
+    neck: '<rect x="21.5" y="11" width="5" height="4" rx="1.5"/>',
+    shoulderL: '<path d="M12.5 17c0-1.8 1.5-3 3.3-3H19v6.5h-6.5z"/>',
+    shoulderR: '<path d="M35.5 17c0-1.8-1.5-3-3.3-3H29v6.5h6.5z"/>',
+    chest: '<path d="M16.5 15h15v9.5c-2.5 1.2-5 1.7-7.5 1.7s-5-.5-7.5-1.7z"/>',
+    abs: '<path d="M17 25.6c2.3.9 4.6 1.3 7 1.3s4.7-.4 7-1.3V36H17z"/>',
+    back: '<path d="M16.5 15h15v13h-15z"/>',
+    lower: '<path d="M17 28.6h14V36H17z"/>',
+    armUpL: '<rect x="10.3" y="20.8" width="5.8" height="10" rx="2.6"/>',
+    armUpR: '<rect x="31.9" y="20.8" width="5.8" height="10" rx="2.6"/>',
+    foreL: '<rect x="9" y="31.3" width="5" height="9.7" rx="2.4"/>',
+    foreR: '<rect x="34" y="31.3" width="5" height="9.7" rx="2.4"/>',
+    hips: '<path d="M17 36.6h14l1 5.2H16z"/>',
+    thighL: '<rect x="16.4" y="42.3" width="6.6" height="11" rx="3"/>',
+    thighR: '<rect x="25" y="42.3" width="6.6" height="11" rx="3"/>',
+    shinL: '<rect x="17" y="53.8" width="5.6" height="9.6" rx="2.6"/>',
+    shinR: '<rect x="25.4" y="53.8" width="5.6" height="9.6" rx="2.6"/>',
+  };
+  const FRONT = ["head", "neck", "shoulderL", "shoulderR", "chest", "abs", "armUpL", "armUpR", "foreL", "foreR", "hips", "thighL", "thighR", "shinL", "shinR"];
+  const BACK = ["head", "neck", "shoulderL", "shoulderR", "back", "lower", "armUpL", "armUpR", "foreL", "foreR", "hips", "thighL", "thighR", "shinL", "shinR"];
+  const MUSCLES = {
+    peito: ["front", ["chest"]],
+    costas: ["back", ["back"]],
+    ombros: ["front", ["shoulderL", "shoulderR"]],
+    biceps: ["front", ["armUpL", "armUpR"]],
+    triceps: ["back", ["armUpL", "armUpR"]],
+    quadriceps: ["front", ["thighL", "thighR"]],
+    posterior: ["back", ["thighL", "thighR"]],
+    gluteos: ["back", ["hips"]],
+    panturrilha: ["back", ["shinL", "shinR"]],
+    abdomen: ["front", ["abs"]],
+    lombar: ["back", ["lower"]],
+  };
+
+  function bodyIcon(groupId, cls = "") {
+    const [view, on] = MUSCLES[groupId] || [];
+    if (!view) return "";
+    const parts = view === "front" ? FRONT : BACK;
+    const base = parts.filter((p) => !on.includes(p)).map((p) => BODY[p]).join("");
+    return `<svg class="body-icon ${cls}" viewBox="0 0 48 64" aria-hidden="true" focusable="false"><g class="body-base">${base}</g><g class="body-on">${on.map((p) => BODY[p]).join("")}</g></svg>`;
+  }
+
+  // Ícone do grupo: silhueta quando o grupo é conhecido; senão o ícone escolhido no cadastro.
+  function groupIcon(group, cls = "") {
+    return (group && bodyIcon(group.id, cls)) || icon(group?.icon || "fitness_center", cls);
+  }
+
   // O usuário consegue fazer o exercício se tiver todos os equipamentos dele
   // (exercícios sem equipamento = peso do corpo, sempre disponíveis).
   // equipmentAny: basta ter um deles (ex.: roldana OU elástico).
@@ -250,6 +300,8 @@
     EQUIPMENT,
     EQUIPMENT_ICONS,
     icon,
+    bodyIcon,
+    groupIcon,
     canDo,
     BAND_COLORS,
     EXERCISE_TYPES,

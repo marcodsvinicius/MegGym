@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify, EXERCISE_TYPES, exerciseType } =
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify, EXERCISE_TYPES, exerciseType, groupIcon } =
     window.MegGym;
   const Store = window.MegStore;
 
@@ -106,7 +106,7 @@
 
   function groupChips(list) {
     return list
-      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}</span>`)
+      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}</span>`)
       .join("");
   }
 
@@ -668,7 +668,7 @@
         const count = all.filter((e) => inGroup(e, g.id) && available(e)).length;
         return `
           <a class="group-card" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
-            <span class="group-icon">${icon(g.icon || "fitness_center")}</span>
+            <span class="group-icon">${groupIcon(g)}</span>
             <span>
               <span class="group-name">${escapeHtml(g.name)}</span><br>
               <span class="group-count">${count} ${count === 1 ? "exercício" : "exercícios"}</span>
@@ -1017,7 +1017,7 @@
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-              <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
+              <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
               ${supersetTag(ssDetail[i])}
               ${ex ? loadPreview(ex) : ""}
               ${ex ? notePreview(ex.id) : ""}
@@ -1550,7 +1550,7 @@
                 <span class="item-index">${i + 1}</span>
                 <div class="item-main">
                   <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-                  <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}</div>
+                  <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}` : ""}</div>
                   ${supersetTag(ss[i])}
                   <div class="sets-reps">
                     <label><span>Séries</span><input class="input input-sm" data-field="sets" inputmode="numeric" maxlength="10" value="${escapeHtml(item.sets)}"></label>
@@ -1590,7 +1590,7 @@
             const added = chosen.has(ex.id);
             return `
               <li class="item-row">
-                <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}">${icon(g?.icon || "fitness_center")}</span>
+                <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}">${groupIcon(g)}</span>
                 <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}">
                   <div class="item-title">${escapeHtml(ex.name)}</div>
                   <div class="meta">${escapeHtml(g?.name || "")}${ex.sets || ex.reps ? ` · ${escapeHtml(setsReps(ex.sets, ex.reps))}` : ""}</div>
@@ -1673,7 +1673,7 @@
               skipped
                 ? `<div class="run-tag">Pulado</div>`
                 : `<div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
-                  <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
+                  <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
                   ${loadPreview(ex)}
                   ${notePreview(ex.id)}
                   <div class="run-sets-done" data-sets-summary="${i}" data-type="${exerciseType(ex)}">${escapeHtml(setsSummary(session.sets?.[i], exerciseType(ex)))}</div>
@@ -1998,7 +1998,7 @@
           .map(
             ({ g, n }) => `
           <li style="--group-color:${safeColor(g.color)}">
-            <span class="hbar-label">${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}</span>
+            <span class="hbar-label">${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}</span>
             <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
             <span class="hbar-value">${n}</span>
           </li>`
@@ -2315,7 +2315,7 @@
                       <span class="item-index done-index">${icon("check")}</span>
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
-                        <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                        <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
                         ${e.pr ? `<div class="pr-badge">${icon("emoji_events", "mi-inline")} Recorde: ${escapeHtml(e.pr.text)}</div>` : ""}
                         ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type))}</div>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
@@ -3540,7 +3540,7 @@
           ? `<section class="sheet-section">
               <h3>Grupo muscular</h3>
               <a class="group-detail" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
-                <span class="group-icon">${icon(g.icon || "fitness_center")}</span>
+                <span class="group-icon">${groupIcon(g)}</span>
                 <span class="item-main">
                   <span class="item-title">${escapeHtml(g.name)}</span><br>
                   <span class="meta">${groupCount} ${groupCount === 1 ? "exercício" : "exercícios"} neste grupo · ver todos</span>
