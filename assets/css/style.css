@@ -1911,3 +1911,10 @@ body.sheet-open { overflow: hidden; }
 /* Com o descanso na tela, os botões fixos sobem para não ficarem embaixo da barra */
 body.resting .sticky-cta { bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 84px); transition: bottom .3s var(--ease-out); }
 body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
+
+/* Fechar o cartão de instalar */
+.install-card { position: relative; }
+.install-close { position: absolute; top: 6px; right: 6px; width: 36px; height: 36px; color: var(--text-muted); }
+.install-card .install-body { padding-right: 24px; }
+@keyframes card-out { to { opacity: 0; transform: scale(.96) translateY(-6px); } }
+.install-card.closing { animation: card-out .25s var(--ease-out) forwards; }

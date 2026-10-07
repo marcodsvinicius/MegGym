@@ -162,3 +162,19 @@ test("todas as telas abrem sem erro", () =>
       assert.ok((await page.locator("#app").innerHTML()).length > 50, `tela vazia: ${hash}`);
     }
   }));
+
+test("cartão de instalar: fecha e continua em Configurações", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page);
+    await page.waitForSelector(".install-card");
+    await page.click("[data-install-dismiss]");
+    await page.waitForSelector(".install-card", { state: "detached" });
+    await page.reload();
+    await page.waitForSelector("#app-shell:not(.hidden)");
+    assert.equal(await page.locator(".install-card").count(), 0, "cartão continua fechado");
+    await page.goto(server.url + "#/atividade");
+    assert.equal(await page.locator(".install-card").count(), 0, "fechado também na Atividade");
+    await page.goto(server.url + "#/atividade/configuracoes");
+    await page.click("#install-setting");
+    await page.waitForSelector(".install-help"); // sem instalação com 1 toque no teste → abre o passo a passo
+  }));

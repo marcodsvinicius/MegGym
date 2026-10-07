@@ -281,10 +281,21 @@
 
   const PWA = window.MegPWA;
 
+  // Fechar o cartão vale para o aparelho; depois disso, instalar fica só em Configurações.
+  const INSTALL_DISMISSED = "meggym.installCardClosed";
+  function installDismissed() {
+    try {
+      return localStorage.getItem(INSTALL_DISMISSED) === "1";
+    } catch {
+      return false;
+    }
+  }
+
   function installCard() {
-    if (!PWA || PWA.status() === "installed") return "";
+    if (!PWA || PWA.status() === "installed" || installDismissed()) return "";
     return `
       <section class="install-card">
+        <button class="icon-btn install-close" type="button" data-install-dismiss aria-label="Fechar">${icon("close")}</button>
         <img src="assets/icons/icon-192.png" alt="" width="52" height="52">
         <div class="install-body">
           <h2>Instale o MegGym</h2>
@@ -335,11 +346,26 @@
   if (PWA) PWA.onChange(refreshInstallSlot);
 
   app.addEventListener("click", async (e) => {
+    const close = e.target.closest("[data-install-dismiss]");
+    if (close) {
+      try {
+        localStorage.setItem(INSTALL_DISMISSED, "1");
+      } catch {}
+      const card = close.closest(".install-card");
+      card.classList.add("closing");
+      setTimeout(refreshInstallSlot, reduceMotion() ? 0 : 250);
+      toast("Você pode instalar depois em Configurações.");
+      return;
+    }
     if (e.target.closest("[data-install]")) {
-      if (PWA.status() === "prompt") {
+      if (!PWA) return;
+      if (PWA.status() === "installed") {
+        toast("O MegGym já está instalado neste aparelho.", "success");
+      } else if (PWA.status() === "prompt") {
         const accepted = await PWA.install();
         if (accepted) toast("App instalado!", "success");
         refreshInstallSlot();
+        if ($("install-setting")) renderSettings();
       } else {
         showInstallHelp();
       }
@@ -2055,6 +2081,19 @@
         <p class="meta" style="margin:16px 0 10px">Modo</p>
         ${modePickerHtml(theme, "theme-picker")}
         <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
+      </section>
+
+      <section class="settings-group">
+        <h2 class="settings-title">App</h2>
+        <div class="settings-list">
+          <button class="settings-item" type="button" id="install-setting" data-install>
+            <span class="settings-icon">${icon("install_mobile")}</span>
+            <span class="item-main"><span class="item-title">Instalar app</span><br><span class="meta">${
+              PWA?.status() === "installed" ? "Já instalado neste aparelho" : "Abrir pela tela inicial, em tela cheia e sem internet"
+            }</span></span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+        </div>
       </section>
 
       <section class="settings-group">
