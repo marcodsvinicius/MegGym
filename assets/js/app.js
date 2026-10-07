@@ -269,8 +269,9 @@
     return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}`;
   }
 
+  // Estado vazio: ícone em destaque, mensagem e (opcional) ação.
   function empty(iconName, text, extra = "") {
-    return `<div class="state">${icon(iconName, "state-icon")}${text}${extra}</div>`;
+    return `<div class="state"><span class="state-badge">${icon(iconName, "state-icon")}</span><p class="state-text">${text}</p>${extra ? `<div class="state-actions">${extra}</div>` : ""}</div>`;
   }
 
   function fab(href, label) {
@@ -344,6 +345,32 @@
   }
 
   if (PWA) PWA.onChange(refreshInstallSlot);
+
+  // Aviso de versão nova: aparece quando o service worker baixou uma atualização.
+  const updateBar = document.createElement("div");
+  updateBar.className = "update-bar hidden";
+  updateBar.setAttribute("role", "status");
+  updateBar.innerHTML = `
+    <span class="update-icon">${icon("system_update")}</span>
+    <span class="update-text"><strong>Nova versão disponível</strong><br><span>Seus dados continuam salvos.</span></span>
+    <button class="btn btn-primary btn-sm" type="button" id="update-apply">Atualizar</button>
+    <button class="icon-btn" type="button" id="update-later" aria-label="Agora não">${icon("close")}</button>`;
+  document.body.appendChild(updateBar);
+  let updateDismissed = false;
+  function refreshUpdateBar() {
+    updateBar.classList.toggle("hidden", !PWA?.updateAvailable() || updateDismissed);
+  }
+  $("update-apply").addEventListener("click", () => {
+    $("update-apply").disabled = true;
+    $("update-apply").textContent = "Atualizando…";
+    if (!PWA.applyUpdate()) location.reload();
+  });
+  $("update-later").addEventListener("click", () => {
+    updateDismissed = true;
+    refreshUpdateBar();
+    toast("Tudo bem. A versão nova entra na próxima vez que você abrir o app.");
+  });
+  if (PWA) PWA.onUpdate(() => ((updateDismissed = false), refreshUpdateBar()));
 
   app.addEventListener("click", async (e) => {
     const close = e.target.closest("[data-install-dismiss]");
@@ -621,7 +648,7 @@
                 </a>
                 ${lastWorkout ? `<a class="btn btn-sm btn-primary" href="#/treinos/${encodeURIComponent(lastWorkout.id)}">Fazer de novo</a>` : ""}
               </div>`
-            : empty("flag", "Você ainda não terminou nenhum treino.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Escolher um treino</a>`)
+            : empty("flag", "Você ainda não terminou nenhum treino.", `<a class="btn btn-primary" href="#/treinos">Escolher um treino</a>`)
         }
       </section>
 
@@ -720,7 +747,7 @@
         hidden && equipFilter
           ? `Nenhum exercício com os seus equipamentos aqui.`
           : "Nenhum exercício encontrado com esses filtros.",
-        hidden && equipFilter ? `<br><button class="btn" style="margin-top:12px" type="button" data-equip-filter="off">Mostrar todos (${hidden})</button>` : ""
+        hidden && equipFilter ? `<button class="btn" type="button" data-equip-filter="off">Mostrar todos (${hidden})</button>` : ""
       );
     } else {
       list.innerHTML = `<div class="exercise-grid">${items.map(exerciseCard).join("")}</div>`;
@@ -965,7 +992,7 @@
       ${
         list.length
           ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>`
-          : empty("fitness_center", "Nenhum treino criado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos/novo">Criar meu primeiro treino</a>`)
+          : empty("fitness_center", "Nenhum treino criado ainda.", `<a class="btn btn-primary" href="#/treinos/novo">Criar meu primeiro treino</a>`)
       }`;
   }
 
@@ -2019,6 +2046,32 @@
     $("evolution").innerHTML = evolutionHtml(Store.history(user.id), activityMetric);
   });
 
+  // Atividade sem nenhum treino: passos para começar, no lugar de gráficos zerados.
+  function firstStepsHtml() {
+    const hasLoad = exercises().some((ex) => Store.exerciseLoad(user.id, ex.id).weight || Store.exerciseLoad(user.id, ex.id).band);
+    const started = Boolean(Store.session(user.id));
+    const steps = [
+      [true, "Criar seu perfil", "Feito! Seus equipamentos filtram os exercícios."],
+      [started, "Começar um treino", "Escolha o Treino de hoje no Início ou qualquer um em Treinos."],
+      [hasLoad, "Registrar suas cargas", "Anote peso e repetições em cada série."],
+      [false, "Terminar e ver sua evolução", "Gráficos, recordes e músculos trabalhados aparecem aqui."],
+    ];
+    return `
+      <section class="first-steps">
+        <h2 class="subsection-title">Seus primeiros passos</h2>
+        <ol class="steps-list">${steps
+          .map(
+            ([done, title, text]) => `
+          <li class="${done ? "done" : ""}">
+            <span class="step-mark" aria-hidden="true">${done ? icon("check") : ""}</span>
+            <span><strong>${title}</strong>${done ? '<span class="visually-hidden"> (feito)</span>' : ""}<br><span class="meta">${text}</span></span>
+          </li>`
+          )
+          .join("")}</ol>
+        <a class="btn btn-primary btn-block" href="#/inicio">${icon("play_arrow", "mi-inline")} Ver treino de hoje</a>
+      </section>`;
+  }
+
   function renderActivity(params) {
     setHeader("Atividade", {
       action: `<a class="icon-btn" href="#/atividade/configuracoes" aria-label="Configurações" title="Configurações">
@@ -2051,9 +2104,13 @@
         <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
         <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
       </div>
-      <section class="subsection evolution" id="evolution">${evolutionHtml(history, activityMetric)}</section>
-      ${muscleBalanceHtml(history)}
-      ${exerciseProgressHtml()}
+      ${
+        history.length
+          ? `<section class="subsection evolution" id="evolution">${evolutionHtml(history, activityMetric)}</section>
+             ${muscleBalanceHtml(history)}
+             ${exerciseProgressHtml()}`
+          : firstStepsHtml()
+      }
       <section class="subsection">
         <div class="subsection-head">
           <h2 class="subsection-title">Meus equipamentos</h2>
@@ -2082,7 +2139,7 @@
                   </a></li>`
                 )
                 .join("")}</ul>`
-            : empty("event_busy", "Nenhum treino registrado ainda.", `<br><a class="btn btn-primary" style="margin-top:12px" href="#/treinos">Ver treinos</a>`)
+            : empty("event_busy", "Nenhum treino registrado ainda.", `<a class="btn btn-primary" href="#/treinos">Ver treinos</a>`)
         }
       </section>`;
   }
@@ -2338,6 +2395,10 @@
             <span class="item-main"><span class="item-title">Meus equipamentos</span><br><span class="meta">${(user.equipment || []).length} selecionados</span></span>
             <span class="chevron" aria-hidden="true">›</span>
           </a>
+          <button class="settings-item" type="button" id="tour-again">
+            <span class="settings-icon">${icon("lightbulb")}</span>
+            <span class="item-main"><span class="item-title">Ver dicas de novo</span><br><span class="meta">Como registrar séries, descanso e opções</span></span>
+          </button>
           <button class="settings-item settings-danger" type="button" id="logout-btn">
             <span class="settings-icon">${icon("logout")}</span>
             <span class="item-main"><span class="item-title">Sair</span><br><span class="meta">Trocar de perfil neste aparelho</span></span>
@@ -2362,6 +2423,7 @@
       renderSettings();
     });
     $("backup-import").addEventListener("click", () => restoreFromFile());
+    $("tour-again").addEventListener("click", showTour);
     $("logout-btn").addEventListener("click", () => {
       if (!confirm("Sair deste perfil?")) return;
       Store.logout();
@@ -2904,6 +2966,41 @@
     }
   });
 
+  /* ---------- Primeiro uso: 3 dicas rápidas ---------- */
+
+  const TOUR = [
+    ["today", "Seu treino do dia", "No Início aparece o Treino de hoje. Toque em Começar para iniciar, ou escolha outro em Treinos."],
+    ["check_circle", "Registre cada série", "Abra o exercício, anote repetições e peso e marque a série. O descanso começa sozinho, e o app compara com a última vez."],
+    ["more_vert", "Do seu jeito", "No menu ⋮ de cada exercício dá para pular, trocar por outro do mesmo grupo ou mudar a ordem. Ao terminar, compartilhe o resumo."],
+  ];
+
+  function showTour() {
+    let step = 0;
+    const draw = () => {
+      const [ic, title, text] = TOUR[step];
+      const last = step === TOUR.length - 1;
+      $("sheet-content").innerHTML = `
+        <div class="tour" aria-live="polite">
+          <span class="tour-icon">${icon(ic)}</span>
+          <p class="eyebrow-text">Dica ${step + 1} de ${TOUR.length}</p>
+          <h2 id="sheet-title">${title}</h2>
+          <p class="tour-text">${text}</p>
+          <div class="tour-dots" aria-hidden="true">${TOUR.map((_, i) => `<span class="${i === step ? "on" : ""}"></span>`).join("")}</div>
+          <button class="btn btn-primary btn-block btn-lg" type="button" id="tour-next">${last ? "Começar a treinar" : "Próxima dica"}</button>
+          ${last ? "" : `<button class="btn btn-ghost btn-block" type="button" id="tour-skip">Pular dicas</button>`}
+        </div>`;
+      $("tour-next").addEventListener("click", () => (last ? closeSheet() : (step++, draw())));
+      $("tour-skip")?.addEventListener("click", () => closeSheet());
+      $("tour-next").focus({ preventScroll: true });
+    };
+    draw();
+    sheetReturnFocus = document.activeElement;
+    sheet.classList.remove("hidden");
+    document.body.classList.add("sheet-open");
+    requestAnimationFrame(() => sheet.classList.add("open"));
+    user = Store.updateUser(user.id, { tourDone: true });
+  }
+
   function enterApp() {
     if (!user.onboarded) {
       startProfileCompletion(user);
@@ -2915,6 +3012,7 @@
     $("app-shell").classList.remove("hidden");
     route();
     resumeRest();
+    if (!user.tourDone && !Store.history(user.id).length) setTimeout(showTour, reduceMotion() ? 0 : 500);
   }
 
   $("back-btn").addEventListener("click", () => {

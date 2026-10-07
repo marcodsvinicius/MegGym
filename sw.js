@@ -1,6 +1,6 @@
 /* Service worker do MegGym: deixa o app instalável e funcionando offline.
    Ao mudar arquivos do app, aumente VERSION (e o ?v= dos arquivos no index.html). */
-const VERSION = "v35";
+const VERSION = "v37";
 const CACHE = `meggym-${VERSION}`;
 
 const CORE = [
@@ -9,25 +9,31 @@ const CORE = [
   "./manifest.webmanifest",
   "./data/exercises.json",
   "./data/workouts.json",
-  "./assets/css/style.css?v=35",
-  "./assets/js/theme.js?v=35",
-  "./assets/js/config.js?v=35",
-  "./assets/js/supabase.js?v=35",
-  "./assets/js/common.js?v=35",
-  "./assets/js/store.js?v=35",
-  "./assets/js/pwa.js?v=35",
-  "./assets/js/app.js?v=35",
+  "./assets/css/style.css?v=37",
+  "./assets/js/theme.js?v=37",
+  "./assets/js/config.js?v=37",
+  "./assets/js/supabase.js?v=37",
+  "./assets/js/common.js?v=37",
+  "./assets/js/store.js?v=37",
+  "./assets/js/pwa.js?v=37",
+  "./assets/js/app.js?v=37",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/favicon-32.png",
-  "./assets/fonts/material-symbols-rounded.woff2?v=35",
+  "./assets/fonts/material-symbols-rounded.woff2?v=37",
   "./assets/fonts/plus-jakarta-sans.woff2",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)));
-  self.skipWaiting();
+  // Não troca sozinho: a versão nova espera o usuário tocar em "Atualizar" (mensagem abaixo).
+  // Na primeira instalação não há versão antiga, então ela já começa ativa.
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "VERSION") event.source?.postMessage({ type: "VERSION", version: VERSION });
 });
 
 self.addEventListener("activate", (event) => {

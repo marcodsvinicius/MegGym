@@ -31,6 +31,13 @@ test("onboarding cria o perfil e mostra o início", () =>
     await page.click('#ob-equipment [type="submit"]');
     await page.click('#ob-style [type="submit"]');
     await page.waitForSelector("#app-shell:not(.hidden)");
+    // Dicas do primeiro uso: 3 passos e fecha.
+    await page.waitForSelector(".tour");
+    await page.click("#tour-next");
+    await page.click("#tour-next");
+    assert.match(await page.textContent("#tour-next"), /Começar a treinar/);
+    await page.click("#tour-next");
+    await page.waitForSelector("#sheet", { state: "hidden" });
     assert.match(await page.textContent(".page-title"), /Ana/);
     assert.ok(await page.isVisible(".today-card"), "cartão Treino de hoje");
   }));
@@ -246,4 +253,21 @@ test("monta bi-set no formulário do treino", () =>
     await page.waitForURL(new RegExp(`treinos/${id}$`));
     assert.equal(await page.evaluate((w) => MegStore.getWorkout(w).items[0].linkNext, id), true);
     assert.equal(await page.locator(".item-row .ss-tag").count(), 2);
+  }));
+
+test("primeiro uso: atividade vazia mostra os primeiros passos; dicas não voltam sozinhas", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page, { tourDone: false });
+    await page.waitForSelector(".tour");
+    await page.click("#tour-skip");
+    await page.goto(server.url + "#/atividade");
+    await page.waitForSelector(".first-steps");
+    assert.equal(await page.locator("#evolution").count(), 0, "sem gráfico zerado");
+    await page.reload();
+    await page.waitForSelector("#app-shell:not(.hidden)");
+    await page.waitForTimeout(600);
+    assert.equal(await page.locator(".tour").count(), 0, "dicas só aparecem uma vez");
+    await page.goto(server.url + "#/atividade/configuracoes");
+    await page.click("#tour-again");
+    await page.waitForSelector(".tour");
   }));
