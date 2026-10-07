@@ -38,6 +38,11 @@ O MegGym pode ser instalado pelo navegador e abre em tela cheia, como um app, in
 
 O app usa ícones do **Material Symbols** (Google), guardados em `assets/fonts/` só com os ícones usados (≈50 KB, funciona offline). Para usar um ícone novo: escreva `icon("nome_do_icone")` no código e rode `python3 tools/update-icons.py`. Nomes em https://fonts.google.com/icons.
 
+## Créditos
+
+- Ilustrações dos grupos musculares: mapa muscular do projeto [react-native-body-highlighter](https://github.com/HichamELBSI/react-native-body-highlighter) (licença MIT, aviso completo em `assets/js/bodymap.js`).
+- Ícones: [Material Symbols](https://fonts.google.com/icons) (Google, Apache 2.0).
+
 ## Treinos que vêm com o app
 
 `data/workouts.json` traz treinos prontos. Ao subir a `version`, o app aplica a lista **uma vez** em cada aparelho; com `"replaceExisting": true` ele apaga os treinos salvos no aparelho e deixa só os do arquivo (o histórico é mantido).
