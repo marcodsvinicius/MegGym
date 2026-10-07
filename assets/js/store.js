@@ -17,6 +17,7 @@
     weightLog: "meggym.wlog.", // + id do usuário → { [exerciseId]: [{ date: "AAAA-MM-DD", weight }] }
     structures: "meggym.structures",
     rest: "meggym.rest.", // + id do usuário → fim do descanso em andamento { end, total }
+    saved: "meggym.saved.", // + id do usuário → { workouts: [ids], structures: [ids] }
     plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
 
@@ -303,7 +304,7 @@
     if (index >= 0) {
       saved = list[index] = { ...list[index], ...structure, updatedAt: new Date().toISOString() };
     } else {
-      saved = { ...structure, id: newId("st"), createdBy: user?.name || "", createdAt: new Date().toISOString() };
+      saved = { visibility: "private", ...structure, id: newId("st"), ownerId: user?.id || MEGGYM, createdBy: user?.name || "", createdAt: new Date().toISOString() };
       list.push(saved);
     }
     write(KEY.structures, list);
@@ -321,6 +322,42 @@
 
   function plan(userId) {
     return read(KEY.plan + userId, null);
+  }
+
+  // Seguir um treino avulso (sem divisão) como "Meu Treino".
+  function followWorkout(userId, workoutId) {
+    const value = { workoutId, startedAt: new Date().toISOString() };
+    write(KEY.plan + userId, value);
+    return value;
+  }
+
+  function visibleStructures(userId) {
+    return structures().filter((st) => canSeeWorkout(st, userId));
+  }
+
+  function copyStructure(id, user) {
+    const src = getStructure(id);
+    if (!src) return null;
+    const { id: _id, ownerId, createdBy, createdAt, updatedAt, ...data } = src;
+    return saveStructure({ ...data, visibility: "private", copiedFrom: src.id, copiedFromName: src.name, copiedFromAuthor: createdBy || "MegGym" }, user);
+  }
+
+  /* ---------- Salvos (favoritos do usuário) ---------- */
+
+  function saved(userId) {
+    const v = read(KEY.saved + userId, null) || {};
+    return { workouts: v.workouts || [], structures: v.structures || [] };
+  }
+
+  function isSaved(userId, kind, id) {
+    return saved(userId)[kind].includes(id);
+  }
+
+  function toggleSaved(userId, kind, id) {
+    const v = saved(userId);
+    v[kind] = v[kind].includes(id) ? v[kind].filter((x) => x !== id) : [id, ...v[kind]];
+    write(KEY.saved + userId, v);
+    return v[kind].includes(id);
   }
 
   function followStructure(userId, structureId) {
@@ -430,7 +467,7 @@
 
   /* ---------- Backup (arquivo .json com tudo do usuário) ---------- */
 
-  const PER_USER = ["session", "notes", "exerciseNotes", "exerciseLoads", "weightLog", "plan", "rest"];
+  const PER_USER = ["session", "notes", "exerciseNotes", "exerciseLoads", "weightLog", "plan", "rest", "saved"];
 
   function exportBackup(userId) {
     const user = users().find((u) => u.id === userId);
@@ -516,6 +553,12 @@
     deleteStructure,
     plan,
     followStructure,
+    followWorkout,
+    visibleStructures,
+    copyStructure,
+    saved,
+    isSaved,
+    toggleSaved,
     unfollowStructure,
     applySeed,
     session,

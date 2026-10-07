@@ -14,7 +14,8 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 - **Configurações** (Atividade → ⚙): estilo e modo, editar perfil, equipamentos e sair.
 - **Menu inferior:** Início · Treinos · Exercícios · Atividade.
 - **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
-- **Treinos:** nome, descrição e exercícios (com séries × repetições). Os grupos musculares do treino são calculados a partir dos exercícios. Todos os perfis do aparelho veem todos os treinos.
+- **Treinos:** abas **Meu Treino** (a divisão ou treino que você segue, com o próximo treino e o progresso), **Explorar** (divisões e treinos públicos da comunidade, com busca e filtros por grupo, equipamentos e tamanho da divisão) e **Salvos** (o que você salvou + o que você criou).
+- **Treino x Divisão:** treino = uma sessão de exercícios; divisão = conjunto de treinos em sequência (A, B, C…). Ao criar, cada um escolhe **privado** (só você) ou **público** (aparece em Explorar). Só o dono edita; os outros podem salvar, seguir ou copiar para editar.
 - **Executar:** "Iniciar treino" abre a lista para marcar cada exercício; com todos marcados, "Terminar treino" registra dia, horário e duração.
 - **Treino de hoje:** no Início, sugere o próximo treino (da estrutura seguida ou o que vem depois do último feito).
 - **Durante o treino:** séries com repetições e peso (mostra o que foi feito da última vez), temporizador de descanso por treino (padrão 60s, continua certo com a tela apagada, bipe e vibração no fim) e menu ⋮ em cada exercício para pular, trocar por outro do mesmo grupo ou mudar a ordem.

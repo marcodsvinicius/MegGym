@@ -475,7 +475,7 @@
       <section class="home-structure">
         <a class="home-structure-head" href="#/estruturas/${encodeURIComponent(st.id)}">
           <span>
-            <span class="meta">Sua estrutura</span><br>
+            <span class="meta">Sua divisão</span><br>
             <strong>${escapeHtml(st.name)}</strong>
           </span>
           <span class="home-structure-count"><strong>${pr.done}</strong>/${pr.duration}</span>
@@ -483,7 +483,7 @@
         <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
         ${
           pr.completed
-            ? `<p class="meta">${icon("emoji_events", "mi-inline")} Estrutura concluída!</p>`
+            ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída!</p>`
             : pr.next
               ? `<p class="meta">Próximo: Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</p>`
               : ""
@@ -497,8 +497,10 @@
     const st = plan && Store.getStructure(plan.structureId);
     if (st) {
       const pr = structureProgress(st);
-      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} da sua estrutura ${st.name}` };
+      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} da sua divisão ${st.name}` };
     }
+    const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
+    if (single) return { workout: single, reason: "Seu treino atual" };
     const list = Store.visibleWorkouts(user.id).filter((w) => w.items?.length);
     if (!list.length) return null;
     const last = history.find((h) => list.some((w) => w.id === h.workoutId));
@@ -948,12 +950,10 @@
   const isMine = (w) => Store.ownerOf(w) === user.id;
   // Autor para mostrar: "MegGym", o nome de quem criou, ou "você".
   const authorOf = (w) => (isMine(w) ? "você" : Store.ownerOf(w) === "meggym" ? "MegGym" : w.createdBy || "alguém");
-  let workoutsTab = "meus";
 
   function workoutCard(w) {
     const gs = workoutGroups(w.items);
     const active = Store.session(user.id)?.workoutId === w.id;
-    const vis = isMine(w) ? (Store.visibilityOf(w) === "public" ? `${icon("public", "mi-inline")} Público` : `${icon("lock", "mi-inline")} Privado`) : "";
     return `
       <a class="workout-card" href="#/treinos/${encodeURIComponent(w.id)}">
         <div class="workout-card-head">
@@ -962,61 +962,246 @@
         </div>
         ${w.description ? `<p class="exercise-desc clamp-2">${escapeHtml(w.description)}</p>` : ""}
         <div class="group-chips">${groupChips(gs)}</div>
-        <p class="meta">${w.items.length} ${w.items.length === 1 ? "exercício" : "exercícios"}${isMine(w) ? ` · ${vis}` : ` · por ${escapeHtml(authorOf(w))}`}</p>
+        <p class="meta">${w.items.length} ${w.items.length === 1 ? "exercício" : "exercícios"}</p>
+        <p class="meta card-owner">${ownerTag(w)}${Store.isSaved(user.id, "workouts", w.id) ? ` · ${icon("bookmark", "mi-inline")} Salvo` : ""}</p>
       </a>`;
   }
 
-  function renderWorkouts() {
-    setHeader("Treinos", { action: `<a class="btn btn-sm btn-primary" href="#/treinos/novo">${icon("add", "mi-inline")} Novo</a>` });
+  /* ================= Treinos: Meu Treino · Explorar · Salvos ================= */
+
+  // Abas do topo; a aba fica no endereço (#/treinos?aba=explorar) para o "voltar" funcionar.
+  const TRAIN_TABS = [
+    ["meu", "Meu Treino"],
+    ["explorar", "Explorar"],
+    ["salvos", "Salvos"],
+  ];
+  let exploreState = { kind: "divisoes", q: "", group: "", equip: false, days: "" };
+
+  const divisionLetters = (st) =>
+    (st.workoutIds || []).map((id, i) => (Store.getWorkout(id) ? `<span class="letter-chip">${letter(i)}</span>` : "")).join("");
+
+  function ownerTag(item) {
+    if (isMine(item)) return Store.visibilityOf(item) === "public" ? `${icon("public", "mi-inline")} Seu · público` : `${icon("lock", "mi-inline")} Seu · privado`;
+    return `${icon("person", "mi-inline")} por ${escapeHtml(authorOf(item))}`;
+  }
+
+  function divisionCard(st) {
+    const pr = structureProgress(st);
+    const n = (st.workoutIds || []).length;
+    const saved = Store.isSaved(user.id, "structures", st.id);
+    return `
+      <a class="structure-card ${pr.following ? "following" : ""}" href="#/estruturas/${encodeURIComponent(st.id)}">
+        <div class="workout-card-head">
+          <h3>${escapeHtml(st.name)}</h3>
+          ${pr.following ? `<span class="badge badge-live">Seguindo</span>` : saved ? `<span class="badge">${icon("bookmark", "mi-inline")} Salva</span>` : ""}
+        </div>
+        ${st.description ? `<p class="exercise-desc clamp-2">${escapeHtml(st.description)}</p>` : ""}
+        <div class="structure-meta">
+          <span class="letters">${divisionLetters(st)}</span>
+          <span class="meta">${n} ${n === 1 ? "treino" : "treinos"} · ${pr.duration} sessões</span>
+        </div>
+        <p class="meta card-owner">${ownerTag(st)}</p>
+      </a>`;
+  }
+
+  function renderWorkouts(params = new URLSearchParams()) {
+    const tab = TRAIN_TABS.some(([id]) => id === params.get("aba")) ? params.get("aba") : "meu";
+    setHeader("Treinos", { action: `<button class="btn btn-sm btn-primary" type="button" id="new-train">${icon("add", "mi-inline")} Novo</button>` });
     setTab("treinos");
-    const visible = Store.visibleWorkouts(user.id);
-    const mine = visible.filter(isMine);
-    const community = visible.filter((w) => !isMine(w));
-    const list = workoutsTab === "meus" ? mine : community;
-    const structs = Store.structures();
-    const plan = Store.plan(user.id);
-    structs.sort((a, b) => (b.id === plan?.structureId) - (a.id === plan?.structureId));
+    app.innerHTML = `
+      <nav class="top-tabs" role="tablist" aria-label="Treinos">
+        ${TRAIN_TABS.map(([id, label]) => `<a role="tab" href="#/treinos?aba=${id}" aria-selected="${id === tab}" ${id === tab ? 'aria-current="page"' : ""}>${label}</a>`).join("")}
+      </nav>
+      <div id="train-tab">${tab === "meu" ? myTrainingHtml() : tab === "explorar" ? exploreHtml() : savedHtml()}</div>`;
+    $("new-train").addEventListener("click", async () => {
+      const choice = await actionSheet({
+        title: "Criar",
+        actions: [
+          { id: "treino", icon: "fitness_center", label: "Novo treino", hint: "Uma sessão com exercícios, séries e repetições" },
+          { id: "divisao", icon: "view_week", label: "Nova divisão", hint: "Conjunto de treinos em sequência (A, B, C…)" },
+        ],
+      });
+      if (choice === "treino") location.hash = "#/treinos/novo";
+      if (choice === "divisao") location.hash = "#/estruturas/novo";
+    });
+    if (tab === "explorar") bindExplore();
+    $("mt-start")?.addEventListener("click", (e) => {
+      const w = Store.getWorkout(e.currentTarget.dataset.workout);
+      if (w) startWorkout(w);
+    });
+    $("mt-unfollow")?.addEventListener("click", async () => {
+      const ok = await confirmSheet({ icon: "flag", title: "Parar de seguir?", text: "O progresso da divisão será zerado. Seu histórico continua.", confirmLabel: "Parar de seguir", cancelLabel: "Voltar", danger: true });
+      if (!ok) return;
+      Store.unfollowStructure(user.id);
+      renderWorkouts(params);
+    });
+  }
+
+  // Meu Treino: a divisão (ou treino) que o usuário está seguindo.
+  function myTrainingHtml() {
     const session = Store.session(user.id);
     const activeWorkout = session && Store.getWorkout(session.workoutId);
-    app.innerHTML = `
-      ${
-        activeWorkout
-          ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
-              <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
-            </a>`
-          : ""
-      }
-      <section class="list-section">
-        <div class="subsection-head">
-          <h2 class="subsection-title">Estrutura de treinos</h2>
-          <a class="btn btn-sm" href="#/estruturas/novo">${icon("add", "mi-inline")} Nova</a>
+    const resume = activeWorkout
+      ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
+          <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
+        </a>`
+      : "";
+    const plan = Store.plan(user.id);
+    const st = plan?.structureId && Store.getStructure(plan.structureId);
+    const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
+
+    if (st) {
+      const pr = structureProgress(st);
+      const items = (st.workoutIds || [])
+        .map((wid, i) => {
+          const w = Store.getWorkout(wid);
+          if (!w) return "";
+          const isNext = !pr.completed && pr.next?.workout.id === w.id && pr.next.letter === letter(i);
+          return `
+            <li><a class="item-row item-link ${isNext ? "highlight-next" : ""}" href="#/treinos/${encodeURIComponent(w.id)}">
+              <span class="item-index letter-index">${letter(i)}</span>
+              <div class="item-main">
+                <div class="item-title">${escapeHtml(shortName(w.name))}</div>
+                <div class="meta">${w.items.length} exercícios${isNext ? " · <strong>próximo</strong>" : ""}</div>
+              </div>
+              <span class="chevron" aria-hidden="true">›</span>
+            </a></li>`;
+        })
+        .join("");
+      return `
+        ${resume}
+        <section class="my-plan">
+          <p class="eyebrow-text">${icon("flag", "mi-inline")} Divisão que você segue</p>
+          <a class="my-plan-title" href="#/estruturas/${encodeURIComponent(st.id)}"><h2>${escapeHtml(st.name)}</h2><span class="chevron" aria-hidden="true">›</span></a>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${pr.duration}" aria-valuenow="${pr.done}" aria-label="Progresso da divisão"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+          <p class="meta">${pr.done} de ${pr.duration} sessões · desde ${new Date(plan.startedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</p>
+          ${
+            pr.completed
+              ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída! Escolha outra em Explorar ou recomece.</p>`
+              : pr.next && !activeWorkout
+                ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="mt-start" data-workout="${escapeHtml(pr.next.workout.id)}">${icon("play_arrow", "mi-inline")} Começar Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</button>`
+                : ""
+          }
+        </section>
+        <section class="subsection">
+          <h2 class="subsection-title">Treinos da divisão</h2>
+          <ol class="item-list">${items}</ol>
+        </section>
+        <button class="btn btn-ghost btn-block" type="button" id="mt-unfollow">Parar de seguir esta divisão</button>`;
+    }
+
+    if (single) {
+      return `
+        ${resume}
+        <section class="my-plan">
+          <p class="eyebrow-text">${icon("flag", "mi-inline")} Treino que você segue</p>
+          <a class="my-plan-title" href="#/treinos/${encodeURIComponent(single.id)}"><h2>${escapeHtml(single.name)}</h2><span class="chevron" aria-hidden="true">›</span></a>
+          <div class="group-chips">${groupChips(workoutGroups(single.items))}</div>
+          <p class="meta">${single.items.length} exercícios</p>
+          ${activeWorkout ? "" : `<button class="btn btn-primary btn-block btn-lg" type="button" id="mt-start" data-workout="${escapeHtml(single.id)}">${icon("play_arrow", "mi-inline")} Começar treino</button>`}
+        </section>
+        <button class="btn btn-ghost btn-block" type="button" id="mt-unfollow">Parar de seguir</button>`;
+    }
+
+    return `
+      ${resume}
+      ${empty(
+        "flag",
+        "Você ainda não segue nenhum treino. Escolha uma divisão pronta (como ABC) ou monte a sua.",
+        `<a class="btn btn-primary" href="#/treinos?aba=explorar">${icon("explore", "mi-inline")} Explorar</a><a class="btn" href="#/treinos?aba=salvos">Meus salvos</a>`
+      )}`;
+  }
+
+  // Explorar: divisões e treinos públicos da comunidade, com filtros.
+  function exploreHtml() {
+    const f = exploreState;
+    const groupOptions = groups().map((g) => `<option value="${escapeHtml(g.id)}" ${f.group === g.id ? "selected" : ""}>${escapeHtml(g.name)}</option>`).join("");
+    return `
+      <div class="explore-filters">
+        <div class="seg" role="tablist" aria-label="Tipo">
+          <button type="button" role="tab" data-ex-kind="divisoes" aria-selected="${f.kind === "divisoes"}">Divisões</button>
+          <button type="button" role="tab" data-ex-kind="treinos" aria-selected="${f.kind === "treinos"}">Treinos</button>
         </div>
-        ${
-          structs.length
-            ? `<div class="workout-list">${structs.map(structureCard).join("")}</div>`
-            : `<p class="meta">Agrupe vários treinos numa sequência para seguir (ex.: ABC).</p>`
-        }
-      </section>
-      <div class="subsection-head list-section-title">
-        <h2 class="subsection-title">Treinos</h2>
-        <div class="seg" role="tablist" aria-label="Quais treinos">
-          <button type="button" role="tab" data-wtab="meus" aria-selected="${workoutsTab === "meus"}">Meus (${mine.length})</button>
-          <button type="button" role="tab" data-wtab="comunidade" aria-selected="${workoutsTab === "comunidade"}">Comunidade (${community.length})</button>
+        <label class="search"><span class="visually-hidden">Buscar</span><input class="input" id="ex-q" type="search" placeholder="Buscar por nome…" value="${escapeHtml(f.q)}"></label>
+        <div class="filter-row">
+          <label><span class="visually-hidden">Grupo muscular</span><select class="select" id="ex-group"><option value="">Todos os grupos</option>${groupOptions}</select></label>
+          <button class="chip" type="button" id="ex-equip" aria-pressed="${f.equip}">${icon("home", "mi-inline")} Com meus equipamentos</button>
+        </div>
+        <div class="filter-row ${f.kind === "divisoes" ? "" : "hidden"}" id="ex-days" role="group" aria-label="Treinos por divisão">
+          ${["", "2", "3", "4", "5"].map((d) => `<button class="chip" type="button" data-ex-days="${d}" aria-pressed="${f.days === d}">${d ? (d === "5" ? "5+ treinos" : `${d} treinos`) : "Qualquer tamanho"}</button>`).join("")}
         </div>
       </div>
-      ${
-        list.length
-          ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>`
-          : workoutsTab === "meus"
-            ? empty("fitness_center", "Você ainda não tem treinos seus. Crie um ou copie um da Comunidade.", `<a class="btn btn-primary" href="#/treinos/novo">Criar meu treino</a><button class="btn" type="button" data-wtab="comunidade">Ver Comunidade</button>`)
-            : empty("groups", "Nenhum treino público da comunidade ainda.")
-      }`;
-    app.querySelectorAll("[data-wtab]").forEach((b) =>
+      <div id="ex-results" aria-live="polite">${exploreResults()}</div>`;
+  }
+
+  const canDoWorkout = (w) => w.items.every((it) => {
+    const ex = findExercise(it.exerciseId);
+    return !ex || available(ex);
+  });
+
+  function exploreResults() {
+    const f = exploreState;
+    const q = normalizeText(f.q.trim());
+    const matchWorkout = (w) =>
+      (!f.group || workoutGroups(w.items).some((g) => g.id === f.group)) && (!f.equip || canDoWorkout(w));
+    if (f.kind === "treinos") {
+      const list = Store.visibleWorkouts(user.id).filter((w) => !isMine(w) && Store.visibilityOf(w) === "public" && (!q || normalizeText(w.name).includes(q)) && matchWorkout(w));
+      return list.length ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>` : empty("search_off", "Nenhum treino com esses filtros.");
+    }
+    const list = Store.visibleStructures(user.id).filter((st) => {
+      if (isMine(st) || Store.visibilityOf(st) !== "public") return false;
+      const ws = (st.workoutIds || []).map((id) => Store.getWorkout(id)).filter(Boolean);
+      const n = ws.length;
+      return (
+        (!q || normalizeText(st.name).includes(q)) &&
+        (!f.days || (f.days === "5" ? n >= 5 : n === Number(f.days))) &&
+        (!f.group || ws.some((w) => workoutGroups(w.items).some((g) => g.id === f.group))) &&
+        (!f.equip || ws.every(canDoWorkout))
+      );
+    });
+    return list.length ? `<div class="workout-list">${list.map(divisionCard).join("")}</div>` : empty("search_off", "Nenhuma divisão com esses filtros.");
+  }
+
+  function bindExplore() {
+    const refresh = () => ($("ex-results").innerHTML = exploreResults());
+    app.querySelectorAll("[data-ex-kind]").forEach((b) =>
       b.addEventListener("click", () => {
-        workoutsTab = b.dataset.wtab;
-        renderWorkouts();
+        exploreState.kind = b.dataset.exKind;
+        app.querySelectorAll("[data-ex-kind]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+        $("ex-days").classList.toggle("hidden", exploreState.kind !== "divisoes");
+        refresh();
       })
     );
+    $("ex-q").addEventListener("input", (e) => ((exploreState.q = e.target.value), refresh()));
+    $("ex-group").addEventListener("change", (e) => ((exploreState.group = e.target.value), refresh()));
+    $("ex-equip").addEventListener("click", (e) => {
+      exploreState.equip = !exploreState.equip;
+      e.currentTarget.setAttribute("aria-pressed", String(exploreState.equip));
+      refresh();
+    });
+    app.querySelectorAll("[data-ex-days]").forEach((b) =>
+      b.addEventListener("click", () => {
+        exploreState.days = b.dataset.exDays;
+        app.querySelectorAll("[data-ex-days]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        refresh();
+      })
+    );
+  }
+
+  // Salvos: o que o usuário salvou da comunidade + o que ele criou.
+  function savedHtml() {
+    const sv = Store.saved(user.id);
+    const divisions = Store.visibleStructures(user.id).filter((st) => isMine(st) || sv.structures.includes(st.id));
+    const workouts = Store.visibleWorkouts(user.id).filter((w) => isMine(w) || sv.workouts.includes(w.id));
+    return `
+      <section class="subsection">
+        <h2 class="subsection-title">Divisões</h2>
+        ${divisions.length ? `<div class="workout-list">${divisions.map(divisionCard).join("")}</div>` : `<p class="meta">Salve uma divisão em Explorar ou crie a sua no botão Novo.</p>`}
+      </section>
+      <section class="subsection">
+        <h2 class="subsection-title">Treinos</h2>
+        ${workouts.length ? `<div class="workout-list">${workouts.map(workoutCard).join("")}</div>` : `<p class="meta">Salve treinos em Explorar ou crie o seu no botão Novo.</p>`}
+      </section>`;
   }
 
   function renderWorkoutDetail(id) {
@@ -1028,6 +1213,8 @@
       return;
     }
     const mine = isMine(w);
+    const savedThis = Store.isSaved(user.id, "workouts", w.id);
+    const followingThis = Store.plan(user.id)?.workoutId === w.id;
     setHeader(w.name, { back: "#/treinos", action: mine ? `<a class="btn btn-sm" href="#/treinos/${encodeURIComponent(w.id)}/editar">Editar</a>` : "" });
     const session = Store.session(user.id);
     const activeHere = session?.workoutId === w.id;
@@ -1068,13 +1255,31 @@
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
           ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
-        ${mine ? "" : `<button class="btn btn-block" type="button" id="copy-btn">${icon("content_copy", "mi-inline")} Copiar para meus treinos</button>`}
+        <div class="detail-actions">
+          ${followingThis ? `<span class="btn btn-block is-on" aria-disabled="true">${icon("flag", "mi-inline")} Seu treino atual</span>` : `<button class="btn btn-block" type="button" id="follow-w">${icon("flag", "mi-inline")} Seguir este treino</button>`}
+          ${mine ? "" : `<button class="btn btn-block ${savedThis ? "is-on" : ""}" type="button" id="save-w" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salvo" : "Salvar"}</button>`}
+          ${mine ? "" : `<button class="btn btn-block" type="button" id="copy-btn">${icon("content_copy", "mi-inline")} Copiar para editar</button>`}
+        </div>
       </div>`;
     $("start-btn").addEventListener("click", () => startWorkout(w));
+    $("save-w")?.addEventListener("click", () => {
+      const on = Store.toggleSaved(user.id, "workouts", w.id);
+      toast(on ? "Treino salvo." : "Removido dos salvos.");
+      renderWorkoutDetail(w.id);
+    });
+    $("follow-w")?.addEventListener("click", async () => {
+      const plan = Store.plan(user.id);
+      if (plan) {
+        const ok = await confirmSheet({ icon: "flag", title: "Trocar seu treino atual?", text: "Você vai parar de seguir o atual e o progresso dele recomeça. O histórico continua.", confirmLabel: "Seguir este treino", cancelLabel: "Voltar" });
+        if (!ok) return;
+      }
+      Store.followWorkout(user.id, w.id);
+      toast("Agora este é o seu treino.", "success");
+      location.hash = "#/treinos?aba=meu";
+    });
     $("copy-btn")?.addEventListener("click", () => {
       const copy = Store.copyWorkout(w.id, user);
-      workoutsTab = "meus";
-      toast("Copiado para Meus treinos. Agora você pode editar.", "success");
+      toast("Cópia criada em Salvos. Agora você pode editar.", "success");
       location.hash = `#/treinos/${encodeURIComponent(copy.id)}`;
     });
   }
@@ -1118,43 +1323,17 @@
     };
   }
 
-  function structureCard(st) {
-    const pr = structureProgress(st);
-    const names = (st.workoutIds || [])
-      .map((id, i) => {
-        const w = Store.getWorkout(id);
-        return w ? `<span class="letter-chip">${letter(i)}</span>` : "";
-      })
-      .join("");
-    return `
-      <a class="structure-card ${pr.following ? "following" : ""}" href="#/estruturas/${encodeURIComponent(st.id)}">
-        <div class="workout-card-head">
-          <h3>${escapeHtml(st.name)}</h3>
-          ${pr.completed ? `<span class="badge badge-iniciante">Concluída</span>` : pr.following ? `<span class="badge badge-live">Seguindo</span>` : ""}
-        </div>
-        ${st.description ? `<p class="exercise-desc clamp-2">${escapeHtml(st.description)}</p>` : ""}
-        <div class="structure-meta">
-          <span class="letters">${names}</span>
-          <span class="meta">${icon("event_repeat", "mi-inline")} ${pr.duration} treinos</span>
-        </div>
-        ${
-          pr.following
-            ? `<div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
-               <p class="meta">${pr.done} de ${pr.duration}${pr.next && !pr.completed ? ` · próximo: Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}` : ""}</p>`
-            : ""
-        }
-      </a>`;
-  }
-
   function renderStructureDetail(id) {
     setTab("treinos");
     const st = Store.getStructure(id);
-    if (!st) {
-      setHeader("Estrutura", { back: "#/treinos" });
-      app.innerHTML = empty("help", "Estrutura não encontrada.");
+    if (!st || !Store.canSeeWorkout(st, user.id)) {
+      setHeader("Divisão", { back: "#/treinos" });
+      app.innerHTML = empty("help", "Divisão não encontrada.");
       return;
     }
-    setHeader(st.name, { back: "#/treinos", action: `<a class="btn btn-sm" href="#/estruturas/${encodeURIComponent(st.id)}/editar">Editar</a>` });
+    const mine = isMine(st);
+    const savedThis = Store.isSaved(user.id, "structures", st.id);
+    setHeader(st.name, { back: "#/treinos", action: mine ? `<a class="btn btn-sm" href="#/estruturas/${encodeURIComponent(st.id)}/editar">Editar</a>` : "" });
     const pr = structureProgress(st);
     const plan = Store.plan(user.id);
     const items = (st.workoutIds || [])
@@ -1184,7 +1363,7 @@
           <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
           ${
             pr.completed
-              ? `<p class="meta">${icon("emoji_events", "mi-inline")} Estrutura concluída! Parabéns pela constância.</p>`
+              ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída! Parabéns pela constância.</p>`
               : pr.next
                 ? `<p class="meta">Próximo: <strong>Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</strong></p>`
                 : ""
@@ -1195,12 +1374,17 @@
     app.innerHTML = `
       ${st.description ? `<p class="lead">${escapeHtml(st.description)}</p>` : ""}
       <div class="structure-facts">
-        <span class="fact">${icon("event_repeat", "mi-inline")} Duração: ${pr.duration} treinos</span>
-        <span class="fact">${icon("format_list_numbered", "mi-inline")} ${(st.workoutIds || []).length} treinos na sequência</span>
+        <span class="fact">${icon("format_list_numbered", "mi-inline")} ${(st.workoutIds || []).length} treinos (${(st.workoutIds || []).map((_, i) => letter(i)).join(", ")})</span>
+        <span class="fact">${icon("event_repeat", "mi-inline")} Duração: ${pr.duration} sessões</span>
       </div>
+      <p class="workout-owner">${
+        mine
+          ? Store.visibilityOf(st) === "public" ? `${icon("public", "mi-inline")} Pública: aparece em Explorar` : `${icon("lock", "mi-inline")} Privada: só você vê`
+          : `${icon("groups", "mi-inline")} Da comunidade · por ${escapeHtml(authorOf(st))}`
+      }${st.copiedFromName ? ` · copiada de “${escapeHtml(st.copiedFromName)}”` : ""}</p>
       ${progressHtml}
       <section class="subsection">
-        <h2 class="subsection-title">Sequência</h2>
+        <h2 class="subsection-title">Treinos da divisão</h2>
         <ol class="item-list">${items || `<li class="state state-sm">Nenhum treino.</li>`}</ol>
       </section>
       <div class="sticky-cta">
@@ -1209,22 +1393,40 @@
             ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-start">${icon("play_arrow", "mi-inline")} Iniciar Treino ${pr.next.letter}</button>
                <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
             : pr.completed
-              ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow">${icon("replay", "mi-inline")} Recomeçar estrutura</button>
+              ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow">${icon("replay", "mi-inline")} Recomeçar divisão</button>
                  <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
-              : `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow" ${pr.next ? "" : "disabled"}>${icon("flag", "mi-inline")} Seguir esta estrutura</button>`
+              : `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow" ${pr.next ? "" : "disabled"}>${icon("flag", "mi-inline")} Seguir esta divisão</button>`
+        }
+        ${
+          mine
+            ? ""
+            : `<div class="detail-actions">
+                <button class="btn btn-block ${savedThis ? "is-on" : ""}" type="button" id="st-save" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salva" : "Salvar"}</button>
+                <button class="btn btn-block" type="button" id="st-copy">${icon("content_copy", "mi-inline")} Copiar para editar</button>
+              </div>`
         }
       </div>`;
 
     $("st-start")?.addEventListener("click", () => startWorkout(pr.next.workout));
+    $("st-save")?.addEventListener("click", () => {
+      const on = Store.toggleSaved(user.id, "structures", st.id);
+      toast(on ? "Divisão salva." : "Removida dos salvos.");
+      renderStructureDetail(st.id);
+    });
+    $("st-copy")?.addEventListener("click", () => {
+      const copy = Store.copyStructure(st.id, user);
+      toast("Cópia criada em Salvos. Agora você pode editar.", "success");
+      location.hash = `#/estruturas/${encodeURIComponent(copy.id)}`;
+    });
     $("st-follow")?.addEventListener("click", () => {
-      const current = plan && plan.structureId !== st.id ? Store.getStructure(plan.structureId) : null;
+      const current = plan && plan.structureId !== st.id ? Store.getStructure(plan.structureId) || Store.getWorkout(plan.workoutId) : null;
       if (current && !confirm(`Você está seguindo "${current.name}". Trocar para "${st.name}"? O progresso recomeça.`)) return;
       Store.followStructure(user.id, st.id);
       toast(`Agora você segue ${st.name}!`, "success");
-      renderStructureDetail(st.id);
+      location.hash = "#/treinos?aba=meu";
     });
     $("st-unfollow")?.addEventListener("click", () => {
-      if (!confirm("Parar de seguir esta estrutura? O progresso será zerado.")) return;
+      if (!confirm("Parar de seguir esta divisão? O progresso será zerado.")) return;
       Store.unfollowStructure(user.id);
       renderStructureDetail(st.id);
     });
@@ -1235,19 +1437,20 @@
   function renderStructureForm(editId) {
     setTab("treinos");
     const editing = editId ? Store.getStructure(editId) : null;
-    if (editId && !editing) {
-      setHeader("Estrutura", { back: "#/treinos" });
-      app.innerHTML = empty("help", "Estrutura não encontrada.");
+    if (editId && (!editing || !isMine(editing))) {
+      if (editing && Store.canSeeWorkout(editing, user.id)) return location.replace(`#/estruturas/${encodeURIComponent(editing.id)}`);
+      setHeader("Divisão", { back: "#/treinos" });
+      app.innerHTML = empty("help", "Divisão não encontrada.");
       return;
     }
     if (!structureDraft || structureDraft.id !== (editing?.id || null)) {
       structureDraft = editing
-        ? { id: editing.id, name: editing.name, description: editing.description || "", duration: editing.duration || "", workoutIds: [...(editing.workoutIds || [])] }
-        : { id: null, name: "", description: "", duration: 30, workoutIds: [] };
+        ? { id: editing.id, name: editing.name, description: editing.description || "", duration: editing.duration || "", workoutIds: [...(editing.workoutIds || [])], visibility: Store.visibilityOf(editing) }
+        : { id: null, name: "", description: "", duration: 30, workoutIds: [], visibility: "private" };
     }
     const d = structureDraft;
     const back = editing ? `#/estruturas/${encodeURIComponent(editing.id)}` : "#/treinos";
-    setHeader(editing ? "Editar estrutura" : "Nova estrutura", { back });
+    setHeader(editing ? "Editar divisão" : "Nova divisão", { back });
     app.innerHTML = `
       <form class="form-stack" id="structure-form" novalidate>
         <div class="field">
@@ -1259,11 +1462,24 @@
           <textarea class="textarea textarea-sm" id="st-description" maxlength="600" placeholder="Objetivo, como alternar os treinos…">${escapeHtml(d.description)}</textarea>
         </div>
         <div class="field">
-          <label for="st-duration">Duração (quantidade de treinos) <span class="req">*</span></label>
+          <label for="st-duration">Duração (quantas sessões até concluir) <span class="req">*</span></label>
           <input class="input" id="st-duration" type="number" inputmode="numeric" min="1" max="365" value="${escapeHtml(d.duration)}">
         </div>
+        <fieldset class="field fieldset">
+          <legend>Quem pode ver</legend>
+          <div class="visibility-options">
+            <label class="vis-option">
+              <input type="radio" name="st-visibility" value="private" ${d.visibility !== "public" ? "checked" : ""}>
+              <span>${icon("lock")}<strong>Privada</strong><small>Só você vê, em Salvos.</small></span>
+            </label>
+            <label class="vis-option">
+              <input type="radio" name="st-visibility" value="public" ${d.visibility === "public" ? "checked" : ""}>
+              <span>${icon("public")}<strong>Pública</strong><small>Aparece em Explorar; outros podem seguir e salvar.</small></span>
+            </label>
+          </div>
+        </fieldset>
         <section class="subsection">
-          <h2 class="subsection-title">Sequência de treinos</h2>
+          <h2 class="subsection-title">Treinos da divisão (A, B, C…)</h2>
           <ol class="item-list" id="st-items"></ol>
           <span class="field-error hidden" id="st-items-error"></span>
         </section>
@@ -1272,8 +1488,8 @@
           <ul class="item-list" id="st-picker"></ul>
         </section>
         <div class="sticky-cta">
-          <button class="btn btn-primary btn-block btn-lg" type="submit">${editing ? "Salvar estrutura" : "Criar estrutura"}</button>
-          ${editing ? `<button class="btn btn-danger btn-block" type="button" id="st-delete">Excluir estrutura</button>` : ""}
+          <button class="btn btn-primary btn-block btn-lg" type="submit">${editing ? "Salvar divisão" : "Criar divisão"}</button>
+          ${editing ? `<button class="btn btn-danger btn-block" type="button" id="st-delete">Excluir divisão</button>` : ""}
         </div>
       </form>`;
 
@@ -1315,6 +1531,7 @@
     $("st-name").addEventListener("input", (e) => (d.name = e.target.value));
     $("st-description").addEventListener("input", (e) => (d.description = e.target.value));
     $("st-duration").addEventListener("input", (e) => (d.duration = e.target.value));
+    document.querySelectorAll('input[name="st-visibility"]').forEach((r) => r.addEventListener("change", () => (d.visibility = r.value)));
     $("st-items").addEventListener("click", (e) => {
       const btn = e.target.closest("[data-st-action]");
       if (!btn) return;
@@ -1336,7 +1553,7 @@
       d.name = $("st-name").value.trim();
       const duration = Number($("st-duration").value);
       const errors = [];
-      if (!d.name) errors.push(["st-name", "Dê um nome à estrutura."]);
+      if (!d.name) errors.push(["st-name", "Dê um nome à divisão."]);
       if (!Number.isInteger(duration) || duration < 1 || duration > 365) errors.push(["st-duration", "Informe de 1 a 365 treinos."]);
       showErrors(e.target, errors);
       const itemsError = $("st-items-error");
@@ -1344,18 +1561,18 @@
       itemsError.classList.toggle("hidden", Boolean(d.workoutIds.length));
       if (errors.length || !d.workoutIds.length) return;
       const saved = Store.saveStructure(
-        { ...(d.id ? { id: d.id } : {}), name: d.name, description: $("st-description").value.trim(), duration, workoutIds: [...d.workoutIds] },
+        { ...(d.id ? { id: d.id } : {}), name: d.name, description: $("st-description").value.trim(), duration, workoutIds: [...d.workoutIds], visibility: d.visibility === "public" ? "public" : "private" },
         user
       );
       structureDraft = null;
-      toast(editing ? "Estrutura salva!" : "Estrutura criada!", "success");
+      toast(editing ? "Divisão salva!" : "Divisão criada!", "success");
       location.hash = `#/estruturas/${encodeURIComponent(saved.id)}`;
     });
     $("st-delete")?.addEventListener("click", () => {
-      if (!confirm(`Excluir a estrutura "${editing.name}"? Os treinos continuam existindo.`)) return;
+      if (!confirm(`Excluir a divisão "${editing.name}"? Os treinos continuam existindo.`)) return;
       Store.deleteStructure(editing.id);
       structureDraft = null;
-      toast("Estrutura excluída.");
+      toast("Divisão excluída.");
       location.hash = "#/treinos";
     });
     renderItems();
@@ -2552,7 +2769,7 @@
         else if (parts[1] && parts[2] === "editar") renderWorkoutForm(parts[1]);
         else if (parts[1] && parts[2] === "executar") renderWorkoutRun(parts[1]);
         else if (parts[1]) renderWorkoutDetail(parts[1]);
-        else renderWorkouts();
+        else renderWorkouts(params);
         break;
       case "exercicios":
         if (parts[1] === "novo") renderExerciseForm(null, params.get("grupo"));
