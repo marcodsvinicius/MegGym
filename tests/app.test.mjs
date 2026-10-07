@@ -245,7 +245,8 @@ test("exercício de tempo: cronômetro marca a série; recorde e bi-set", () =>
 test("monta bi-set no formulário do treino", () =>
   withApp(async ({ page }) => {
     await seedUser(page);
-    const id = await page.evaluate(() => MegStore.workouts()[0].id);
+    // Só o dono edita: copia um treino da comunidade para os meus.
+    const id = await page.evaluate(() => MegStore.copyWorkout(MegStore.workouts()[0].id, MegStore.currentUser()).id);
     await page.goto(server.url + `#/treinos/${id}/editar`);
     await page.locator("[data-link]").first().click();
     assert.ok(await page.isVisible(".item-row .ss-tag"));
@@ -270,4 +271,50 @@ test("primeiro uso: atividade vazia mostra os primeiros passos; dicas não volta
     await page.goto(server.url + "#/atividade/configuracoes");
     await page.click("#tour-again");
     await page.waitForSelector(".tour");
+  }));
+
+test("meus treinos x comunidade: privado só o dono vê, público aparece na comunidade e pode ser copiado", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page, { name: "Ana" });
+    // Ana cria um treino público e um privado.
+    for (const [name, vis] of [["Treino da Ana público", "public"], ["Treino da Ana privado", "private"]]) {
+      await page.goto(server.url + "#/treinos/novo");
+      await page.fill("#w-name", name);
+      await page.locator("[data-add]").first().click();
+      await page.check(`input[name="w-visibility"][value="${vis}"]`, { force: true });
+      await page.click('#workout-form [type="submit"]');
+      await page.waitForURL(/#\/treinos\/w-/);
+    }
+    await page.goto(server.url + "#/treinos");
+    assert.equal(await page.locator(".workout-card h3", { hasText: "Treino da Ana" }).count(), 2, "Ana vê os dois em Meus");
+
+    // Marco entra no mesmo aparelho.
+    await page.evaluate(() => {
+      const u = MegStore.createUser({ name: "Marco", equipment: ["halter", "banco"] });
+      MegStore.updateUser(u.id, { tourDone: true });
+    });
+    await page.goto(server.url + "#/treinos");
+    await page.reload();
+    await page.waitForSelector("[data-wtab]");
+    assert.equal(await page.locator(".workout-card h3", { hasText: "Treino da Ana" }).count(), 0, "nada da Ana em Meus");
+    await page.click('[data-wtab="comunidade"]');
+    assert.equal(await page.locator(".workout-card h3", { hasText: "Treino da Ana público" }).count(), 1);
+    assert.equal(await page.locator(".workout-card h3", { hasText: "Treino da Ana privado" }).count(), 0, "privado não aparece");
+
+    const privId = await page.evaluate(() => MegStore.workouts().find((w) => w.name === "Treino da Ana privado").id);
+    await page.goto(server.url + `#/treinos/${privId}`);
+    await page.waitForSelector(".state");
+    await page.goto(server.url + `#/treinos/${privId}/editar`);
+    await page.waitForSelector(".state");
+
+    // Copiar o público: vira privado do Marco e editável.
+    await page.goto(server.url + "#/treinos");
+    await page.click('[data-wtab="comunidade"]');
+    await page.locator(".workout-card", { hasText: "Treino da Ana público" }).click();
+    await page.waitForSelector("#copy-btn");
+    assert.equal(await page.locator("#header-action a", { hasText: "Editar" }).count(), 0, "sem Editar em treino dos outros");
+    await page.click("#copy-btn");
+    await page.waitForSelector("#header-action a:has-text('Editar')");
+    const copy = await page.evaluate(() => MegStore.workouts().find((w) => w.copiedFrom && w.ownerId === MegStore.currentUser().id));
+    assert.equal(copy.visibility, "private");
   }));

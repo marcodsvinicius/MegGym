@@ -499,7 +499,7 @@
       const pr = structureProgress(st);
       if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} da sua estrutura ${st.name}` };
     }
-    const list = Store.workouts().filter((w) => w.items?.length);
+    const list = Store.visibleWorkouts(user.id).filter((w) => w.items?.length);
     if (!list.length) return null;
     const last = history.find((h) => list.some((w) => w.id === h.workoutId));
     if (!last) return { workout: list[0], reason: "Bom para começar" };
@@ -945,9 +945,15 @@
 
   /* ================= Treinos ================= */
 
+  const isMine = (w) => Store.ownerOf(w) === user.id;
+  // Autor para mostrar: "MegGym", o nome de quem criou, ou "você".
+  const authorOf = (w) => (isMine(w) ? "você" : Store.ownerOf(w) === "meggym" ? "MegGym" : w.createdBy || "alguém");
+  let workoutsTab = "meus";
+
   function workoutCard(w) {
     const gs = workoutGroups(w.items);
     const active = Store.session(user.id)?.workoutId === w.id;
+    const vis = isMine(w) ? (Store.visibilityOf(w) === "public" ? `${icon("public", "mi-inline")} Público` : `${icon("lock", "mi-inline")} Privado`) : "";
     return `
       <a class="workout-card" href="#/treinos/${encodeURIComponent(w.id)}">
         <div class="workout-card-head">
@@ -956,14 +962,17 @@
         </div>
         ${w.description ? `<p class="exercise-desc clamp-2">${escapeHtml(w.description)}</p>` : ""}
         <div class="group-chips">${groupChips(gs)}</div>
-        <p class="meta">${w.items.length} ${w.items.length === 1 ? "exercício" : "exercícios"}${w.createdBy ? ` · por ${escapeHtml(w.createdBy)}` : ""}</p>
+        <p class="meta">${w.items.length} ${w.items.length === 1 ? "exercício" : "exercícios"}${isMine(w) ? ` · ${vis}` : ` · por ${escapeHtml(authorOf(w))}`}</p>
       </a>`;
   }
 
   function renderWorkouts() {
     setHeader("Treinos", { action: `<a class="btn btn-sm btn-primary" href="#/treinos/novo">${icon("add", "mi-inline")} Novo</a>` });
     setTab("treinos");
-    const list = Store.workouts();
+    const visible = Store.visibleWorkouts(user.id);
+    const mine = visible.filter(isMine);
+    const community = visible.filter((w) => !isMine(w));
+    const list = workoutsTab === "meus" ? mine : community;
     const structs = Store.structures();
     const plan = Store.plan(user.id);
     structs.sort((a, b) => (b.id === plan?.structureId) - (a.id === plan?.structureId));
@@ -988,23 +997,38 @@
             : `<p class="meta">Agrupe vários treinos numa sequência para seguir (ex.: ABC).</p>`
         }
       </section>
-      <div class="subsection-head list-section-title"><h2 class="subsection-title">Treinos</h2></div>
+      <div class="subsection-head list-section-title">
+        <h2 class="subsection-title">Treinos</h2>
+        <div class="seg" role="tablist" aria-label="Quais treinos">
+          <button type="button" role="tab" data-wtab="meus" aria-selected="${workoutsTab === "meus"}">Meus (${mine.length})</button>
+          <button type="button" role="tab" data-wtab="comunidade" aria-selected="${workoutsTab === "comunidade"}">Comunidade (${community.length})</button>
+        </div>
+      </div>
       ${
         list.length
           ? `<div class="workout-list">${list.map(workoutCard).join("")}</div>`
-          : empty("fitness_center", "Nenhum treino criado ainda.", `<a class="btn btn-primary" href="#/treinos/novo">Criar meu primeiro treino</a>`)
+          : workoutsTab === "meus"
+            ? empty("fitness_center", "Você ainda não tem treinos seus. Crie um ou copie um da Comunidade.", `<a class="btn btn-primary" href="#/treinos/novo">Criar meu treino</a><button class="btn" type="button" data-wtab="comunidade">Ver Comunidade</button>`)
+            : empty("groups", "Nenhum treino público da comunidade ainda.")
       }`;
+    app.querySelectorAll("[data-wtab]").forEach((b) =>
+      b.addEventListener("click", () => {
+        workoutsTab = b.dataset.wtab;
+        renderWorkouts();
+      })
+    );
   }
 
   function renderWorkoutDetail(id) {
     setTab("treinos");
     const w = Store.getWorkout(id);
-    if (!w) {
+    if (!w || !Store.canSeeWorkout(w, user.id)) {
       setHeader("Treino", { back: "#/treinos" });
       app.innerHTML = empty("help", "Treino não encontrado.");
       return;
     }
-    setHeader(w.name, { back: "#/treinos", action: `<a class="btn btn-sm" href="#/treinos/${encodeURIComponent(w.id)}/editar">Editar</a>` });
+    const mine = isMine(w);
+    setHeader(w.name, { back: "#/treinos", action: mine ? `<a class="btn btn-sm" href="#/treinos/${encodeURIComponent(w.id)}/editar">Editar</a>` : "" });
     const session = Store.session(user.id);
     const activeHere = session?.workoutId === w.id;
     const ssDetail = supersets(w.items);
@@ -1031,14 +1055,28 @@
       ${w.description ? `<p class="lead">${escapeHtml(w.description)}</p>` : ""}
       <div class="group-chips">${groupChips(workoutGroups(w.items))}</div>
       <p class="meta">${w.items.length} exercícios · você fez este treino ${doneCount} ${doneCount === 1 ? "vez" : "vezes"}</p>
+      <p class="workout-owner">${
+        mine
+          ? Store.visibilityOf(w) === "public"
+            ? `${icon("public", "mi-inline")} Público: aparece na Comunidade`
+            : `${icon("lock", "mi-inline")} Privado: só você vê`
+          : `${icon("groups", "mi-inline")} Da comunidade · por ${escapeHtml(authorOf(w))}`
+      }${w.copiedFromName ? ` · copiado de “${escapeHtml(w.copiedFromName)}”` : ""}</p>
       <ol class="item-list">${items || `<li class="state">Nenhum exercício.</li>`}</ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
           ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
+        ${mine ? "" : `<button class="btn btn-block" type="button" id="copy-btn">${icon("content_copy", "mi-inline")} Copiar para meus treinos</button>`}
       </div>`;
     $("start-btn").addEventListener("click", () => startWorkout(w));
+    $("copy-btn")?.addEventListener("click", () => {
+      const copy = Store.copyWorkout(w.id, user);
+      workoutsTab = "meus";
+      toast("Copiado para Meus treinos. Agora você pode editar.", "success");
+      location.hash = `#/treinos/${encodeURIComponent(copy.id)}`;
+    });
   }
 
   // Inicia (ou continua) um treino e abre a tela de execução.
@@ -1259,7 +1297,7 @@
             .join("")
         : `<li class="state state-sm">Adicione os treinos na ordem em que devem ser feitos (A, B, C…).</li>`;
       if (d.workoutIds.length) $("st-items-error").classList.add("hidden");
-      const all = Store.workouts();
+      const all = Store.visibleWorkouts(user.id);
       $("st-picker").innerHTML = all.length
         ? all
             .map(
@@ -1328,7 +1366,9 @@
   function renderWorkoutForm(editId) {
     setTab("treinos");
     const editing = editId ? Store.getWorkout(editId) : null;
-    if (editId && !editing) {
+    if (editId && (!editing || !isMine(editing))) {
+      // Só o dono edita; os outros podem copiar o treino.
+      if (editing && Store.canSeeWorkout(editing, user.id)) return location.replace(`#/treinos/${encodeURIComponent(editing.id)}`);
       setHeader("Treino", { back: "#/treinos" });
       app.innerHTML = empty("help", "Treino não encontrado.");
       return;
@@ -1341,9 +1381,10 @@
             description: editing.description || "",
             notes: editing.notes || "",
             restSeconds: restSecondsOf(editing),
+            visibility: Store.visibilityOf(editing),
             items: editing.items.map((i) => ({ load: "", rir: "", rest: "", ...i })),
           }
-        : { id: null, name: "", description: "", notes: "", restSeconds: DEFAULT_REST, items: [] };
+        : { id: null, name: "", description: "", notes: "", restSeconds: DEFAULT_REST, visibility: "private", items: [] };
     }
     const back = editing ? `#/treinos/${encodeURIComponent(editing.id)}` : "#/treinos";
     setHeader(editing ? "Editar treino" : "Novo treino", { back });
@@ -1364,8 +1405,21 @@
         </div>
         <div class="field">
           <label for="w-notes">Observações do treino</label>
-          <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas… (todos veem)">${escapeHtml(draft.notes || "")}</textarea>
+          <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas…">${escapeHtml(draft.notes || "")}</textarea>
         </div>
+        <fieldset class="field fieldset">
+          <legend>Quem pode ver</legend>
+          <div class="visibility-options">
+            <label class="vis-option">
+              <input type="radio" name="w-visibility" value="private" ${draft.visibility !== "public" ? "checked" : ""}>
+              <span>${icon("lock")}<strong>Privado</strong><small>Só você vê, em Meus treinos.</small></span>
+            </label>
+            <label class="vis-option">
+              <input type="radio" name="w-visibility" value="public" ${draft.visibility === "public" ? "checked" : ""}>
+              <span>${icon("public")}<strong>Público</strong><small>Aparece na Comunidade; outros podem fazer e copiar.</small></span>
+            </label>
+          </div>
+        </fieldset>
         <div class="field">
           <label for="w-rest">Descanso entre séries (segundos)</label>
           <input class="input" id="w-rest" type="number" inputmode="numeric" min="10" max="600" step="5" value="${escapeHtml(draft.restSeconds || DEFAULT_REST)}">
@@ -1408,6 +1462,7 @@
     $("w-description").addEventListener("input", (e) => (draft.description = e.target.value));
     $("w-notes").addEventListener("input", (e) => (draft.notes = e.target.value));
     $("w-rest").addEventListener("input", (e) => (draft.restSeconds = e.target.value));
+    document.querySelectorAll('input[name="w-visibility"]').forEach((r) => r.addEventListener("change", () => (draft.visibility = r.value)));
     $("picker-search").addEventListener("input", renderPicker);
     $("picker-group").addEventListener("change", renderPicker);
 
@@ -1466,6 +1521,7 @@
           description: draft.description,
           notes: String(draft.notes || "").trim(),
           restSeconds: Math.min(Math.max(parseInt(draft.restSeconds, 10) || DEFAULT_REST, 10), 600),
+          visibility: draft.visibility === "public" ? "public" : "private",
           items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest, linkNext }, i, all) => ({
             exerciseId,
             ...(linkNext && i < all.length - 1 ? { linkNext: true } : {}),

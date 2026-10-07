@@ -140,6 +140,37 @@
     return workouts().find((w) => w.id === id) || null;
   }
 
+  /* Dono e visibilidade: "meus treinos" (privados ou públicos) e "comunidade" (públicos dos outros).
+     Treinos antigos sem dono: os de fábrica são do MegGym; os criados no app ficam do perfil com o
+     mesmo nome de quem criou e continuam públicos (antes todos eram compartilhados). */
+  const MEGGYM = "meggym";
+
+  function ownerOf(w) {
+    if (w.ownerId) return w.ownerId;
+    if (!w.createdBy || w.createdBy === "MegGym") return MEGGYM;
+    return users().find((u) => u.name === w.createdBy)?.id || MEGGYM;
+  }
+
+  function visibilityOf(w) {
+    return w.visibility === "private" ? "private" : "public";
+  }
+
+  function canSeeWorkout(w, userId) {
+    return ownerOf(w) === userId || visibilityOf(w) === "public";
+  }
+
+  function visibleWorkouts(userId) {
+    return workouts().filter((w) => canSeeWorkout(w, userId));
+  }
+
+  // Copia um treino (da comunidade) para os treinos do usuário, como privado.
+  function copyWorkout(id, user) {
+    const src = getWorkout(id);
+    if (!src) return null;
+    const { id: _id, ownerId, createdBy, createdAt, updatedAt, ...data } = src;
+    return saveWorkout({ ...data, visibility: "private", copiedFrom: src.id, copiedFromName: src.name, copiedFromAuthor: createdBy || "MegGym" }, user);
+  }
+
   function saveWorkout(workout, user) {
     const list = workouts();
     const index = list.findIndex((w) => w.id === workout.id);
@@ -147,7 +178,7 @@
     if (index >= 0) {
       saved = list[index] = { ...list[index], ...workout, updatedAt: new Date().toISOString() };
     } else {
-      saved = { ...workout, id: newId("w"), createdBy: user?.name || "", createdAt: new Date().toISOString() };
+      saved = { visibility: "private", ...workout, id: newId("w"), ownerId: user?.id || MEGGYM, createdBy: user?.name || "", createdAt: new Date().toISOString() };
       list.push(saved);
     }
     write(KEY.workouts, list);
@@ -473,6 +504,11 @@
     workouts,
     getWorkout,
     saveWorkout,
+    ownerOf,
+    visibilityOf,
+    canSeeWorkout,
+    visibleWorkouts,
+    copyWorkout,
     deleteWorkout,
     structures,
     getStructure,
