@@ -2743,7 +2743,7 @@
         const [y, m, d] = e.date.split("-");
         const lbl = `${d}/${m}${i === 0 || list[i - 1].date.slice(0, 4) !== y ? `/${y.slice(2)}` : ""}`;
         return `
-          <li class="wbar ${i === list.length - 1 ? "latest" : ""}" title="${fmt(e.value)} ${unit} em ${d}/${m}/${y}">
+          <li class="wbar ${i === list.length - 1 ? "latest" : ""} ${e.value ? "" : "zero"}" title="${fmt(e.value)} ${unit} em ${d}/${m}/${y}">
             <span class="wbar-value">${fmt(e.value)}</span>
             <span class="wbar-col"><span class="wbar-fill" style="height:${e.value ? Math.max(4, (e.value / max) * 100) : 0}%"></span></span>
             <span class="wbar-date">${lbl}</span>
@@ -2834,7 +2834,8 @@
     const rows = Array.from({ length: Math.max(count, run.sets.length) }, (_, i) => {
       const s = run.sets[i] || {};
       const prev = last?.sets[i];
-      const prevText = prev ? [prev.reps ? `${prev.reps} reps` : "", prev.weight ? `${prev.weight} kg` : ""].filter(Boolean).join(" × ") : "";
+      const kg = (v) => String(Math.round(parseFloat(String(v).replace(",", ".")) * 10) / 10).replace(".", ",");
+      const prevText = prev ? [prev.reps ? `${prev.reps} reps` : "", prev.weight ? `${kg(prev.weight)} kg` : ""].filter(Boolean).join(" × ") : "";
       return `
         <li class="set-row ${s.done ? "done" : ""}" data-set="${i}">
           <span class="set-num">${i + 1}</span>
@@ -3041,7 +3042,7 @@
     const restLabel = run ? `${run.restSeconds}s` : prescription.rest || ex.rest;
     const stats = [
       ["Séries", sets],
-      ["Repetições", reps],
+      ["Reps", reps],
       ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)

@@ -1918,3 +1918,191 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 .install-card .install-body { padding-right: 24px; }
 @keyframes card-out { to { opacity: 0; transform: scale(.96) translateY(-6px); } }
 .install-card.closing { animation: card-out .25s var(--ease-out) forwards; }
+
+/* =====================================================================
+   DESIGN SYSTEM — tokens semânticos + componentes base
+   Cada estilo (suave / energia / esportivo) só troca tokens; os componentes
+   abaixo usam sempre os mesmos tokens, então ficam consistentes entre telas.
+   ===================================================================== */
+:root {
+  /* Espaçamento (escala de 4px) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px;
+  /* Tipografia */
+  --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.125rem; --fs-xl: 1.375rem; --fs-2xl: 1.75rem;
+  --fw-medium: 600; --fw-bold: 700; --fw-heavy: 800;
+  --label-tracking: .08em;
+  /* Controles */
+  --control-h: 44px; --control-h-sm: 36px; --control-h-lg: 52px;
+  --control-radius: var(--radius-sm);
+  --field-bg: var(--surface); --field-border: var(--border); --field-border-w: 1px;
+  /* Cartões */
+  --card-bg: var(--surface); --card-border-w: 1px; --card-border: var(--border);
+  --card-shadow: var(--shadow); --card-pad: var(--space-4); --card-gap: var(--space-3);
+  --tint: var(--surface-2); /* fundo de blocos internos (séries, estatísticas) */
+  /* Pílulas: chips, badges, segmentado */
+  --pill-radius: 999px; --pill-h: 28px;
+  /* Foco e marcadores */
+  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  --check-border: color-mix(in srgb, var(--text) 28%, transparent);
+  --stack-gap: var(--space-4);
+}
+:root[data-style="suave"] { --card-border-w: 0px; --control-radius: 14px; --field-bg: var(--surface); }
+:root[data-style="energia"] { --card-border-w: 0px; --card-shadow: none; --control-radius: 12px; }
+:root[data-style="esportivo"] {
+  --card-border-w: 2px; --card-shadow: none; --pill-radius: 0px; --control-radius: 0px;
+  --field-border-w: 2px; --label-tracking: .1em; --check-border: var(--text);
+}
+@media (prefers-color-scheme: dark) { :root[data-style="energia"]:not([data-theme="light"]) { --tint: #22252b; } }
+:root[data-style="energia"][data-theme="dark"] { --tint: #22252b; }
+
+/* ---------- Ritmo vertical: telas e seções com o mesmo espaçamento ---------- */
+.app-main > * + * { margin-top: var(--stack-gap); }
+.app-main > .sticky-cta { margin-top: var(--space-5); }
+.subsection > * + * { margin-top: var(--space-3); }
+.subsection-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+
+/* Rótulos de seção (MINHA CARGA, SÉRIES, EXECUÇÃO…) num só padrão */
+.sheet-section > h3, .settings-title, .stat-label {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sheet-section > h3 { margin: 0 0 var(--space-2); }
+.sheet-section + .sheet-section, .stats + .sheet-section, .tip + .sheet-section { margin-top: var(--space-5); }
+.subsection-title { font-size: var(--fs-lg); margin: 0; }
+.meta { font-size: var(--fs-sm); }
+
+/* ---------- Cartões: um só tratamento ---------- */
+.today-card, .install-card, .week-card, .stat-tile, .item-row, .run-item, .last-workout, .home-structure,
+.structure-progress, .settings-list, .workout-card, .exercise-card, .group-card, .structure-card, .history-hero, .rest-bar {
+  background: var(--card-bg);
+  border: var(--card-border-w) solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+}
+.today-card, .install-card, .week-card, .last-workout, .home-structure { padding: var(--card-pad); }
+.item-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.run-list { gap: var(--space-3); }
+
+/* Treino de hoje: destaque por uma faixa da cor de destaque, não por borda diferente */
+.today-card { position: relative; overflow: hidden; gap: var(--space-2); }
+.today-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--accent); }
+.today-card.done::before { background: var(--success); }
+.today-card h2 { font-family: var(--font-display); text-transform: var(--display-transform); letter-spacing: var(--display-tracking); font-weight: var(--display-weight); font-size: var(--fs-xl); line-height: 1.15; }
+.today-card > .meta:first-child { font-weight: var(--fw-bold); color: var(--accent); font-size: var(--fs-xs); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.today-actions { margin-top: var(--space-2); }
+:root[data-style="esportivo"] .today-card::before { width: 8px; }
+
+/* ---------- Botões ---------- */
+.btn {
+  min-height: var(--control-h); padding: 0 var(--space-4); gap: var(--space-2);
+  font-weight: var(--fw-bold); font-size: var(--fs-sm); line-height: 1.1;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center;
+}
+.btn-sm { min-height: var(--control-h-sm); padding: 0 var(--space-3); font-size: var(--fs-sm); }
+.btn-lg { min-height: var(--control-h-lg); padding: 0 var(--space-5); font-size: var(--fs-md); }
+.btn .mi, .btn .mi-inline { font-size: 1.2em; }
+.btn:focus-visible, .icon-btn:focus-visible, .chip:focus-visible, .settings-item:focus-visible, .seg button:focus-visible { outline: none; box-shadow: var(--ring); }
+.icon-btn { border-radius: var(--pill-radius); }
+:root[data-style="esportivo"] .icon-btn { border-radius: 0; }
+
+/* ---------- Campos ---------- */
+.input, .select, .textarea { min-height: var(--control-h); border-radius: var(--control-radius); background: var(--field-bg); border: var(--field-border-w) solid var(--field-border); }
+.input-sm { min-height: var(--control-h-sm); }
+.input-lg { min-height: var(--control-h-lg); }
+.input:focus, .select:focus, .textarea:focus { box-shadow: var(--ring); border-color: var(--accent); }
+
+/* ---------- Pílulas: chips, badges, grupos, equipamentos e segmentado ---------- */
+.chip, .badge, .group-chip, .equip-chip, .run-load, .ex-load-preview, .seg, .seg button { border-radius: var(--pill-radius); }
+.badge { font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: .04em; padding: 3px 10px; }
+.group-chip, .equip-chip { font-size: var(--fs-xs); font-weight: var(--fw-bold); min-height: 26px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; }
+.seg { padding: 3px; background: var(--tint); }
+.seg button { min-height: 30px; padding: 0 var(--space-3); font-size: var(--fs-xs); letter-spacing: .02em; }
+:root[data-style="esportivo"] .seg { border: 2px solid var(--border); padding: 0; background: transparent; }
+:root[data-style="esportivo"] .seg button { text-transform: uppercase; }
+:root[data-style="esportivo"] .seg button[aria-selected="true"] { background: var(--text); color: var(--bg); box-shadow: none; }
+:root[data-style="energia"] .seg button[aria-selected="true"] { background: var(--accent); color: var(--accent-contrast); }
+
+/* ---------- Estatísticas do exercício: grade de tamanho igual (não quebra torto) ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: var(--space-2); }
+.stat { min-width: 0; padding: var(--space-2) var(--space-3); gap: 2px; border-radius: var(--radius-sm); background: var(--tint); border: var(--field-border-w) solid transparent; }
+.stat-label { font-size: .65rem; display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+.stat-value { font-size: var(--fs-md); white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; }
+.stat-btn { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--tint)); }
+:root[data-style="esportivo"] .stat { border-color: var(--border); border-radius: 0; background: var(--surface); }
+:root[data-style="esportivo"] .stat-btn { background: var(--accent); color: #111; border-color: var(--border); }
+:root[data-style="esportivo"] .stat-btn .stat-value { color: #111; }
+.tip { border-radius: var(--radius-sm); background: var(--tint); font-size: var(--fs-sm); line-height: 1.45; }
+
+/* ---------- Séries: grade alinhada ---------- */
+.set-list { gap: var(--space-2); }
+.set-row {
+  display: grid; grid-template-columns: 24px 1fr 1fr 40px; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); background: var(--tint);
+  border: var(--field-border-w) solid transparent;
+}
+.set-row:not(:has([data-set-field="weight"])) { grid-template-columns: 24px 1fr 40px; }
+.set-field { display: flex; align-items: center; gap: var(--space-1); }
+.set-field .input { text-align: center; font-weight: var(--fw-heavy); font-variant-numeric: tabular-nums; }
+.set-unit { width: 28px; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.set-prev { grid-column: 2 / -1; padding: 0; margin-top: -2px; font-size: var(--fs-xs); }
+.set-check, .run-check { border: 2px solid var(--check-border); background: var(--surface); }
+.set-row.done { background: color-mix(in srgb, var(--success) 12%, var(--tint)); opacity: 1; }
+.set-row.done .set-check { border-color: var(--success); }
+:root[data-style="esportivo"] .set-row { border-color: var(--border); border-radius: 0; background: var(--surface); }
+:root[data-style="esportivo"] .set-check { border-radius: 0; }
+:root[data-style="suave"] .set-check { border-radius: 14px; }
+
+/* ---------- Lista de execução ---------- */
+.run-item { padding: var(--card-pad); gap: var(--space-3); }
+.run-sets { font-size: var(--fs-lg); line-height: 1.2; display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.run-load { font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-size: var(--fs-xs); font-weight: var(--fw-bold); padding: 2px 8px; background: var(--accent-container); color: var(--on-accent-container); }
+.run-sets-done { font-size: var(--fs-xs); }
+.run-menu { margin: -6px -6px 0 0; }
+
+/* ---------- Listas de configurações e de ações ---------- */
+.settings-list { padding: 0; }
+.settings-item { min-height: 60px; padding: var(--space-3) var(--space-4); gap: var(--space-3); border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); }
+.settings-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--tint); color: var(--accent); flex: none; }
+:root[data-style="esportivo"] .settings-item { border-bottom: 2px solid var(--border); }
+:root[data-style="esportivo"] .settings-icon { border-radius: 0; background: var(--text); color: var(--accent); }
+.action-sheet .settings-list { margin-top: var(--space-2); }
+
+/* ---------- Gráficos ---------- */
+.wchart { gap: var(--space-2); }
+.wbar-fill { border-radius: var(--radius-sm) var(--radius-sm) 2px 2px; background: color-mix(in srgb, var(--accent) 35%, var(--tint)); }
+.wbar.latest .wbar-fill { background: var(--accent); }
+.wbar.zero .wbar-value { visibility: hidden; }
+.wbar.zero .wbar-col { border-bottom: 2px solid var(--tint); }
+.hbar-track { background: var(--tint); }
+:root[data-style="esportivo"] .wbar-fill, :root[data-style="esportivo"] .hbar-track, :root[data-style="esportivo"] .hbar-fill { border-radius: 0; }
+:root[data-style="esportivo"] .wbar-fill { background: var(--text); }
+:root[data-style="esportivo"] .wbar.latest .wbar-fill { background: var(--accent); }
+
+/* ---------- Painéis, avisos e barra de descanso ---------- */
+.sheet { border-radius: calc(var(--radius) + 6px) calc(var(--radius) + 6px) 0 0; }
+:root[data-style="esportivo"] .sheet { border-top: 3px solid var(--accent); }
+.toast { border-radius: var(--pill-radius); padding: var(--space-3) var(--space-5); font-size: var(--fs-sm); }
+:root[data-style="esportivo"] .toast { border-radius: 0; text-transform: uppercase; letter-spacing: .04em; }
+.rest-bar { border-radius: var(--radius); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); }
+.rest-time { font-family: var(--font-display); letter-spacing: var(--display-tracking); font-weight: var(--display-weight); }
+.rest-fill { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.rest-bar .btn { min-height: var(--control-h-sm); padding: 0 var(--space-3); }
+:root[data-style="esportivo"] .rest-bar { background: var(--text); color: var(--bg); border-color: var(--text); }
+:root[data-style="esportivo"] .rest-fill { background: color-mix(in srgb, var(--accent) 35%, var(--text)); }
+:root[data-style="esportivo"] .rest-bar .btn:not(.btn-primary) { background: transparent; color: var(--bg); border-color: var(--bg); }
+
+/* ---------- Cartão de instalar e estado vazio ---------- */
+.install-card { gap: var(--space-4); }
+.install-card img { border-radius: var(--radius-sm); }
+:root[data-style="esportivo"] .install-card img { border-radius: 0; }
+.state, .empty { color: var(--text-muted); }
+
+/* Botão principal desabilitado: neutro e legível, sem "laranja lavado" */
+.btn-primary:disabled { background: var(--tint); border-color: transparent; color: var(--text-muted); opacity: 1; filter: none; }
+:root[data-style="esportivo"] .btn-primary:disabled { border-color: var(--border); background: var(--surface); }
+/* Área fixa de ações: fundo sólido do app para não misturar com a lista atrás */
+.sticky-cta { background: var(--bg); backdrop-filter: none; border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -10px 16px -6px var(--bg); }

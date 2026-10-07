@@ -334,7 +334,7 @@
   }
 
   function logWeight(userId, exerciseId, weight, { replace = false, date = new Date() } = {}) {
-    const kg = parseFloat(String(weight || "").replace(",", "."));
+    const kg = Math.round(parseFloat(String(weight || "").replace(",", ".")) * 10) / 10;
     if (!(kg > 0)) return;
     const d = new Date(date);
     const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
