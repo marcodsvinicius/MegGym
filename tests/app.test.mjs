@@ -94,7 +94,7 @@ test("treino: séries, descanso, pular, trocar, reordenar e terminar", () =>
     await page.waitForURL(/historico\/.+novo=1/);
     const [img] = await Promise.all([page.waitForEvent("download"), page.click("#share-btn")]);
     assert.match(img.suggestedFilename(), /^meggym-.*\.png$/, "resumo para compartilhar");
-    await page.goto(server.url + "#/atividade");
+    await page.goto(server.url + "#/atividade?aba=evolucao");
     await page.waitForSelector("#evolution");
     const h = await page.evaluate(() => MegStore.history()[0]);
     assert.equal(h.exercises.length, total - 1);
@@ -279,7 +279,10 @@ test("treinos: público vai para Explorar, privado só o dono vê; salvar e segu
     for (const [name, vis] of [["Treino da Ana público", "public"], ["Treino da Ana privado", "private"]]) {
       await page.goto(server.url + "#/treinos/novo");
       await page.fill("#w-name", name);
+      await page.click("#open-picker");
       await page.locator("[data-add]").first().click();
+      await page.click("#picker-done");
+      await page.waitForSelector("#sheet", { state: "hidden" });
       await page.check(`input[name="w-visibility"][value="${vis}"]`, { force: true });
       await page.click('#workout-form [type="submit"]');
       await page.waitForURL(/#\/treinos\/w-/);

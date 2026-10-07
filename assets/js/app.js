@@ -613,19 +613,12 @@
 
       ${homeStructureCard()}
 
-      <section class="motivation">
-        ${icon(msg.emoji, "motivation-emoji")}
-        <div>
-          <h2>${escapeHtml(msg.title)}</h2>
-          <p>${escapeHtml(msg.text)}</p>
-        </div>
-      </section>
-
       <section class="week-card" aria-labelledby="week-title">
         <div class="week-head">
           <h2 id="week-title">Sua semana</h2>
           <span class="meta">${weekStart.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} – ${new Date(weekEnd - 1).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>
         </div>
+        <p class="week-motivation">${icon(msg.emoji, "mi-inline")} <strong>${escapeHtml(msg.title)}</strong> ${escapeHtml(msg.text)}</p>
         <div class="week-stats">
           <div class="week-stat">
             <span class="week-stat-value">${week.length}</span>
@@ -1369,22 +1362,10 @@
       })
       .join("");
 
-    let progressHtml = "";
-    if (pr.following) {
-      progressHtml = `
-        <section class="structure-progress">
-          <div class="week-head"><h2>Seu progresso</h2><span class="meta">desde ${new Date(plan.startedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span></div>
-          <div class="structure-progress-value"><strong>${pr.done}</strong> de ${pr.duration} sessões</div>
-          <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
-          ${
-            pr.completed
-              ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída! Parabéns pela constância.</p>`
-              : pr.next
-                ? `<p class="meta">Próximo: <strong>Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</strong></p>`
-                : ""
-          }
-        </section>`;
-    }
+    // O progresso fica em Treinos › Meu Treino; aqui só um aviso curto com o atalho.
+    const progressHtml = pr.following
+      ? `<a class="following-note" href="#/treinos?aba=meu">${icon("flag", "mi-inline")} ${pr.completed ? "Você concluiu esta divisão" : `Você segue esta divisão · ${pr.done} de ${pr.duration} sessões`}<span class="chevron" aria-hidden="true">›</span></a>`
+      : "";
 
     app.innerHTML = `
       ${st.description ? `<p class="lead">${escapeHtml(st.description)}</p>` : ""}
@@ -1630,14 +1611,15 @@
           <label for="w-name">Nome do treino <span class="req">*</span></label>
           <input class="input" id="w-name" maxlength="60" value="${escapeHtml(draft.name)}" placeholder="Ex.: Treino A — Peito e tríceps">
         </div>
-        <div class="field">
-          <label for="w-description">Descrição</label>
-          <textarea class="textarea textarea-sm" id="w-description" maxlength="500" placeholder="Objetivo, observações…">${escapeHtml(draft.description)}</textarea>
-        </div>
-        <div class="field">
-          <label for="w-notes">Observações do treino</label>
-          <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas…">${escapeHtml(draft.notes || "")}</textarea>
-        </div>
+
+        <section class="subsection">
+          <h2 class="subsection-title">Exercícios <span class="meta" id="w-count"></span></h2>
+          <div class="group-chips" id="w-groups"></div>
+          <ol class="item-list" id="w-items"></ol>
+          <span class="field-error hidden" id="w-items-error"></span>
+          <button class="add-exercises" type="button" id="open-picker">${icon("add_circle")} Adicionar exercícios</button>
+        </section>
+
         <fieldset class="field fieldset">
           <legend>Quem pode ver</legend>
           <div class="visibility-options">
@@ -1651,37 +1633,25 @@
             </label>
           </div>
         </fieldset>
-        <div class="field">
-          <label for="w-rest">Descanso entre séries (segundos)</label>
-          <input class="input" id="w-rest" type="number" inputmode="numeric" min="10" max="600" step="5" value="${escapeHtml(draft.restSeconds || DEFAULT_REST)}">
-          <p class="meta">O temporizador começa ao marcar cada série. Padrão: 60s. Se um exercício tiver descanso próprio, vale o dele.</p>
-        </div>
-        <div class="field">
-          <span class="label">Grupos musculares trabalhados</span>
-          <div class="group-chips" id="w-groups"></div>
-        </div>
 
-        <section class="subsection">
-          <h2 class="subsection-title">Exercícios do treino <span class="meta" id="w-count"></span></h2>
-          <ol class="item-list" id="w-items"></ol>
-          <span class="field-error hidden" id="w-items-error"></span>
-        </section>
-
-        <section class="subsection">
-          <h2 class="subsection-title">Adicionar da lista de exercícios</h2>
-          <div class="toolbar">
-            <label class="search">
-              <span class="visually-hidden">Buscar</span>
-              <input class="input" id="picker-search" type="search" placeholder="Buscar exercício…">
-            </label>
-            <label>
-              <span class="visually-hidden">Grupo muscular</span>
-              <select class="select" id="picker-group"><option value="">Todos os grupos</option>${groupOptions}</select>
-            </label>
+        <details class="more-options" ${draft.description || draft.notes || Number(draft.restSeconds) !== DEFAULT_REST ? "open" : ""}>
+          <summary>${icon("tune", "mi-inline")} Mais opções <span class="meta">descrição, observações e descanso</span></summary>
+          <div class="form-stack">
+            <div class="field">
+              <label for="w-description">Descrição</label>
+              <textarea class="textarea textarea-sm" id="w-description" maxlength="500" placeholder="Objetivo, observações…">${escapeHtml(draft.description)}</textarea>
+            </div>
+            <div class="field">
+              <label for="w-notes">Observações do treino</label>
+              <textarea class="textarea textarea-sm" id="w-notes" maxlength="1000" placeholder="Descanso, progressão, dicas…">${escapeHtml(draft.notes || "")}</textarea>
+            </div>
+            <div class="field">
+              <label for="w-rest">Descanso entre séries (segundos)</label>
+              <input class="input" id="w-rest" type="number" inputmode="numeric" min="10" max="600" step="5" value="${escapeHtml(draft.restSeconds || DEFAULT_REST)}">
+              <p class="meta">O temporizador começa ao marcar cada série. Padrão: 60s. Se um exercício tiver descanso próprio, vale o dele.</p>
+            </div>
           </div>
-          <div id="picker-filter"></div>
-          <ul class="item-list" id="picker-list"></ul>
-        </section>
+        </details>
 
         <div class="sticky-cta">
           <button class="btn btn-primary btn-block btn-lg" type="submit">${editing ? "Salvar treino" : "Criar treino"}</button>
@@ -1694,8 +1664,7 @@
     $("w-notes").addEventListener("input", (e) => (draft.notes = e.target.value));
     $("w-rest").addEventListener("input", (e) => (draft.restSeconds = e.target.value));
     document.querySelectorAll('input[name="w-visibility"]').forEach((r) => r.addEventListener("change", () => (draft.visibility = r.value)));
-    $("picker-search").addEventListener("input", renderPicker);
-    $("picker-group").addEventListener("change", renderPicker);
+    $("open-picker").addEventListener("click", openPicker);
 
     $("w-items").addEventListener("input", (e) => {
       const row = e.target.closest("[data-index]");
@@ -1720,16 +1689,6 @@
       if (action === "down" && i < draft.items.length - 1) [draft.items[i + 1], draft.items[i]] = [draft.items[i], draft.items[i + 1]];
       renderDraftItems();
       renderPicker();
-    });
-    $("picker-list").addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-add]");
-      if (!btn) return;
-      const ex = findExercise(btn.dataset.add);
-      if (!ex) return;
-      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "", load: "", rir: "", rest: ex.rest || "" });
-      renderDraftItems();
-      renderPicker();
-      toast(`${ex.name} adicionado`);
     });
 
     $("workout-form").addEventListener("submit", (event) => {
@@ -1783,6 +1742,45 @@
     }
 
     renderDraftItems();
+  }
+
+  // Seletor de exercícios em painel: busca, grupo e equipamentos; adiciona sem sair do formulário.
+  function openPicker() {
+    const groupOptions = groups().map((g) => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`).join("");
+    $("sheet-content").innerHTML = `
+      <div class="picker-sheet">
+        <h2 id="sheet-title">Adicionar exercícios</h2>
+        <div class="toolbar">
+          <label class="search"><span class="visually-hidden">Buscar</span><input class="input" id="picker-search" type="search" placeholder="Buscar exercício…"></label>
+          <label><span class="visually-hidden">Grupo muscular</span><select class="select" id="picker-group"><option value="">Todos os grupos</option>${groupOptions}</select></label>
+        </div>
+        <div id="picker-filter"></div>
+        <ul class="item-list" id="picker-list"></ul>
+        <div class="picker-done"><button class="btn btn-primary btn-block btn-lg" type="button" id="picker-done">Concluir</button></div>
+      </div>`;
+    const content = $("sheet-content");
+    $("picker-search").addEventListener("input", renderPicker);
+    $("picker-group").addEventListener("change", renderPicker);
+    $("picker-done").addEventListener("click", () => closeSheet());
+    content.onclick = (e) => {
+      const toggle = e.target.closest("[data-equip-filter]");
+      if (toggle) {
+        equipFilter = toggle.dataset.equipFilter === "on";
+        return renderPicker();
+      }
+      const btn = e.target.closest("[data-add]");
+      if (!btn || !draft) return;
+      const ex = findExercise(btn.dataset.add);
+      if (!ex) return;
+      draft.items.push({ exerciseId: ex.id, sets: ex.sets || "", reps: ex.reps || "", load: "", rir: "", rest: ex.rest || "" });
+      renderDraftItems();
+      renderPicker();
+      pop(content.querySelector(`[data-add="${CSS.escape(ex.id)}"]`));
+    };
+    sheetReturnFocus = $("open-picker");
+    sheet.classList.remove("hidden");
+    document.body.classList.add("sheet-open");
+    requestAnimationFrame(() => sheet.classList.add("open"));
     renderPicker();
   }
 
@@ -1814,7 +1812,7 @@
   }
 
   function renderDraftItems() {
-    $("w-groups").innerHTML = groupChips(workoutGroups(draft.items)) || `<span class="meta">Aparecem conforme você adiciona exercícios.</span>`;
+    $("w-groups").innerHTML = groupChips(workoutGroups(draft.items));
     $("w-count").textContent = draft.items.length ? `(${draft.items.length})` : "";
     if (draft.items.length) $("w-items-error").classList.add("hidden");
     const ss = supersets(draft.items);
@@ -1858,7 +1856,7 @@
               </li>${link}`;
           })
           .join("")
-      : `<li class="state state-sm">Nenhum exercício ainda. Adicione da lista abaixo.</li>`;
+      : `<li class="state state-sm">Nenhum exercício ainda. Toque em Adicionar exercícios.</li>`;
   }
 
   function renderPicker() {
@@ -1878,15 +1876,17 @@
             return `
               <li class="item-row">
                 <span class="group-icon group-icon-sm" style="--group-color:${safeColor(g?.color)}">${groupIcon(g)}</span>
-                <div class="item-main tappable" data-exercise="${escapeHtml(ex.id)}">
+                <div class="item-main">
                   <div class="item-title">${escapeHtml(ex.name)}</div>
                   <div class="meta">${escapeHtml(g?.name || "")}${ex.sets || ex.reps ? ` · ${escapeHtml(setsReps(ex.sets, ex.reps))}` : ""}</div>
                 </div>
-                <button class="btn btn-sm ${added ? "" : "btn-primary"}" type="button" data-add="${escapeHtml(ex.id)}">${icon("add", "mi-inline")} ${added ? "De novo" : "Adicionar"}</button>
+                <button class="btn btn-sm ${added ? "" : "btn-primary"}" type="button" data-add="${escapeHtml(ex.id)}" aria-label="Adicionar ${escapeHtml(ex.name)}">${icon(added ? "check" : "add", "mi-inline")} ${added ? "Mais 1" : "Adicionar"}</button>
               </li>`;
           })
           .join("")
       : `<li class="state state-sm">Nenhum exercício encontrado.</li>`;
+    const n = draft?.items.length || 0;
+    if ($("picker-done")) $("picker-done").textContent = n ? `Concluir (${n} ${n === 1 ? "exercício" : "exercícios"})` : "Concluir";
   }
 
   /* ---------- Executar treino ---------- */
@@ -2383,58 +2383,80 @@
       .join("")
       .toUpperCase();
 
-    app.innerHTML = `
-      <section class="profile">
-        <span class="avatar" aria-hidden="true">${escapeHtml(initials)}</span>
-        <div>
-          <h2 class="page-title">${escapeHtml(user.name)}</h2>
-          <p class="meta">${[user.age ? `${user.age} anos` : "", SEXES.find(([id]) => id === user.sex)?.[1] || ""].filter(Boolean).join(" · ")}</p>
-          <a class="link-btn" href="#/atividade/perfil">Editar perfil</a>
+    const tabs = [["resumo", "Resumo"], ["evolucao", "Evolução"], ["historico", "Histórico"]];
+    const tab = tabs.some(([id]) => id === params.get("aba")) ? params.get("aba") : highlight ? "historico" : "resumo";
+    const historyRow = (h) => `
+      <li><a class="item-row item-link ${h.id === highlight ? "highlight" : ""}" href="#/atividade/historico/${encodeURIComponent(h.id)}">
+        <span class="history-icon">${icon("check_circle")}</span>
+        <div class="item-main">
+          <div class="item-title">${escapeHtml(h.workoutName)}</div>
+          <div class="meta">${escapeHtml(formatDateTime(h.finishedAt))} · ${formatDuration(h.startedAt, h.finishedAt)} · ${h.exerciseCount} exercícios</div>
         </div>
-      </section>
-      <div id="install-slot" data-context="activity">${installCard()}</div>
-      <div class="stat-tiles">
-        <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
-        <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
-      </div>
-      ${
-        history.length
-          ? `<section class="subsection evolution" id="evolution">${evolutionHtml(history, activityMetric)}</section>
-             ${muscleBalanceHtml(history)}
-             ${exerciseProgressHtml()}`
-          : firstStepsHtml()
-      }
-      <section class="subsection">
-        <div class="subsection-head">
-          <h2 class="subsection-title">Meus equipamentos</h2>
-          <a class="btn btn-sm" href="#/atividade/equipamentos">Editar</a>
+        <span class="chevron" aria-hidden="true">›</span>
+      </a></li>`;
+    const noHistory = empty("event_busy", "Nenhum treino registrado ainda.", `<a class="btn btn-primary" href="#/treinos">Ver treinos</a>`);
+
+    let body = "";
+    if (tab === "resumo") {
+      const totalMs = history.reduce((sum, h) => sum + durationMs(h), 0);
+      const total = formatTotal(totalMs);
+      body = `
+        <section class="profile">
+          <span class="avatar" aria-hidden="true">${escapeHtml(initials)}</span>
+          <div>
+            <h2 class="page-title">${escapeHtml(user.name)}</h2>
+            <p class="meta">${[user.age ? `${user.age} anos` : "", SEXES.find(([id]) => id === user.sex)?.[1] || ""].filter(Boolean).join(" · ")}</p>
+            <a class="link-btn" href="#/atividade/perfil">Editar perfil</a>
+          </div>
+        </section>
+        <div class="stat-tiles">
+          <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
+          <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
+          <div class="stat-tile"><span class="stat-tile-value">${total.value}<small>${total.unit}</small></span><span class="stat-tile-label">de treino no total</span></div>
+          <div class="stat-tile"><span class="stat-tile-value">${streak(history)}</span><span class="stat-tile-label">dias seguidos</span></div>
         </div>
-        ${
-          (user.equipment || []).length
-            ? `<div class="equip-chips">${(user.equipment || []).map((id) => `<span class="equip-chip">${icon(EQUIPMENT_ICONS[id] || "fitness_center", "mi-inline")} ${escapeHtml(EQUIPMENT[id] || id)}</span>`).join("")}</div>`
-            : `<p class="meta">Nenhum marcado — mostramos exercícios com o peso do corpo.</p>`
-        }
-      </section>
-      <section class="subsection">
-        <h2 class="subsection-title">Histórico</h2>
         ${
           history.length
-            ? `<ul class="item-list">${history
-                .map(
-                  (h) => `
-                  <li><a class="item-row item-link ${h.id === highlight ? "highlight" : ""}" href="#/atividade/historico/${encodeURIComponent(h.id)}">
-                    <span class="history-icon">${icon("check_circle")}</span>
-                    <div class="item-main">
-                      <div class="item-title">${escapeHtml(h.workoutName)}</div>
-                      <div class="meta">${escapeHtml(formatDateTime(h.finishedAt))} · ${formatDuration(h.startedAt, h.finishedAt)} · ${h.exerciseCount} exercícios</div>
-                    </div>
-                    <span class="chevron" aria-hidden="true">›</span>
-                  </a></li>`
-                )
-                .join("")}</ul>`
-            : empty("event_busy", "Nenhum treino registrado ainda.", `<a class="btn btn-primary" href="#/treinos">Ver treinos</a>`)
+            ? `<section class="subsection">
+                <div class="subsection-head"><h2 class="subsection-title">Últimos treinos</h2><a class="btn btn-sm" href="#/atividade?aba=historico">Ver todos</a></div>
+                <ul class="item-list">${history.slice(0, 3).map(historyRow).join("")}</ul>
+              </section>`
+            : firstStepsHtml()
         }
-      </section>`;
+        <div id="install-slot" data-context="activity">${installCard()}</div>`;
+    } else if (tab === "evolucao") {
+      body = history.length
+        ? `<section class="subsection evolution" id="evolution">${evolutionHtml(history, activityMetric)}</section>
+           ${muscleBalanceHtml(history)}
+           ${exerciseProgressHtml()}`
+        : empty("insights", "Sua evolução aparece aqui depois do primeiro treino: semanas, músculos trabalhados e cargas.", `<a class="btn btn-primary" href="#/treinos">Ver treinos</a>`);
+    } else {
+      // Histórico agrupado por mês.
+      const byMonth = [];
+      history.forEach((h) => {
+        const label = capitalize(new Date(h.finishedAt).toLocaleDateString("pt-BR", { month: "long", year: "numeric" }));
+        const last = byMonth[byMonth.length - 1];
+        if (last && last.label === label) last.items.push(h);
+        else byMonth.push({ label, items: [h] });
+      });
+      body = history.length
+        ? byMonth
+            .map(
+              (m) => `
+          <section class="subsection">
+            <h2 class="subsection-title">${escapeHtml(m.label)} <span class="meta">${m.items.length} ${m.items.length === 1 ? "treino" : "treinos"}</span></h2>
+            <ul class="item-list">${m.items.map(historyRow).join("")}</ul>
+          </section>`
+            )
+            .join("")
+        : noHistory;
+    }
+
+    app.innerHTML = `
+      <nav class="top-tabs" role="tablist" aria-label="Atividade">
+        ${tabs.map(([id, label]) => `<a role="tab" href="#/atividade?aba=${id}" aria-selected="${id === tab}" ${id === tab ? 'aria-current="page"' : ""}>${label}</a>`).join("")}
+      </nav>
+      ${body}`;
   }
 
   /* ---------- Resumo para compartilhar (imagem gerada no aparelho) ---------- */
@@ -3950,6 +3972,7 @@
     const finish = () => {
       sheet.classList.add("hidden");
       $("sheet-content").innerHTML = ""; // para o vídeo
+      $("sheet-content").onclick = null; // tira o clique do seletor de exercícios
     };
     if (immediate) finish();
     else setTimeout(finish, 220);

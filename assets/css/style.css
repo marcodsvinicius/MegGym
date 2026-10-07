@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=44") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=45") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2329,3 +2329,32 @@ body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inse
 .loads-list.collapsed > li:nth-child(n+6) { display: none; }
 .ex-load-preview small { font-size: inherit; opacity: .8; }
 .stats { grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); }
+
+/* Formulário de treino: adicionar exercícios em painel + mais opções */
+.add-exercises {
+  width: 100%; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent); border-radius: var(--radius); background: color-mix(in srgb, var(--accent) 6%, transparent);
+  color: var(--accent-ink); font: inherit; font-weight: var(--fw-bold); cursor: pointer;
+}
+.add-exercises:active { transform: scale(.98); }
+:root[data-style="esportivo"] .add-exercises { border-radius: 0; border-color: var(--border); }
+.more-options { border: var(--card-border-w) solid var(--card-border); border-radius: var(--radius); background: var(--card-bg); }
+.more-options > summary { list-style: none; cursor: pointer; padding: var(--space-3) var(--space-4); font-weight: var(--fw-bold); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; min-height: 52px; }
+.more-options > summary::-webkit-details-marker { display: none; }
+.more-options > summary::after { content: "expand_more"; font-family: "Material Symbols Rounded"; margin-left: auto; transition: transform .2s; font-size: 22px; }
+.more-options[open] > summary::after { transform: rotate(180deg); }
+.more-options > summary .meta { font-weight: 500; }
+.more-options > .form-stack { padding: 0 var(--space-4) var(--space-4); }
+.picker-sheet { display: grid; gap: var(--space-3); }
+.picker-sheet h2 { margin: 0; font-size: 1.15rem; }
+.picker-done { position: sticky; bottom: 0; padding: var(--space-2) 0 var(--space-1); background: var(--surface); }
+
+/* Motivação como uma linha dentro de "Sua semana" (o Treino de hoje é o único destaque) */
+.week-motivation { margin: 0 0 var(--space-3); font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.4; }
+.week-motivation strong { color: var(--text); }
+.week-motivation .mi { color: var(--accent-ink); }
+.following-note { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--accent-container); color: var(--on-accent-container); text-decoration: none; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
+.following-note .chevron { margin-left: auto; }
+:root[data-style="esportivo"] .following-note { border-radius: 0; }
+.add-exercises { color: var(--text); }
+.add-exercises .mi { color: var(--accent-ink); }

@@ -15,7 +15,7 @@ test("sem violações de acessibilidade (axe) nos 3 estilos, claro e escuro", as
   try {
     await seedUser(page);
     const id = await page.evaluate(() => MegStore.workouts()[0].id);
-    const screens = ["#/inicio", "#/treinos", `#/treinos/${id}`, "#/exercicios/grupo/peito", "#/exercicios/ver/prancha", "#/atividade", "#/atividade/configuracoes"];
+    const screens = ["#/inicio", "#/treinos", "#/treinos?aba=explorar", `#/treinos/${id}`, "#/treinos/novo", "#/exercicios/grupo/peito", "#/exercicios/ver/prancha", "#/atividade", "#/atividade?aba=evolucao", "#/atividade?aba=historico", "#/atividade/configuracoes"];
     const problems = [];
     for (const style of ["suave", "energia", "esportivo"])
       for (const theme of ["light", "dark"]) {
