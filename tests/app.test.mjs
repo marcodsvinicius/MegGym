@@ -85,11 +85,12 @@ test("treino: séries, descanso, pular, trocar, reordenar e terminar", () =>
     while (await page.locator('[data-toggle][aria-pressed="false"]').count()) await page.locator('[data-toggle][aria-pressed="false"]').first().click();
     await page.click("#finish-btn");
     await page.waitForURL(/atividade\?feito=/);
+    await page.waitForSelector("#evolution");
     const h = await page.evaluate(() => MegStore.history()[0]);
     assert.equal(h.exercises.length, total - 1);
     assert.ok(h.exercises.some((e) => e.swappedFrom), "troca registrada");
     assert.ok(h.exercises[0].setLog.length > 0, "séries registradas");
-    assert.ok(await page.isVisible("#evolution .wchart"), "gráfico de evolução");
+    await page.waitForSelector("#evolution .wchart"); // gráfico de evolução
     await page.click('[data-metric="volume"]');
     assert.match(await page.textContent("#evolution .meta"), /kg no total/);
   }));
