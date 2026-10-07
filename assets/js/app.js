@@ -176,7 +176,7 @@
 
   function loadPreview(ex) {
     const text = loadText(Store.exerciseLoad(user.id, ex.id), ex);
-    return `<div class="ex-load-preview ${text ? "" : "hidden"}" data-load-preview="${escapeHtml(ex.id)}">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(text)}</span></div>`;
+    return `<div class="ex-load-preview ${text ? "" : "hidden"}" data-load-preview="${escapeHtml(ex.id)}">${icon("person", "mi-inline")} <small>Sua carga:</small> <span>${escapeHtml(text)}</span></div>`;
   }
 
   function refreshLoadPreviews(exerciseId) {
@@ -471,6 +471,8 @@
     const st = plan && Store.getStructure(plan.structureId);
     if (!st) return "";
     const pr = structureProgress(st);
+    const trainedToday = Store.history(user.id).some((h) => dayKey(h.finishedAt) === dayKey(new Date()));
+    if (!pr.completed && !trainedToday && !Store.session(user.id)) return ""; // o Treino de hoje já mostra o próximo e o progresso
     return `
       <section class="home-structure">
         <a class="home-structure-head" href="#/estruturas/${encodeURIComponent(st.id)}">
@@ -497,7 +499,7 @@
     const st = plan && Store.getStructure(plan.structureId);
     if (st) {
       const pr = structureProgress(st);
-      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} da sua divisão ${st.name}` };
+      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} · ${st.name}`, progress: pr };
     }
     const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
     if (single) return { workout: single, reason: "Seu treino atual" };
@@ -535,6 +537,12 @@
         <h2>${escapeHtml(w.name)}</h2>
         <div class="group-chips">${groupChips(workoutGroups(w.items))}</div>
         <p class="meta">${w.items.length} exercícios · ${sets} séries · cerca de ${minutes} min</p>
+        ${
+          sug.progress
+            ? `<div class="progress" role="progressbar" aria-label="Progresso da divisão" aria-valuemin="0" aria-valuemax="${sug.progress.duration}" aria-valuenow="${sug.progress.done}"><div class="progress-bar" style="width:${sug.progress.percent}%"></div></div>
+               <p class="meta">${sug.progress.done} de ${sug.progress.duration} sessões da divisão</p>`
+            : ""
+        }
         <div class="today-actions">
           <button class="btn btn-primary btn-lg" type="button" data-start-workout="${escapeHtml(w.id)}">${icon("play_arrow", "mi-inline")} Começar</button>
           <a class="btn btn-lg" href="#/treinos/${encodeURIComponent(w.id)}">Ver treino</a>
@@ -603,8 +611,6 @@
 
       ${todayCardHtml(history, trainedDays.has(dayKey(today)))}
 
-      <div id="install-slot" data-context="home">${installCard()}</div>
-
       ${homeStructureCard()}
 
       <section class="motivation">
@@ -636,6 +642,8 @@
         </div>
         <ol class="week-days" aria-label="Dias da semana">${days}</ol>
       </section>
+
+      <div id="install-slot" data-context="home">${installCard()}</div>
 
       <section class="subsection">
         <h2 class="subsection-title">Último treino</h2>
@@ -693,11 +701,17 @@
     return `<span class="type-tag type-${t}">${icon(ic, "mi-inline")} ${label}</span>`;
   }
 
+  // "10-12 cada lado" → "10-12" quando o tipo já é "por lado" (o rótulo diz Reps/lado).
+  function repsShort(ex, reps) {
+    const t = String(reps || "");
+    return exerciseType(ex) === "unilateral" ? t.replace(/\s*(cada|por)\s+(lado|braço|perna)s?$/i, "") : t;
+  }
+
   function exerciseCard(ex) {
     const img = safeUrl(ex.image);
     const stats = [
       ["Séries", ex.sets],
-      [exerciseType(ex) === "tempo" ? "Tempo" : "Reps", ex.reps],
+      [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, ex.reps)],
       ["Descanso", ex.rest],
     ]
       .filter(([, v]) => v)
@@ -723,7 +737,7 @@
           }
           ${ex.description ? `<p class="exercise-desc clamp-2">${escapeHtml(ex.description)}</p>` : ""}
           <div class="card-foot">
-            <span class="meta">${hasVideo ? `${icon("smart_display", "mi-inline")} Tem vídeo · ` : ""}Toque para ver detalhes</span>
+            ${hasVideo ? `<span class="meta">${icon("smart_display", "mi-inline")} Tem vídeo</span>` : ""}
             ${ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : ""}
           </div>
         </div>
@@ -867,7 +881,7 @@
         <div class="field">
           <label for="ex-type">Tipo</label>
           <select class="select" id="ex-type">${Object.entries(EXERCISE_TYPES)
-            .map(([id, [label, , hint]]) => `<option value="${id}" ${exerciseType(ex) === id ? "selected" : ""}>${label} — ${hint}</option>`)
+            .map(([id, [label]]) => `<option value="${id}" ${exerciseType(ex) === id ? "selected" : ""}>${label}</option>`)
             .join("")}</select>
         </div>
         <fieldset class="field fieldset">
@@ -1191,8 +1205,9 @@
   // Salvos: o que o usuário salvou da comunidade + o que ele criou.
   function savedHtml() {
     const sv = Store.saved(user.id);
-    const divisions = Store.visibleStructures(user.id).filter((st) => isMine(st) || sv.structures.includes(st.id));
-    const workouts = Store.visibleWorkouts(user.id).filter((w) => isMine(w) || sv.workouts.includes(w.id));
+    const plan = Store.plan(user.id);
+    const divisions = Store.visibleStructures(user.id).filter((st) => isMine(st) || sv.structures.includes(st.id) || plan?.structureId === st.id);
+    const workouts = Store.visibleWorkouts(user.id).filter((w) => isMine(w) || sv.workouts.includes(w.id) || plan?.workoutId === w.id);
     return `
       <section class="subsection">
         <h2 class="subsection-title">Divisões</h2>
@@ -1245,21 +1260,21 @@
       <p class="workout-owner">${
         mine
           ? Store.visibilityOf(w) === "public"
-            ? `${icon("public", "mi-inline")} Público: aparece na Comunidade`
+            ? `${icon("public", "mi-inline")} Público: aparece em Explorar`
             : `${icon("lock", "mi-inline")} Privado: só você vê`
           : `${icon("groups", "mi-inline")} Da comunidade · por ${escapeHtml(authorOf(w))}`
       }${w.copiedFromName ? ` · copiado de “${escapeHtml(w.copiedFromName)}”` : ""}</p>
+      <div class="action-row">
+        ${followingThis ? `<span class="chip is-on">${icon("flag", "mi-inline")} Seu treino atual</span>` : `<button class="chip" type="button" id="follow-w">${icon("flag", "mi-inline")} Seguir</button>`}
+        ${mine ? "" : `<button class="chip ${savedThis ? "is-on" : ""}" type="button" id="save-w" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salvo" : "Salvar"}</button>`}
+        ${mine ? "" : `<button class="chip" type="button" id="copy-btn">${icon("content_copy", "mi-inline")} Copiar para editar</button>`}
+      </div>
       <ol class="item-list">${items || `<li class="state">Nenhum exercício.</li>`}</ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
       <div class="sticky-cta">
         <button class="btn btn-primary btn-block btn-lg" type="button" id="start-btn" ${w.items.length ? "" : "disabled"}>
           ${icon("play_arrow", "mi-inline")} ${activeHere ? "Continuar treino" : "Iniciar treino"}
         </button>
-        <div class="detail-actions">
-          ${followingThis ? `<span class="btn btn-block is-on" aria-disabled="true">${icon("flag", "mi-inline")} Seu treino atual</span>` : `<button class="btn btn-block" type="button" id="follow-w">${icon("flag", "mi-inline")} Seguir este treino</button>`}
-          ${mine ? "" : `<button class="btn btn-block ${savedThis ? "is-on" : ""}" type="button" id="save-w" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salvo" : "Salvar"}</button>`}
-          ${mine ? "" : `<button class="btn btn-block" type="button" id="copy-btn">${icon("content_copy", "mi-inline")} Copiar para editar</button>`}
-        </div>
       </div>`;
     $("start-btn").addEventListener("click", () => startWorkout(w));
     $("save-w")?.addEventListener("click", () => {
@@ -1359,7 +1374,7 @@
       progressHtml = `
         <section class="structure-progress">
           <div class="week-head"><h2>Seu progresso</h2><span class="meta">desde ${new Date(plan.startedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span></div>
-          <div class="structure-progress-value"><strong>${pr.done}</strong> de ${pr.duration} treinos</div>
+          <div class="structure-progress-value"><strong>${pr.done}</strong> de ${pr.duration} sessões</div>
           <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
           ${
             pr.completed
@@ -1382,6 +1397,15 @@
           ? Store.visibilityOf(st) === "public" ? `${icon("public", "mi-inline")} Pública: aparece em Explorar` : `${icon("lock", "mi-inline")} Privada: só você vê`
           : `${icon("groups", "mi-inline")} Da comunidade · por ${escapeHtml(authorOf(st))}`
       }${st.copiedFromName ? ` · copiada de “${escapeHtml(st.copiedFromName)}”` : ""}</p>
+      ${
+        mine && !pr.following
+          ? ""
+          : `<div class="action-row">
+              ${mine ? "" : `<button class="chip ${savedThis ? "is-on" : ""}" type="button" id="st-save" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salva" : "Salvar"}</button>`}
+              ${mine ? "" : `<button class="chip" type="button" id="st-copy">${icon("content_copy", "mi-inline")} Copiar para editar</button>`}
+              ${pr.following ? `<button class="chip" type="button" id="st-unfollow">${icon("close", "mi-inline")} Parar de seguir</button>` : ""}
+            </div>`
+      }
       ${progressHtml}
       <section class="subsection">
         <h2 class="subsection-title">Treinos da divisão</h2>
@@ -1390,20 +1414,10 @@
       <div class="sticky-cta">
         ${
           pr.following && !pr.completed && pr.next
-            ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-start">${icon("play_arrow", "mi-inline")} Iniciar Treino ${pr.next.letter}</button>
-               <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
+            ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-start">${icon("play_arrow", "mi-inline")} Iniciar Treino ${pr.next.letter}</button>`
             : pr.completed
-              ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow">${icon("replay", "mi-inline")} Recomeçar divisão</button>
-                 <button class="btn btn-ghost btn-block" type="button" id="st-unfollow">Parar de seguir</button>`
+              ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow">${icon("replay", "mi-inline")} Recomeçar divisão</button>`
               : `<button class="btn btn-primary btn-block btn-lg" type="button" id="st-follow" ${pr.next ? "" : "disabled"}>${icon("flag", "mi-inline")} Seguir esta divisão</button>`
-        }
-        ${
-          mine
-            ? ""
-            : `<div class="detail-actions">
-                <button class="btn btn-block ${savedThis ? "is-on" : ""}" type="button" id="st-save" aria-pressed="${savedThis}">${icon(savedThis ? "bookmark_added" : "bookmark_add", "mi-inline")} ${savedThis ? "Salva" : "Salvar"}</button>
-                <button class="btn btn-block" type="button" id="st-copy">${icon("content_copy", "mi-inline")} Copiar para editar</button>
-              </div>`
         }
       </div>`;
 
@@ -1629,18 +1643,18 @@
           <div class="visibility-options">
             <label class="vis-option">
               <input type="radio" name="w-visibility" value="private" ${draft.visibility !== "public" ? "checked" : ""}>
-              <span>${icon("lock")}<strong>Privado</strong><small>Só você vê, em Meus treinos.</small></span>
+              <span>${icon("lock")}<strong>Privado</strong><small>Só você vê, em Salvos.</small></span>
             </label>
             <label class="vis-option">
               <input type="radio" name="w-visibility" value="public" ${draft.visibility === "public" ? "checked" : ""}>
-              <span>${icon("public")}<strong>Público</strong><small>Aparece na Comunidade; outros podem fazer e copiar.</small></span>
+              <span>${icon("public")}<strong>Público</strong><small>Aparece em Explorar; outros podem fazer, salvar e copiar.</small></span>
             </label>
           </div>
         </fieldset>
         <div class="field">
           <label for="w-rest">Descanso entre séries (segundos)</label>
           <input class="input" id="w-rest" type="number" inputmode="numeric" min="10" max="600" step="5" value="${escapeHtml(draft.restSeconds || DEFAULT_REST)}">
-          <p class="meta">O temporizador começa ao marcar cada série. Padrão: 60s.</p>
+          <p class="meta">O temporizador começa ao marcar cada série. Padrão: 60s. Se um exercício tiver descanso próprio, vale o dele.</p>
         </div>
         <div class="field">
           <span class="label">Grupos musculares trabalhados</span>
@@ -1913,7 +1927,7 @@
         <div class="run-progress-text"><span id="run-count"></span></div>
         <div class="progress"><div class="progress-bar" id="run-bar"></div></div>
       </div>
-      <p class="meta run-rest-info">${icon("timer", "mi-inline")} Descanso entre séries: ${restSecondsOf(w)}s · toque em ${icon("more_vert", "mi-inline")} para pular, trocar ou mudar a ordem</p>
+      <p class="meta run-rest-info">${icon("timer", "mi-inline")} Descanso padrão: ${restSecondsOf(w)}s · toque em ${icon("more_vert", "mi-inline")} para pular, trocar ou mudar a ordem</p>
       <ol class="run-list" id="run-list"></ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
       <section class="finish-card" id="finish-card" aria-labelledby="finish-title">
@@ -1945,7 +1959,7 @@
             ${
               skipped
                 ? `<div class="run-tag">Pulado</div>`
-                : `<div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load">${icon("fitness_center", "mi-inline")} ${escapeHtml(item.load)}</span>` : ""}</div>
+                : `<div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load" title="Carga sugerida pelo treino">${icon("fitness_center", "mi-inline")} meta ${escapeHtml(item.load)}</span>` : ""}</div>
                   <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
                   ${loadPreview(ex)}
                   ${notePreview(ex.id)}
@@ -2286,14 +2300,13 @@
     const rows = exercises()
       .map((ex) => ({ ex, log: Store.weightLog(user.id, ex.id) }))
       .filter((x) => x.log.length)
-      .sort((a, b) => b.log[b.log.length - 1].date.localeCompare(a.log[a.log.length - 1].date))
-      .slice(0, 10);
+      .sort((a, b) => b.log[b.log.length - 1].date.localeCompare(a.log[a.log.length - 1].date));
     if (!rows.length) return "";
     const fmt = (n) => String(Math.round(n * 10) / 10).replace(".", ",");
     return `
       <section class="subsection">
         <h2 class="subsection-title">Cargas por exercício</h2>
-        <ul class="item-list">${rows
+        <ul class="item-list loads-list ${rows.length > 5 ? "collapsed" : ""}">${rows
           .map(({ ex, log }) => {
             const first = log[0].weight;
             const last = log[log.length - 1].weight;
@@ -2309,10 +2322,17 @@
             </a></li>`;
           })
           .join("")}</ul>
+        ${rows.length > 5 ? `<button class="btn btn-ghost btn-block" type="button" data-show-loads>Ver todas (${rows.length})</button>` : ""}
       </section>`;
   }
 
   app.addEventListener("click", (e) => {
+    const more = e.target.closest("[data-show-loads]");
+    if (more) {
+      app.querySelector(".loads-list")?.classList.remove("collapsed");
+      more.remove();
+      return;
+    }
     const btn = e.target.closest("[data-metric]");
     if (!btn || !$("evolution")) return;
     activityMetric = btn.dataset.metric;
@@ -3405,7 +3425,15 @@
     const w = session && Store.getWorkout(session.workoutId);
     if (!w) return null;
     const index = Number(prescription.runIndex);
-    return { index, workout: w, restSeconds: restSecondsOf(w), sets: session.sets?.[index] || [] };
+    return { index, workout: w, restSeconds: itemRestSeconds(w, index), sets: session.sets?.[index] || [] };
+  }
+
+  // Descanso do exercício: o que estiver no item ("90s", "60-90s", "2 min") vale mais que o padrão do treino.
+  function itemRestSeconds(w, index) {
+    const txt = String(w?.items?.[index]?.rest || "").toLowerCase();
+    const n = parseInt(txt.match(/\d+/)?.[0], 10);
+    if (n > 0) return /min/.test(txt) ? n * 60 : n;
+    return restSecondsOf(w);
   }
 
   /* ---------- Recordes pessoais ---------- */
@@ -3568,7 +3596,7 @@
         if (ss && !ss.last) {
           const next = findExercise(Store.session(user.id)?.swaps?.[index + 1] || w.items[index + 1]?.exerciseId);
           toast(`${ss.name}: sem descanso, vá para ${next ? next.name : "o próximo"}.`);
-        } else startRest(restSecondsOf(w));
+        } else startRest(itemRestSeconds(w, index));
       }
     });
   }
@@ -3751,7 +3779,7 @@
     const restLabel = run ? `${run.restSeconds}s` : prescription.rest || ex.rest;
     const stats = [
       ["Séries", sets],
-      [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", reps],
+      [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, reps)],
       ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
