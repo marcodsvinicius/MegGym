@@ -14,6 +14,7 @@
     notes: "meggym.notes.", // (antigo) + id do usuário → { [workoutId]: texto }
     exerciseNotes: "meggym.exnotes.", // + id do usuário → { [exerciseId]: texto }
     exerciseLoads: "meggym.exloads.", // + id do usuário → { [exerciseId]: { weight, band } }
+    weightLog: "meggym.wlog.", // + id do usuário → { [exerciseId]: [{ date: "AAAA-MM-DD", weight }] }
     structures: "meggym.structures",
     plan: "meggym.plan.", // + id do usuário → { structureId, startedAt }
   };
@@ -309,6 +310,26 @@
     write(KEY.exerciseNotes + userId, all);
   }
 
+  // Histórico de pesos: um registro por dia (fica o maior peso do dia; replace troca o do dia).
+  function weightLog(userId, exerciseId) {
+    return read(KEY.weightLog + userId, {})[exerciseId] || [];
+  }
+
+  function logWeight(userId, exerciseId, weight, { replace = false, date = new Date() } = {}) {
+    const kg = parseFloat(String(weight || "").replace(",", "."));
+    if (!(kg > 0)) return;
+    const d = new Date(date);
+    const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const all = read(KEY.weightLog + userId, {});
+    const list = all[exerciseId] || [];
+    const entry = list.find((e) => e.date === day);
+    if (entry) entry.weight = replace ? kg : Math.max(entry.weight, kg);
+    else list.push({ date: day, weight: kg });
+    list.sort((a, b) => a.date.localeCompare(b.date));
+    all[exerciseId] = list;
+    write(KEY.weightLog + userId, all);
+  }
+
   // Carga que o usuário usa em cada exercício: peso (kg) e/ou cor do elástico.
   function exerciseLoad(userId, exerciseId) {
     return read(KEY.exerciseLoads + userId, {})[exerciseId] || { weight: "", band: "" };
@@ -394,6 +415,8 @@
     exerciseNote,
     saveExerciseNote,
     exerciseLoad,
+    weightLog,
+    logWeight,
     saveExerciseLoad,
     getHistory,
     finishSession,

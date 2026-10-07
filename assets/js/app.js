@@ -186,6 +186,7 @@
     });
   }
 
+  let weightLogTimer;
   function bindLoadFields() {
     const box = document.querySelector("[data-load-exercise]");
     if (!box) return;
@@ -201,6 +202,11 @@
         weight.value = weight.value.replace(/[^\d.,]/g, "");
         Store.saveExerciseLoad(user.id, id, { weight: weight.value.replace(".", ",") });
         saved();
+        clearTimeout(weightLogTimer);
+        weightLogTimer = setTimeout(() => {
+          Store.logWeight(user.id, id, weight.value, { replace: true });
+          refreshWeightChart(id);
+        }, 800);
       });
     }
     box.querySelectorAll("[data-band]").forEach((btn) =>
@@ -1526,6 +1532,10 @@
         const ex = findExercise(item.exerciseId);
         return { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", rest: item.rest || "", note: Store.exerciseNote(user.id, ex.id), myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex), setLog: (session.sets?.[i] || []).filter((s) => s.done) };
       });
+      snapshot.forEach((e) => {
+        const max = Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
+        if (max) Store.logWeight(user.id, e.exerciseId, max);
+      });
       const record = Store.finishSession(user, w, valid.length, snapshot);
       if (!record) return;
       toast("Treino concluído!", "success");
@@ -2192,6 +2202,39 @@
   let sheetReturnFocus = null;
 
   // Conteúdo de detalhes do exercício (usado na tela cheia e no bottom sheet).
+  /* ---------- Evolução do peso (gráfico de barras por exercício) ---------- */
+
+  function weightChartHtml(exerciseId) {
+    const list = Store.weightLog(user.id, exerciseId).slice(-12);
+    if (!list.length)
+      return `<h3>Evolução da carga</h3><p class="meta">Registre o peso em Minha carga ou nas séries do treino para ver sua evolução aqui.</p>`;
+    const max = Math.max(...list.map((e) => e.weight));
+    const fmt = (n) => String(n).replace(".", ",");
+    const first = list[0].weight;
+    const last = list[list.length - 1].weight;
+    const diff = Math.round((last - first) * 10) / 10;
+    const bars = list
+      .map((e, i) => {
+        const [y, m, d] = e.date.split("-");
+        const label = `${d}/${m}${i === 0 || list[i - 1].date.slice(0, 4) !== y ? `/${y.slice(2)}` : ""}`;
+        return `
+          <li class="wbar ${i === list.length - 1 ? "latest" : ""}" title="${fmt(e.weight)} kg em ${d}/${m}/${y}">
+            <span class="wbar-value">${fmt(e.weight)}</span>
+            <span class="wbar-col"><span class="wbar-fill" style="height:${Math.max(4, (e.weight / max) * 100)}%"></span></span>
+            <span class="wbar-date">${label}</span>
+          </li>`;
+      })
+      .join("");
+    return `
+      <h3>Evolução da carga</h3>
+      <p class="meta">${list.length === 1 ? `Primeiro registro: ${fmt(last)} kg` : `${diff > 0 ? "+" : ""}${fmt(diff)} kg desde ${list[0].date.split("-").reverse().join("/")}`} · em kg</p>
+      <ol class="wchart" aria-label="Peso por data">${bars}</ol>`;
+  }
+
+  function refreshWeightChart(exerciseId) {
+    document.querySelectorAll(`[data-weight-chart="${CSS.escape(exerciseId)}"]`).forEach((el) => (el.innerHTML = weightChartHtml(exerciseId)));
+  }
+
   /* ---------- Séries e descanso (durante o treino) ---------- */
 
   const DEFAULT_REST = 60;
@@ -2394,6 +2437,8 @@
       ${loadFieldsHtml(ex)}
 
       ${run ? setsTableHtml(ex, run, sets, reps) : ""}
+
+      ${usesWeight(ex) ? `<section class="sheet-section" data-weight-chart="${escapeHtml(ex.id)}">${weightChartHtml(ex.id)}</section>` : ""}
 
       <section class="sheet-section">
         <h3>Execução</h3>

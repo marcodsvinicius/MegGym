@@ -1773,3 +1773,12 @@ body.sheet-open { overflow: hidden; }
 .rest-fill { position: absolute; inset: 0 auto 0 0; background: var(--surface-2); z-index: -1; transition: width .25s linear; }
 .rest-label { font-weight: 700; flex: 1; white-space: nowrap; }
 .rest-time { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---------- Gráfico de evolução do peso ---------- */
+.wchart { list-style: none; margin: 10px 0 0; padding: 0; display: flex; align-items: flex-end; gap: 6px; height: 170px; overflow-x: auto; }
+.wbar { flex: 1 0 34px; max-width: 56px; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.wbar-col { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.wbar-fill { width: 100%; border-radius: 6px 6px 2px 2px; background: color-mix(in srgb, var(--accent) 45%, transparent); }
+.wbar.latest .wbar-fill { background: var(--accent); }
+.wbar-value { font-size: .75rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wbar-date { font-size: .7rem; color: var(--text-muted); white-space: nowrap; }
