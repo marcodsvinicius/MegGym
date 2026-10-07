@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=41") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=42") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2314,3 +2314,10 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 /* Ações do detalhe: seguir, salvar, copiar */
 .detail-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-2); }
 .btn.is-on { border-color: var(--accent); color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+
+/* Aviso de nova versão: flutuante embaixo, logo acima da barra de navegação */
+.update-bar { top: auto; bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom)); box-shadow: 0 -2px 0 transparent, 0 12px 32px rgba(0,0,0,.22); }
+@keyframes update-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.update-bar:not(.hidden) { animation: update-in .35s var(--ease-spring); }
+/* Com a barra de descanso na tela, o aviso fica acima dela */
+body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inset-bottom)); }
