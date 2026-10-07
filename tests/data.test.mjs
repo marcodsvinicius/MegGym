@@ -29,10 +29,22 @@ test("workouts.json: treinos e estruturas apontam para coisas que existem", asyn
 });
 
 test("versão de cache igual em index.html, admin.html e sw.js", async () => {
-  const files = ["index.html", "admin.html", "sw.js"];
+  const files = ["index.html", "admin.html", "sw.js", "assets/css/style.css"];
   const versions = new Set();
   for (const f of files) for (const m of (await read(f)).matchAll(/\?v=(\d+)/g)) versions.add(m[1]);
   assert.equal(versions.size, 1, `?v= diferentes: ${[...versions].join(", ")}`);
   const sw = await read("sw.js");
   assert.equal(sw.match(/VERSION = "v(\d+)"/)[1], [...versions][0], "VERSION do sw.js diferente do ?v=");
+});
+
+test("todos os ícones usados no app estão na fonte de ícones", async () => {
+  const names = new Set();
+  for (const f of ["assets/js/app.js", "assets/js/common.js", "data/exercises.json"]) {
+    const src = await read(f);
+    for (const m of src.matchAll(/(?:icon|empty)\("([a-z0-9_]+)"/g)) names.add(m[1]);
+  }
+  const font = JSON.parse(await read("assets/fonts/icons.json").catch(() => "null"));
+  assert.ok(font, "falta assets/fonts/icons.json: rode python3 tools/update-icons.py");
+  const missing = [...names].filter((n) => !font.includes(n));
+  assert.deepEqual(missing, [], "rode python3 tools/update-icons.py");
 });

@@ -36,5 +36,6 @@ css = urllib.request.urlopen(urllib.request.Request(url, headers=ua)).read().dec
 woff2 = re.search(r"url\((https://fonts\.gstatic\.com/[^)]+)\)", css).group(1)
 out = ROOT / "assets/fonts/material-symbols-rounded.woff2"
 out.write_bytes(urllib.request.urlopen(urllib.request.Request(woff2, headers=ua)).read())
+(ROOT / "assets/fonts/icons.json").write_text(json.dumps(names), encoding="utf-8")
 print(f"{len(names)} ícones -> {out.relative_to(ROOT)} ({out.stat().st_size // 1024} KB)")
-print("Lembre de aumentar VERSION no sw.js para os celulares baixarem a fonte nova.")
+print("Lembre de aumentar VERSION no sw.js e o ?v= (incluindo o da fonte) para os celulares baixarem a fonte nova.")

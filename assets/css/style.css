@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=32") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -1162,6 +1162,12 @@ body.sheet-open { overflow: hidden; }
   font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
   overflow: hidden;
   flex: none;
+  /* Caixa do tamanho de 1 ícone: se a fonte ainda não tiver o ícone, o nome não vaza como texto */
+  width: 1em;
+  height: 1em;
+  max-width: 1em;
+  text-align: center;
+  vertical-align: middle;
 }
 .mi-inline { font-size: 1.15em; vertical-align: -0.2em; width: 1em; }
 .group-icon .mi { font-size: 26px; color: var(--group-color); }
