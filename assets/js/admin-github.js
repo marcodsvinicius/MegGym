@@ -191,6 +191,7 @@
       $("config-toggle").classList.remove("hidden");
       $("editor").classList.remove("hidden");
       renderAll();
+      if (!state.editingExerciseId) renderEquipmentChecks(readEquipmentChecks());
       return true;
     } catch (err) {
       setStatus("Erro de conexão", "err");
@@ -356,7 +357,16 @@
 
   /* ================= Formulário de exercício ================= */
 
-  const exFields = ["group", "name", "description", "sets", "reps", "rest", "difficulty", "image", "video"];
+  const exFields = ["group", "name", "description", "sets", "reps", "rest", "difficulty", "type", "image", "video"];
+
+  // Equipamentos: caixas de seleção montadas a partir da lista do app (common.js).
+  function renderEquipmentChecks(selected = []) {
+    const { EQUIPMENT } = window.MegGym;
+    $("ex-equipment").innerHTML = Object.entries(EQUIPMENT)
+      .map(([id, label]) => `<label class="check-chip"><input type="checkbox" name="ex-equipment" value="${id}" ${selected.includes(id) ? "checked" : ""}><span>${label}</span></label>`)
+      .join("");
+  }
+  const readEquipmentChecks = () => [...document.querySelectorAll('input[name="ex-equipment"]:checked')].map((c) => c.value);
 
   function updateImagePreview() {
     const preview = $("ex-image-preview");
@@ -382,6 +392,7 @@
     const keepGroup = $("ex-group").value;
     $("exercise-form").reset();
     $("ex-group").value = keepGroup;
+    renderEquipmentChecks([]);
     $("exercise-form-title").textContent = "Novo exercício";
     $("exercise-submit").textContent = "Salvar exercício";
     $("exercise-cancel").classList.add("hidden");
@@ -394,6 +405,8 @@
     if (!ex) return;
     state.editingExerciseId = id;
     exFields.forEach((f) => ($(`ex-${f}`).value = ex[f] || ""));
+    if (!ex.type) $("ex-type").value = "reps";
+    renderEquipmentChecks(ex.equipment || []);
     $("ex-image-file").value = "";
     $("exercise-form-title").textContent = `Editando: ${ex.name}`;
     $("exercise-submit").textContent = "Salvar alterações";
@@ -442,6 +455,7 @@
     if (state.busy) return;
     const values = {};
     exFields.forEach((f) => (values[f] = $(`ex-${f}`).value.trim()));
+    values.equipment = readEquipmentChecks();
     const file = $("ex-image-file").files[0];
     if (!validateExercise(values, file)) return;
 

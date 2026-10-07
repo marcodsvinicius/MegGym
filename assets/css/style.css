@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=45") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=46") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";

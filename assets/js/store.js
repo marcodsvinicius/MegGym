@@ -36,6 +36,8 @@
       else localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch {
+      // Armazenamento cheio ou bloqueado: avisa o app para mostrar um alerta.
+      try { window.dispatchEvent(new CustomEvent("meggym:storage-error")); } catch {}
       return false;
     }
   }

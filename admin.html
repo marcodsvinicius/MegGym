@@ -6,9 +6,9 @@
   <meta name="robots" content="noindex, nofollow">
   <title>MegGym — Cadastro de exercícios</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
-  <script src="assets/js/theme.js?v=45"></script>
-  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=45" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=45">
+  <script src="assets/js/theme.js?v=46"></script>
+  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=46" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=46">
 </head>
 <body>
   <header class="site-header">
@@ -215,6 +215,19 @@
                 </select>
               </div>
               <div class="field span-6">
+                <label for="ex-type">Tipo</label>
+                <select class="select" id="ex-type">
+                  <option value="reps">Repetições</option>
+                  <option value="unilateral">Repetições por lado</option>
+                  <option value="tempo">Tempo (cronômetro)</option>
+                </select>
+              </div>
+              <fieldset class="field span-12 fieldset">
+                <legend>Equipamentos</legend>
+                <div class="check-chips" id="ex-equipment"></div>
+                <span class="hint">Marque todos os usados. Em branco = só peso do corpo. (Exercícios que aceitam "um ou outro", como roldana <em>ou</em> elástico, continuam como estão.)</span>
+              </fieldset>
+              <div class="field span-6">
                 <label for="ex-image">Imagem ou GIF</label>
                 <input class="input" id="ex-image" placeholder="https://… (link da imagem)">
                 <span class="hint">Cole um link <strong>ou</strong> envie um arquivo (até 5 MB):</span>
@@ -346,7 +359,7 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=45"></script>
+  <script src="assets/js/config.js?v=46"></script>
   <script>
     // Carrega o admin do modo escolhido em config.js (BACKEND: "github" ou "supabase").
     (function () {
@@ -357,7 +370,7 @@
         : ["common.js", "admin-github.js"];
       files.forEach(function (name) {
         var el = document.createElement("script");
-        el.src = "assets/js/" + name + "?v=45";
+        el.src = "assets/js/" + name + "?v=46";
         el.async = false; // mantém a ordem
         document.body.appendChild(el);
       });

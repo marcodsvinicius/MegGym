@@ -4043,6 +4043,14 @@
 
   window.addEventListener("hashchange", route);
 
+  // Falha ao gravar no aparelho (espaço cheio/navegação privada): avisa no máximo 1x por minuto.
+  let lastStorageWarn = 0;
+  window.addEventListener("meggym:storage-error", () => {
+    if (Date.now() - lastStorageWarn < 60000) return;
+    lastStorageWarn = Date.now();
+    toast("Não foi possível salvar no aparelho. Libere espaço ou faça um backup em Configurações.", "error");
+  });
+
   const seedWorkouts = fetch("data/workouts.json", { cache: "no-cache" })
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null);
