@@ -84,7 +84,10 @@ test("treino: séries, descanso, pular, trocar, reordenar e terminar", () =>
     // Marca o resto e termina.
     while (await page.locator('[data-toggle][aria-pressed="false"]').count()) await page.locator('[data-toggle][aria-pressed="false"]').first().click();
     await page.click("#finish-btn");
-    await page.waitForURL(/atividade\?feito=/);
+    await page.waitForURL(/historico\/.+novo=1/);
+    const [img] = await Promise.all([page.waitForEvent("download"), page.click("#share-btn")]);
+    assert.match(img.suggestedFilename(), /^meggym-.*\.png$/, "resumo para compartilhar");
+    await page.goto(server.url + "#/atividade");
     await page.waitForSelector("#evolution");
     const h = await page.evaluate(() => MegStore.history()[0]);
     assert.equal(h.exercises.length, total - 1);
@@ -108,7 +111,7 @@ test("última vez aparece na série do treino seguinte", () =>
     });
     await page.waitForSelector(".run-item");
     await page.locator('.run-item[data-index="0"] .item-main').click();
-    assert.match(await page.locator(".set-prev").first().textContent(), /11 reps × 14 kg/);
+    assert.match(await page.locator(".set-prev").first().textContent(), /11 reps(\/lado)? × 14 kg/);
   }));
 
 test("gráfico do exercício alterna peso e repetições", () =>
@@ -188,7 +191,7 @@ test("terminar antes registra só os exercícios feitos; descartar não registra
     await page.locator("[data-toggle]").first().click();
     await page.click("#finish-btn");
     await page.click('[data-confirm="yes"]');
-    await page.waitForURL(/atividade\?feito=/);
+    await page.waitForURL(/historico\/.+novo=1/);
     assert.equal(await page.evaluate(() => MegStore.history()[0].exercises.length), 1);
 
     await page.goto(server.url + "#/inicio");
@@ -200,4 +203,47 @@ test("terminar antes registra só os exercícios feitos; descartar não registra
     await page.click('[data-confirm="yes"]');
     await page.waitForURL(new RegExp(`treinos/${id}$`));
     assert.equal(await page.evaluate(() => MegStore.history().length), 1, "descartado não vai pro histórico");
+  }));
+
+test("exercício de tempo: cronômetro marca a série; recorde e bi-set", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page);
+    await page.evaluate(() => {
+      const u = MegStore.currentUser();
+      const w = MegStore.saveWorkout({ name: "Core", items: [
+        { exerciseId: "prancha", sets: "2", reps: "2s", linkNext: true },
+        { exerciseId: "flexao", sets: "1", reps: "10" },
+      ] }, u);
+      // histórico anterior: melhor flexão = 10 reps
+      MegStore.startSession(u.id, w.id);
+      MegStore.finishSession(u, w, 1, [{ exerciseId: "flexao", name: "Flexão", group: "peito", sets: "1", reps: "10", setLog: [{ reps: "10", done: true }] }]);
+      MegStore.startSession(u.id, w.id);
+      location.hash = `#/treinos/${w.id}/executar`;
+    });
+    await page.waitForSelector(".run-item .ss-tag");
+    // Prancha: cronômetro de 2s marca a série sozinho e, por ser bi-set, não inicia descanso.
+    await page.locator('.run-item[data-index="0"] .item-main').click();
+    await page.locator("[data-set-timer]").first().click();
+    await page.waitForSelector('.set-row.done', { timeout: 6000 });
+    assert.equal(await page.isVisible(".rest-bar"), false, "sem descanso no meio do bi-set");
+    await page.click("#sheet-close");
+    // Flexão com 12 reps = recorde.
+    await page.locator('.run-item[data-index="1"] .item-main').click();
+    await page.locator('[data-set-field="reps"]').first().fill("12");
+    await page.locator("[data-set-check]").first().click();
+    await page.waitForSelector(".set-pr");
+    assert.ok(await page.isVisible(".rest-bar"), "descanso depois do último do bi-set");
+  }));
+
+test("monta bi-set no formulário do treino", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page);
+    const id = await page.evaluate(() => MegStore.workouts()[0].id);
+    await page.goto(server.url + `#/treinos/${id}/editar`);
+    await page.locator("[data-link]").first().click();
+    assert.ok(await page.isVisible(".item-row .ss-tag"));
+    await page.click('#workout-form [type="submit"]');
+    await page.waitForURL(new RegExp(`treinos/${id}$`));
+    assert.equal(await page.evaluate((w) => MegStore.getWorkout(w).items[0].linkNext, id), true);
+    assert.equal(await page.locator(".item-row .ss-tag").count(), 2);
   }));

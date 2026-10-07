@@ -82,7 +82,8 @@
       "equipment": [],
       "groups": [
         "triceps"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "supino-halteres",
@@ -98,7 +99,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "supino-chao",
@@ -113,7 +115,8 @@
       "video": "https://youtube.com/shorts/qWLmjXthx7g",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "crucifixo-halteres",
@@ -129,7 +132,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "crucifixo-chao",
@@ -144,7 +148,8 @@
       "video": "https://youtube.com/shorts/va174Fvgr9g",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "crossover",
@@ -161,7 +166,8 @@
       "equipmentAny": [
         "roldana",
         "elastico"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "remada-unilateral",
@@ -177,7 +183,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "remada-curvada",
@@ -192,7 +199,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "pullover-halter",
@@ -208,7 +216,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "puxada-alta-roldana",
@@ -223,7 +232,8 @@
       "video": "",
       "equipment": [
         "roldana"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "remada-baixa-roldana",
@@ -238,7 +248,8 @@
       "video": "",
       "equipment": [
         "roldana"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "arnold-press",
@@ -253,7 +264,8 @@
       "video": "https://youtube.com/shorts/0Zp-1_LvLbE",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "desenvolvimento-halteres",
@@ -268,7 +280,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "elevacao-lateral",
@@ -283,7 +296,8 @@
       "video": "https://youtube.com/shorts/yURmeIEl1Fg",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "elevacao-frontal",
@@ -298,7 +312,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "remada-alta",
@@ -313,7 +328,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "crucifixo-inverso",
@@ -329,7 +345,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "face-pull",
@@ -349,7 +366,8 @@
       ],
       "groups": [
         "costas"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "rosca-direta",
@@ -364,7 +382,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "rosca-alternada",
@@ -379,7 +398,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "rosca-concentrada",
@@ -395,7 +415,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "rosca-martelo-unilateral",
@@ -410,7 +431,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "rosca-martelo",
@@ -425,7 +447,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "triceps-frances-unilateral",
@@ -440,7 +463,8 @@
       "video": "https://youtube.com/shorts/mfXokM_VnMY",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "triceps-frances",
@@ -455,7 +479,8 @@
       "video": "https://youtube.com/shorts/mfXokM_VnMY",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "triceps-testa",
@@ -471,7 +496,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "triceps-acima-cabeca",
@@ -486,7 +512,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "triceps-pushdown",
@@ -503,7 +530,8 @@
       "equipmentAny": [
         "roldana",
         "elastico"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "agachamento-halteres",
@@ -518,7 +546,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "goblet-squat",
@@ -535,7 +564,8 @@
       "equipmentAny": [
         "halter",
         "kettlebell"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "agachamento-sumo",
@@ -553,7 +583,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "agachamento-bulgaro",
@@ -571,7 +602,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "afundo",
@@ -589,7 +621,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "passada",
@@ -607,7 +640,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "afundo-reverso",
@@ -625,7 +659,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "step-up",
@@ -641,7 +676,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "reverse-nordic-curl",
@@ -654,7 +690,22 @@
       "difficulty": "avancado",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "cadeirinha",
+      "group": "quadriceps",
+      "name": "Cadeirinha na parede",
+      "description": "Encoste as costas na parede e desça até os joelhos ficarem a 90°, como se estivesse sentado numa cadeira. Pés afastados na largura do quadril, joelhos alinhados com os pés. Segure a posição.",
+      "sets": "3",
+      "reps": "30-60s",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "type": "tempo"
     },
     {
       "id": "leg-press",
@@ -669,7 +720,8 @@
       "video": "",
       "equipment": [
         "leg-press"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "stiff-halteres",
@@ -684,7 +736,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "rdl-halteres",
@@ -699,7 +752,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "rdl-unilateral",
@@ -717,7 +771,8 @@
       ],
       "groups": [
         "gluteos"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "terra-halteres",
@@ -732,7 +787,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "kettlebell-rdl",
@@ -747,7 +803,8 @@
       "video": "",
       "equipment": [
         "kettlebell"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "flexao-joelho-elastico",
@@ -762,7 +819,8 @@
       "video": "",
       "equipment": [
         "elastico"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "elevacao-pelvica",
@@ -778,7 +836,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "elevacao-pelvica-chao",
@@ -793,7 +852,8 @@
       "video": "",
       "equipment": [
         "anilha"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "hip-thrust",
@@ -809,7 +869,8 @@
       "equipment": [
         "halter",
         "banco"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "kettlebell-swing",
@@ -824,7 +885,8 @@
       "video": "",
       "equipment": [
         "kettlebell"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "panturrilha-em-pe",
@@ -837,7 +899,8 @@
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "reps"
     },
     {
       "id": "panturrilha-unilateral",
@@ -850,7 +913,8 @@
       "difficulty": "intermediario",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "unilateral"
     },
     {
       "id": "panturrilha-sentado",
@@ -865,7 +929,8 @@
       "video": "",
       "equipment": [
         "halter"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "abdominal-elastico",
@@ -880,7 +945,8 @@
       "video": "",
       "equipment": [
         "elastico"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "abdominal-roldana",
@@ -895,7 +961,8 @@
       "video": "",
       "equipment": [
         "roldana"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "ab-wheel",
@@ -910,7 +977,8 @@
       "video": "",
       "equipment": [
         "roda-abdominal"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "prancha",
@@ -926,7 +994,22 @@
       "equipment": [],
       "groups": [
         "lombar"
-      ]
+      ],
+      "type": "tempo"
+    },
+    {
+      "id": "prancha-lateral",
+      "group": "abdomen",
+      "name": "Prancha lateral",
+      "description": "Apoie o antebraço no chão com o cotovelo abaixo do ombro e as pernas estendidas, uma sobre a outra. Suba o quadril até o corpo ficar reto da cabeça aos pés e segure. Faça os dois lados.",
+      "sets": "3",
+      "reps": "20-40s cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "type": "tempo"
     },
     {
       "id": "dead-bug",
@@ -942,7 +1025,8 @@
       "equipment": [],
       "groups": [
         "lombar"
-      ]
+      ],
+      "type": "unilateral"
     },
     {
       "id": "abdominal-bola-suica",
@@ -957,7 +1041,8 @@
       "video": "",
       "equipment": [
         "bola-suica"
-      ]
+      ],
+      "type": "reps"
     },
     {
       "id": "extensao-lombar",
@@ -970,7 +1055,8 @@
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "reps"
     },
     {
       "id": "bird-dog",
@@ -983,7 +1069,8 @@
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "unilateral"
     },
     {
       "id": "superman",
@@ -996,7 +1083,8 @@
       "difficulty": "iniciante",
       "image": "",
       "video": "",
-      "equipment": []
+      "equipment": [],
+      "type": "reps"
     }
   ]
 }

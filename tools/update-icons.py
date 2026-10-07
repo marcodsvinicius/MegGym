@@ -11,7 +11,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-EXTRA = []  # ícones usados de outro jeito (ex.: digitados no admin)
+EXTRA = ["stop", "repeat"]  # ícones usados de outro jeito (ex.: digitados no admin)
 
 names = set(EXTRA)
 for f in ["assets/js/app.js", "assets/js/common.js"]:

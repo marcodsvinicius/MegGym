@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify } =
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify, EXERCISE_TYPES, exerciseType } =
     window.MegGym;
   const Store = window.MegStore;
 
@@ -656,11 +656,19 @@
       <nav class="group-grid" aria-label="Grupos musculares">${cards}</nav>`;
   }
 
+  // Etiqueta do tipo (só quando não é o padrão "repetições").
+  function typeTag(ex) {
+    const t = exerciseType(ex);
+    if (t === "reps") return "";
+    const [label, ic] = EXERCISE_TYPES[t];
+    return `<span class="type-tag type-${t}">${icon(ic, "mi-inline")} ${label}</span>`;
+  }
+
   function exerciseCard(ex) {
     const img = safeUrl(ex.image);
     const stats = [
       ["Séries", ex.sets],
-      ["Repetições", ex.reps],
+      [exerciseType(ex) === "tempo" ? "Tempo" : "Reps", ex.reps],
       ["Descanso", ex.rest],
     ]
       .filter(([, v]) => v)
@@ -669,13 +677,14 @@
     const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const hasVideo = Boolean(youtubeId(ex.video) || safeUrl(ex.video));
     return `
-      <article class="exercise-card tappable" data-exercise-page="${escapeHtml(ex.id)}" tabindex="0" role="link" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
+      <div class="exercise-card tappable" data-exercise-page="${escapeHtml(ex.id)}" tabindex="0" role="link" aria-label="Ver detalhes de ${escapeHtml(ex.name)}">
         ${img ? `<div class="exercise-media"><img src="${escapeHtml(img)}" alt="" loading="lazy"></div>` : ""}
         <div class="exercise-body">
           <div class="exercise-title">
-            <h3>${escapeHtml(ex.name)}</h3>
+            <h2 class="exercise-name">${escapeHtml(ex.name)}</h2>
             ${difficultyBadge(ex.difficulty)}
           </div>
+          ${typeTag(ex)}
           ${stats ? `<div class="stats">${stats}</div>` : ""}
           ${equip ? `<div class="equip-chips">${equip}</div>` : ""}
           ${
@@ -689,7 +698,7 @@
             ${ex.custom ? `<a class="btn btn-sm" href="#/exercicios/editar/${encodeURIComponent(ex.id)}">Editar</a>` : ""}
           </div>
         </div>
-      </article>`;
+      </div>`;
   }
 
   function renderExerciseList(group) {
@@ -812,7 +821,7 @@
             <input class="input" id="ex-sets" maxlength="20" inputmode="numeric" value="${escapeHtml(ex.sets || "")}" placeholder="4">
           </div>
           <div class="field">
-            <label for="ex-reps">Repetições <span class="req">*</span></label>
+            <label for="ex-reps">Repetições ou tempo <span class="req">*</span></label>
             <input class="input" id="ex-reps" maxlength="30" value="${escapeHtml(ex.reps || "")}" placeholder="8-12">
           </div>
         </div>
@@ -825,6 +834,12 @@
             <label for="ex-difficulty">Dificuldade</label>
             <select class="select" id="ex-difficulty">${diffOptions}</select>
           </div>
+        </div>
+        <div class="field">
+          <label for="ex-type">Tipo</label>
+          <select class="select" id="ex-type">${Object.entries(EXERCISE_TYPES)
+            .map(([id, [label, , hint]]) => `<option value="${id}" ${exerciseType(ex) === id ? "selected" : ""}>${label} — ${hint}</option>`)
+            .join("")}</select>
         </div>
         <fieldset class="field fieldset">
           <legend>Equipamentos</legend>
@@ -858,7 +873,7 @@
     $("exercise-form").addEventListener("submit", (event) => {
       event.preventDefault();
       const values = {};
-      ["group", "name", "description", "sets", "reps", "rest", "difficulty", "image", "video"].forEach(
+      ["group", "name", "description", "sets", "reps", "rest", "difficulty", "image", "video", "type"].forEach(
         (f) => (values[f] = $(`ex-${f}`).value.trim())
       );
       values.equipment = [...document.querySelectorAll('input[name="ex-equipment"]:checked')].map((c) => c.value);
@@ -965,16 +980,18 @@
     setHeader(w.name, { back: "#/treinos", action: `<a class="btn btn-sm" href="#/treinos/${encodeURIComponent(w.id)}/editar">Editar</a>` });
     const session = Store.session(user.id);
     const activeHere = session?.workoutId === w.id;
+    const ssDetail = supersets(w.items);
     const items = w.items
       .map((item, i) => {
         const ex = findExercise(item.exerciseId);
         const g = ex && findGroup(ex.group);
         return `
-          <li class="item-row ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"` : ""}>
+          <li class="item-row ${supersetClass(ssDetail[i])} ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"` : ""}>
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
               <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
+              ${supersetTag(ssDetail[i])}
               ${ex ? loadPreview(ex) : ""}
               ${ex ? notePreview(ex.id) : ""}
             </div>
@@ -1374,6 +1391,13 @@
       if (e.target.dataset.field) item[e.target.dataset.field] = e.target.value;
     });
     $("w-items").addEventListener("click", (e) => {
+      const linkBtn = e.target.closest("[data-link]");
+      if (linkBtn) {
+        const item = draft.items[Number(linkBtn.dataset.link)];
+        item.linkNext = !item.linkNext;
+        renderDraftItems();
+        return;
+      }
       const btn = e.target.closest("[data-item-action]");
       if (!btn) return;
       const i = Number(btn.closest("[data-index]").dataset.index);
@@ -1415,8 +1439,9 @@
           description: draft.description,
           notes: String(draft.notes || "").trim(),
           restSeconds: Math.min(Math.max(parseInt(draft.restSeconds, 10) || DEFAULT_REST, 10), 600),
-          items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest }) => ({
+          items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest, linkNext }, i, all) => ({
             exerciseId,
+            ...(linkNext && i < all.length - 1 ? { linkNext: true } : {}),
             sets: String(sets).trim(),
             reps: String(reps).trim(),
             load: String(load || "").trim(),
@@ -1447,21 +1472,59 @@
     renderPicker();
   }
 
+  // Bi-set / super-série: item.linkNext = feito em sequência com o próximo, sem descanso entre eles.
+  // Devolve, por índice, { letter: "A", pos: 1, size: 2, name: "Bi-set", last }.
+  function supersets(items) {
+    const info = {};
+    let block = 0;
+    for (let i = 0; i < items.length; ) {
+      let j = i;
+      while (j < items.length - 1 && items[j].linkNext) j++;
+      if (j > i) {
+        const size = j - i + 1;
+        const letter = String.fromCharCode(65 + (block++ % 26));
+        const name = size === 2 ? "Bi-set" : size === 3 ? "Tri-set" : "Circuito";
+        for (let k = i; k <= j; k++) info[k] = { letter, pos: k - i + 1, size, name, last: k === j, first: k === i };
+      }
+      i = j + 1;
+    }
+    return info;
+  }
+
+  function supersetTag(ss) {
+    return ss ? `<span class="ss-tag">${icon("link", "mi-inline")} ${ss.name} ${ss.letter}${ss.pos}</span>` : "";
+  }
+
+  function supersetClass(ss) {
+    return ss ? `in-ss ${ss.first ? "ss-first" : ""} ${ss.last ? "ss-last" : ""}` : "";
+  }
+
   function renderDraftItems() {
     $("w-groups").innerHTML = groupChips(workoutGroups(draft.items)) || `<span class="meta">Aparecem conforme você adiciona exercícios.</span>`;
     $("w-count").textContent = draft.items.length ? `(${draft.items.length})` : "";
     if (draft.items.length) $("w-items-error").classList.add("hidden");
+    const ss = supersets(draft.items);
     $("w-items").innerHTML = draft.items.length
       ? draft.items
           .map((item, i) => {
             const ex = findExercise(item.exerciseId);
             const g = ex && findGroup(ex.group);
+            const linked = Boolean(item.linkNext) && i < draft.items.length - 1;
+            const link =
+              i < draft.items.length - 1
+                ? `<li class="link-row ${linked ? "linked" : ""}">
+                    <button class="link-btn" type="button" data-link="${i}" aria-pressed="${linked}">
+                      ${icon(linked ? "link_off" : "link", "mi-inline")} ${linked ? "Separar" : "Juntar em bi-set com o próximo"}
+                    </button>
+                  </li>`
+                : "";
             return `
-              <li class="item-row item-row-edit" data-index="${i}">
+              <li class="item-row item-row-edit ${supersetClass(ss[i])}" data-index="${i}">
                 <span class="item-index">${i + 1}</span>
                 <div class="item-main">
                   <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
                   <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}</div>
+                  ${supersetTag(ss[i])}
                   <div class="sets-reps">
                     <label><span>Séries</span><input class="input input-sm" data-field="sets" inputmode="numeric" maxlength="10" value="${escapeHtml(item.sets)}"></label>
                     <span aria-hidden="true">×</span>
@@ -1478,7 +1541,7 @@
                   <button class="icon-btn icon-btn-sm" type="button" data-item-action="down" aria-label="Descer" ${i === draft.items.length - 1 ? "disabled" : ""}>${icon("arrow_downward")}</button>
                   <button class="icon-btn icon-btn-sm icon-btn-danger" type="button" data-item-action="remove" aria-label="Remover">${icon("close")}</button>
                 </div>
-              </li>`;
+              </li>${link}`;
           })
           .join("")
       : `<li class="state state-sm">Nenhum exercício ainda. Adicione da lista abaixo.</li>`;
@@ -1561,11 +1624,13 @@
         <button class="btn btn-ghost btn-block finish-discard" type="button" id="cancel-run">${icon("delete", "mi-inline")} Descartar treino</button>
       </section>`;
 
+    const ssRun = supersets(w.items);
     function itemHtml({ i, item, ex, swapped, skipped, done }, pos, total) {
       const g = findGroup(ex.group);
+      const ss = ssRun[i];
       const original = swapped ? findExercise(item.exerciseId) : null;
       return `
-        <li class="run-item ${done ? "done" : ""} ${skipped ? "skipped" : ""}" data-index="${i}">
+        <li class="run-item ${done ? "done" : ""} ${skipped ? "skipped" : ""} ${supersetClass(ss)}" data-index="${i}">
           ${
             skipped
               ? `<span class="run-check run-skip-icon" aria-hidden="true">${icon("redo")}</span>`
@@ -1575,6 +1640,7 @@
           }
           <div class="item-main ${skipped ? "" : "tappable"}" ${skipped ? "" : `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"`}>
             <div class="item-title">${escapeHtml(ex.name)}</div>
+            ${supersetTag(ss)}
             ${original ? `<div class="run-tag">${icon("swap_horiz", "mi-inline")} no lugar de ${escapeHtml(original.name)}</div>` : ""}
             ${
               skipped
@@ -1583,7 +1649,7 @@
                   <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
                   ${loadPreview(ex)}
                   ${notePreview(ex.id)}
-                  <div class="run-sets-done" data-sets-summary="${i}">${escapeHtml(setsSummary(session.sets?.[i]))}</div>
+                  <div class="run-sets-done" data-sets-summary="${i}" data-type="${exerciseType(ex)}">${escapeHtml(setsSummary(session.sets?.[i], exerciseType(ex)))}</div>
                   <div class="meta link-text">Registrar séries ›</div>`
             }
           </div>
@@ -1682,7 +1748,7 @@
         row.classList.toggle("done", done);
         row.querySelector("[data-toggle]")?.setAttribute("aria-pressed", String(done));
         const sum = row.querySelector("[data-sets-summary]");
-        if (sum) sum.textContent = setsSummary(session.sets?.[i]);
+        if (sum) sum.textContent = setsSummary(session.sets?.[i], sum.dataset.type);
       });
       updateProgress();
     };
@@ -1739,17 +1805,23 @@
         note: Store.exerciseNote(user.id, ex.id),
         myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex),
         setLog: (session.sets?.[i] || []).filter((s) => s.done),
+        type: exerciseType(ex),
       }));
+      const before = Store.history(user.id);
       snapshot.forEach((e) => {
+        const ex = findExercise(e.exerciseId);
+        const pr = ex && recordOf(ex, e.setLog, bestOf(e.exerciseId, before));
+        if (pr) e.pr = pr;
         const max = Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
         if (max) Store.logWeight(user.id, e.exerciseId, max);
       });
+      const prCount = snapshot.filter((e) => e.pr).length;
       const record = Store.finishSession(user, w, list.length, snapshot);
       if (!record) return;
       stopRest();
-      toast("Treino concluído!", "success");
+      toast(prCount ? `Treino concluído com ${prCount} ${prCount === 1 ? "novo recorde" : "novos recordes"}!` : "Treino concluído!", "success");
       celebrate();
-      location.hash = `#/atividade?feito=${encodeURIComponent(record.id)}`;
+      location.hash = `#/atividade/historico/${encodeURIComponent(record.id)}?novo=1`;
     });
 
     $("cancel-run").addEventListener("click", async () => {
@@ -1800,10 +1872,15 @@
   }
 
   // "3 séries: 12×10 kg · 10×10 kg · 8×10 kg"
-  function setsSummary(sets) {
+  function unitOf(type) {
+    return type === "tempo" ? "s" : type === "unilateral" ? "reps/lado" : "reps";
+  }
+
+  function setsSummary(sets, type = "reps") {
     const done = (sets || []).filter((s) => s.done);
     if (!done.length) return "";
-    const parts = done.map((s) => [s.reps ? `${s.reps} reps` : "", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × ")).filter(Boolean);
+    const unit = unitOf(type);
+    const parts = done.map((s) => [s.reps ? (unit === "s" ? `${s.reps}s` : `${s.reps} ${unit}`) : "", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × ")).filter(Boolean);
     const label = `${done.length} ${done.length === 1 ? "série feita" : "séries feitas"}`;
     return parts.length ? `${label}: ${parts.join(" · ")}` : label;
   }
@@ -2010,7 +2087,116 @@
       </section>`;
   }
 
-  function renderHistoryDetail(id) {
+  /* ---------- Resumo para compartilhar (imagem gerada no aparelho) ---------- */
+
+  async function shareSummary(h) {
+    const css = getComputedStyle(document.documentElement);
+    const v = (name, fb) => css.getPropertyValue(name).trim() || fb;
+    const c = { bg: v("--bg", "#111"), surface: v("--surface", "#1b1b1b"), tint: v("--tint", "#222"), text: v("--text", "#fff"), muted: v("--text-muted", "#aaa"), accent: v("--accent", "#ff5a1f"), onAccent: v("--accent-contrast", "#fff") };
+    const display = v("--font-display", "sans-serif");
+    const body = v("--font-body", "sans-serif");
+    const upper = v("--display-transform", "none") === "uppercase";
+    await document.fonts.ready;
+
+    const W = 1080, H = 1350, P = 72;
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    const g = canvas.getContext("2d");
+    const font = (size, weight, fam = body) => (g.font = `${weight} ${size}px ${fam}`);
+    const T = (t) => (upper ? String(t).toUpperCase() : String(t));
+    const fit = (text, max) => {
+      let t = String(text);
+      while (g.measureText(t).width > max && t.length > 3) t = t.slice(0, -2);
+      return t === String(text) ? t : t.trim() + "…";
+    };
+    const R = Math.min(32, (parseFloat(v("--radius", "16")) || 0) * 1.6);
+    const round = (x, y, w, hh) => { g.beginPath(); g.roundRect(x, y, w, hh, R); g.fill(); };
+
+    g.fillStyle = c.bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = c.accent; g.fillRect(0, 0, W, 14);
+
+    const end = new Date(h.finishedAt);
+    font(30, 700); g.fillStyle = c.accent; g.fillText(T("MegGym · treino concluído"), P, 110);
+    font(84, 800, display); g.fillStyle = c.text;
+    const title = T(h.workoutName.replace(/^treino\s*[—–-]\s*/i, ""));
+    const words = title.split(" "); let line = "", y = 210;
+    for (const word of words) {
+      if (g.measureText(line + word).width > W - 2 * P && line) { g.fillText(line.trim(), P, y); y += 92; line = ""; }
+      line += word + " ";
+    }
+    g.fillText(line.trim(), P, y);
+    font(32, 500); g.fillStyle = c.muted;
+    g.fillText(capitalize(end.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })), P, y + 60);
+
+    const list = h.exercises || [];
+    const sets = list.reduce((sum, e) => sum + (e.setLog?.length || 0), 0);
+    const vol = Math.round(workoutVolume(h));
+    const tiles = [
+      [formatDuration(h.startedAt, h.finishedAt), "duração"],
+      [String(h.exerciseCount), "exercícios"],
+      [String(sets || "—"), "séries"],
+      [vol ? `${vol.toLocaleString("pt-BR")} kg` : "—", "volume"],
+    ];
+    const ty = y + 110, tw = (W - 2 * P - 24) / 2, th = 170;
+    tiles.forEach(([val, label], i) => {
+      const x = P + (i % 2) * (tw + 24), yy = ty + Math.floor(i / 2) * (th + 24);
+      g.fillStyle = c.surface; round(x, yy, tw, th);
+      font(64, 800, display); g.fillStyle = c.text; g.fillText(fit(T(val), tw - 64), x + 32, yy + 92);
+      font(28, 600); g.fillStyle = c.muted; g.fillText(label, x + 32, yy + 138);
+    });
+
+    let ly = ty + 2 * (th + 24) + 40;
+    const prs = list.filter((e) => e.pr);
+    if (prs.length) {
+      g.fillStyle = c.accent; round(P, ly, W - 2 * P, 70 + prs.slice(0, 3).length * 46);
+      font(32, 800); g.fillStyle = c.onAccent; g.fillText(`${prs.length} ${prs.length === 1 ? "novo recorde" : "novos recordes"}!`, P + 32, ly + 52);
+      font(28, 600);
+      prs.slice(0, 3).forEach((e, i) => g.fillText(fit(`${e.name}: ${e.pr.text}`, W - 2 * P - 64), P + 32, ly + 100 + i * 46));
+      ly += 70 + prs.slice(0, 3).length * 46 + 30;
+    }
+    ly += 40;
+    font(30, 700); g.fillStyle = c.text;
+    const room = Math.max(0, Math.floor((H - 120 - ly) / 54));
+    list.slice(0, room).forEach((e, i) => {
+      g.fillStyle = c.accent; g.beginPath(); g.arc(P + 6, ly + i * 54 - 10, 6, 0, Math.PI * 2); g.fill();
+      g.fillStyle = c.text; font(30, 700); g.fillText(fit(e.name, 600), P + 28, ly + i * 54);
+      g.fillStyle = c.muted; font(26, 500);
+      // Resumo curto: "3 séries · até 12 kg" (ou reps/segundos quando não há peso).
+      const done = e.setLog || [];
+      const maxW = Math.max(0, ...done.map((x) => num(x.weight)));
+      const maxR = Math.max(0, ...done.map((x) => num(x.reps)));
+      const best = maxW ? `até ${fmtNum(maxW)} kg` : maxR ? `até ${fmtNum(maxR)}${e.type === "tempo" ? "s" : " reps"}` : "";
+      const sum = done.length ? [`${done.length} ${done.length === 1 ? "série" : "séries"}`, best].filter(Boolean).join(" · ") : "";
+      g.textAlign = "right";
+      if (sum) g.fillText(sum, W - P, ly + i * 54);
+      g.textAlign = "left";
+    });
+    if (list.length > room && room) { font(26, 600); g.fillStyle = c.muted; g.fillText(`+ ${list.length - room} exercícios`, P + 28, ly + room * 54); }
+    font(26, 600); g.fillStyle = c.muted; g.fillText("Feito com o MegGym", P, H - 56);
+
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    const file = new File([blob], `meggym-${isoDay(end)}.png`, { type: "image/png" });
+    const text = `Treino concluído: ${h.workoutName} (${formatDuration(h.startedAt, h.finishedAt)})`;
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Meu treino no MegGym", text });
+        return;
+      }
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast("Imagem do resumo salva.", "success");
+  }
+
+  function renderHistoryDetail(id, params = new URLSearchParams()) {
     setTab("atividade");
     const h = Store.getHistory(id);
     if (!h || h.userId !== user.id) {
@@ -2035,7 +2221,10 @@
     const totalSets = list.reduce((sum, e) => sum + (e.setLog?.length || parseInt(e.sets, 10) || 0), 0);
     const sameWorkoutCount = Store.history(user.id).filter((x) => x.workoutId === h.workoutId).length;
 
+    const fresh = params.get("novo") === "1";
+    const prs = list.filter((e) => e.pr);
     app.innerHTML = `
+      ${fresh ? `<p class="eyebrow-text">${icon("celebration", "mi-inline")} Treino concluído${prs.length ? ` · ${prs.length} ${prs.length === 1 ? "recorde" : "recordes"}` : ""}</p>` : ""}
       <section class="history-hero">
         <span class="history-hero-icon">${icon("flag")}</span>
         <div>
@@ -2044,6 +2233,7 @@
         </div>
       </section>
       ${h.workoutDescription ? `<p class="lead">${escapeHtml(h.workoutDescription)}</p>` : ""}
+      <button class="btn ${fresh ? "btn-primary btn-lg" : ""} btn-block" type="button" id="share-btn">${icon("ios_share", "mi-inline")} Compartilhar resumo</button>
 
       <div class="detail-grid">
         <div class="stat-tile"><span class="stat-tile-value">${formatDuration(h.startedAt, h.finishedAt)}</span><span class="stat-tile-label">duração</span></div>
@@ -2069,7 +2259,8 @@
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
                         <div class="meta">${g ? `${icon(g.icon, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
-                        ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog))}</div>` : ""}
+                        ${e.pr ? `<div class="pr-badge">${icon("emoji_events", "mi-inline")} Recorde: ${escapeHtml(e.pr.text)}</div>` : ""}
+                        ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type))}</div>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
                         ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
                       </div>
@@ -2089,6 +2280,7 @@
           ? `<div class="sticky-cta"><a class="btn btn-primary btn-block btn-lg" href="#/treinos/${encodeURIComponent(workout.id)}">${icon("replay", "mi-inline")} Fazer este treino de novo</a></div>`
           : `<p class="meta">Este treino foi excluído.</p>`
       }`;
+    $("share-btn").addEventListener("click", () => shareSummary(h));
   }
 
   function renderSettings() {
@@ -2254,7 +2446,7 @@
       case "atividade":
         if (parts[1] === "configuracoes") renderSettings();
         else if (parts[1] === "perfil") renderEditProfile();
-        else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2]);
+        else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2], params);
         else if (parts[1] === "equipamentos") renderEditEquipment();
         else renderActivity(params);
         break;
@@ -2787,7 +2979,13 @@
           <button type="button" role="tab" data-chart-mode="reps" aria-selected="${!isWeight}">Repetições</button>
         </div>`
       : "";
-    const head = `<div class="chart-head"><h3>Evolução</h3>${toggle}</div>`;
+    const best = bestOf(exerciseId);
+    const logMax = Math.max(0, ...Store.weightLog(user.id, exerciseId).map((e) => e.weight));
+    const recW = Math.max(best.weight, logMax);
+    const recLine = isWeight
+      ? recW ? `<p class="pr-line">${icon("emoji_events", "mi-inline")} Recorde: <strong>${fmtNum(recW)} kg</strong></p>` : ""
+      : best.reps ? `<p class="pr-line">${icon("emoji_events", "mi-inline")} Recorde: <strong>${fmtNum(best.reps)}${ex && exerciseType(ex) === "tempo" ? "s" : " reps"}</strong>${best.repsDate ? ` em ${new Date(best.repsDate).toLocaleDateString("pt-BR")}` : ""}</p>` : "";
+    const head = `<div class="chart-head"><h3>Evolução</h3>${toggle}</div>${recLine}`;
     if (!list.length)
       return `${head}<p class="meta">${
         isWeight
@@ -2839,6 +3037,43 @@
     return { index, workout: w, restSeconds: restSecondsOf(w), sets: session.sets?.[index] || [] };
   }
 
+  /* ---------- Recordes pessoais ---------- */
+
+  const num = (v) => parseFloat(String(v ?? "").replace(",", ".")) || 0;
+
+  // Melhor peso e melhor número (reps ou segundos) já registrados no histórico do usuário.
+  function bestOf(exerciseId, history = Store.history(user.id)) {
+    let weight = 0, reps = 0, weightDate = "", repsDate = "";
+    history.forEach((h) =>
+      (h.exercises || [])
+        .filter((e) => e.exerciseId === exerciseId)
+        .forEach((e) =>
+          (e.setLog || []).forEach((st) => {
+            if (num(st.weight) > weight) (weight = num(st.weight)), (weightDate = h.finishedAt);
+            if (num(st.reps) > reps) (reps = num(st.reps)), (repsDate = h.finishedAt);
+          })
+        )
+    );
+    return { weight, reps, weightDate, repsDate, any: Boolean(weight || reps) };
+  }
+
+  // Recorde de uma lista de séries contra o melhor anterior (peso vale mais que reps).
+  function recordOf(ex, sets, best) {
+    if (!best.any) return null;
+    const done = sets.filter((x) => x.done);
+    const w = Math.max(0, ...done.map((x) => num(x.weight)));
+    const r = Math.max(0, ...done.map((x) => num(x.reps)));
+    const type = exerciseType(ex);
+    if (usesWeight(ex) && w > best.weight && best.weight) return { kind: "peso", value: w, prev: best.weight, text: `${fmtNum(w)} kg (antes ${fmtNum(best.weight)} kg)` };
+    if (r > best.reps && best.reps) {
+      const u = type === "tempo" ? "s" : " reps";
+      return { kind: type === "tempo" ? "tempo" : "reps", value: r, prev: best.reps, text: `${fmtNum(r)}${u} (antes ${fmtNum(best.reps)}${u})` };
+    }
+    return null;
+  }
+
+  const fmtNum = (n) => String(Math.round(n * 10) / 10).replace(".", ",");
+
   // Séries feitas na última vez que o usuário terminou um treino com este exercício.
   function lastSets(exerciseId) {
     for (const h of Store.history(user.id)) {
@@ -2853,20 +3088,30 @@
     const weight = usesWeight(ex);
     const myWeight = Store.exerciseLoad(user.id, ex.id).weight;
     const last = lastSets(ex.id);
+    const type = exerciseType(ex);
+    const timed = type === "tempo";
+    const unit = unitOf(type);
+    const target = parseInt(String(repsText || "").match(/\d+/)?.[0], 10) || 30;
     const rows = Array.from({ length: Math.max(count, run.sets.length) }, (_, i) => {
       const s = run.sets[i] || {};
       const prev = last?.sets[i];
       const kg = (v) => String(Math.round(parseFloat(String(v).replace(",", ".")) * 10) / 10).replace(".", ",");
-      const prevText = prev ? [prev.reps ? `${prev.reps} reps` : "", prev.weight ? `${kg(prev.weight)} kg` : ""].filter(Boolean).join(" × ") : "";
+      const prevText = prev ? [prev.reps ? (timed ? `${prev.reps}s` : `${prev.reps} ${unit}`) : "", prev.weight ? `${kg(prev.weight)} kg` : ""].filter(Boolean).join(" × ") : "";
+      const secs = parseInt(prev?.reps, 10) || target;
       return `
-        <li class="set-row ${s.done ? "done" : ""}" data-set="${i}">
-          <span class="set-num">${i + 1}</span>
-          <label class="set-field"><span class="visually-hidden">Repetições da série ${i + 1}</span>
-            <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(prev?.reps || repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">reps</span></label>
+        <li class="set-row ${s.done ? "done" : ""} ${timed ? "timed" : ""} ${weight ? "weighted" : ""}" data-set="${i}">
+          <span class="set-num" aria-hidden="true">${i + 1}</span>
+          <label class="set-field"><span class="visually-hidden">${timed ? "Segundos" : "Repetições"} da série ${i + 1}</span>
+            <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(timed ? String(secs) : prev?.reps || repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">${unit === "reps/lado" ? "/lado" : unit}</span></label>
           ${
             weight
               ? `<label class="set-field"><span class="visually-hidden">Peso da série ${i + 1}</span>
                   <input class="input input-sm" data-set-field="weight" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || prev?.weight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
+              : ""
+          }
+          ${
+            timed
+              ? `<button type="button" class="set-timer" data-set-timer="${secs}" aria-label="Iniciar cronômetro de ${secs} segundos da série ${i + 1}">${icon("play_arrow", "mi-inline")}<span>${secs}s</span></button>`
               : ""
           }
           <button type="button" class="set-check" data-set-check aria-pressed="${Boolean(s.done)}" aria-label="Concluir série ${i + 1}">
@@ -2880,7 +3125,7 @@
         <h3>Séries</h3>
         ${last ? `<p class="meta">${icon("history", "mi-inline")} Comparando com ${escapeHtml(formatDateTime(last.date))}. Campos vazios usam o valor sugerido ao marcar.</p>` : ""}
         <ol class="set-list">${rows}</ol>
-        <p class="meta">Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.</p>
+        <p class="meta">${timed ? `Toque em ${icon("play_arrow", "mi-inline")} para cronometrar a série; ao terminar ela é marcada e o descanso de ${run.restSeconds}s começa.` : `Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.`}</p>
       </section>`;
   }
 
@@ -2921,6 +3166,8 @@
       save();
     });
     box.addEventListener("click", (e) => {
+      const timerBtn = e.target.closest("[data-set-timer]");
+      if (timerBtn) return toggleSetTimer(timerBtn);
       const btn = e.target.closest("[data-set-check]");
       if (!btn) return;
       const row = btn.closest("[data-set]");
@@ -2936,8 +3183,77 @@
         pop(btn);
       }
       save();
-      if (done) startRest(restSecondsOf(Store.getWorkout(Store.session(user.id)?.workoutId)));
+      if (done) {
+        const ex = findExercise(exId);
+        const sets = read();
+        const pr = ex && recordOf(ex, [sets[Number(row.dataset.set)]], bestOf(exId));
+        const already = box.querySelector(".set-pr");
+        if (pr && !already) {
+          row.insertAdjacentHTML("beforeend", `<span class="set-pr">${icon("emoji_events", "mi-inline")} Recorde!</span>`);
+          toast(`Novo recorde: ${pr.text}`, "success");
+        }
+        const w = Store.getWorkout(Store.session(user.id)?.workoutId);
+        const ss = w && supersets(w.items)[index];
+        if (ss && !ss.last) {
+          const next = findExercise(Store.session(user.id)?.swaps?.[index + 1] || w.items[index + 1]?.exerciseId);
+          toast(`${ss.name}: sem descanso, vá para ${next ? next.name : "o próximo"}.`);
+        } else startRest(restSecondsOf(w));
+      }
     });
+  }
+
+  // Cronômetro de série (exercícios de tempo): conta regressiva no botão; ao fim marca a série.
+  let setTimer = null;
+  function toggleSetTimer(btn) {
+    const row = btn.closest("[data-set]");
+    const input = row.querySelector('[data-set-field="reps"]');
+    if (setTimer && setTimer.btn === btn) {
+      // Parar antes: registra o tempo feito.
+      const elapsed = Math.round((Date.now() - setTimer.start) / 1000);
+      stopSetTimer();
+      if (elapsed > 0) input.value = String(elapsed);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    stopSetTimer();
+    const total = parseInt(input.value, 10) || Number(btn.dataset.setTimer);
+    unlockAudio();
+    keepScreenOn();
+    setTimer = { btn, start: Date.now(), total };
+    btn.classList.add("running");
+    btn.setAttribute("aria-label", "Parar cronômetro e registrar o tempo feito");
+    const label = btn.querySelector("span:not(.mi)");
+    const iconEl = btn.querySelector(".mi");
+    if (iconEl) iconEl.textContent = "stop";
+    const tick = () => {
+      if (!btn.isConnected) return stopSetTimer();
+      const left = total - Math.floor((Date.now() - setTimer.start) / 1000);
+      label.textContent = `${Math.max(left, 0)}s`;
+      btn.style.setProperty("--p", `${Math.min(100, ((total - left) / total) * 100)}%`);
+      if (left <= 0) {
+        stopSetTimer();
+        beep();
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        input.value = String(total);
+        const check = row.querySelector("[data-set-check]");
+        if (!row.classList.contains("done")) check.click();
+      }
+    };
+    setTimer.id = setInterval(tick, 250);
+    tick();
+  }
+
+  function stopSetTimer() {
+    if (!setTimer) return;
+    clearInterval(setTimer.id);
+    const { btn, total } = setTimer;
+    setTimer = null;
+    if (!btn.isConnected) return;
+    btn.classList.remove("running");
+    btn.style.removeProperty("--p");
+    btn.querySelector(".mi").textContent = "play_arrow";
+    btn.querySelector("span:not(.mi)").textContent = `${total}s`;
+    btn.setAttribute("aria-label", `Iniciar cronômetro de ${total} segundos`);
   }
 
   // Temporizador de descanso: barra fixa acima de tudo, continua com o painel fechado.
@@ -3064,7 +3380,7 @@
     const restLabel = run ? `${run.restSeconds}s` : prescription.rest || ex.rest;
     const stats = [
       ["Séries", sets],
-      ["Reps", reps],
+      [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", reps],
       ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
@@ -3092,6 +3408,7 @@
         <h2 id="${titleId}">${escapeHtml(ex.name)}</h2>
         ${difficultyBadge(ex.difficulty)}
       </div>
+      ${typeTag(ex)}
       ${stats ? `<div class="stats">${stats}</div>` : ""}
       ${rirTip}
 

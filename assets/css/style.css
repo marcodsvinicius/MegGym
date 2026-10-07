@@ -84,7 +84,7 @@ body {
 
 img { max-width: 100%; display: block; }
 
-a { color: var(--accent); }
+a { color: var(--accent-ink); }
 
 button, input, select, textarea { font: inherit; color: inherit; }
 
@@ -480,7 +480,7 @@ h1, h2, h3 { line-height: 1.2; letter-spacing: -.01em; margin: 0; }
   box-shadow: var(--shadow-hover);
 }
 .toast.error { background: var(--danger); color: #fff; }
-.toast.success { background: var(--success); color: #fff; }
+.toast.success { background: var(--success); color: var(--on-success); }
 
 .notice {
   padding: 12px 14px;
@@ -615,7 +615,7 @@ body.backend-supabase .github-only { display: none !important; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.bottom-nav a.active { color: var(--accent); }
+.bottom-nav a.active { color: var(--accent-ink); }
 .bottom-nav a.active svg { stroke-width: 2.4; }
 
 @media (min-width: 720px) {
@@ -639,7 +639,7 @@ body.backend-supabase .github-only { display: none !important; }
 .icon-btn-sm { width: 32px; height: 32px; border: 1px solid var(--border); background: var(--surface); font-size: .9rem; }
 .icon-btn-danger { color: var(--danger); }
 
-.link-btn { padding: 0; border: 0; background: none; color: var(--accent); font-weight: 600; cursor: pointer; }
+.link-btn { padding: 0; border: 0; background: none; color: var(--accent-ink); font-weight: 600; cursor: pointer; }
 
 /* ---------- Conteúdo ---------- */
 .section-intro { margin: 0 0 14px; }
@@ -690,7 +690,7 @@ body.backend-supabase .github-only { display: none !important; }
 .workout-card h3 { font-size: 1.1rem; }
 .workout-card .exercise-desc { font-size: .9rem; }
 .workout-card .meta { margin: 0; }
-.badge-live { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.badge-live { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent-ink); }
 
 .resume-banner {
   display: flex;
@@ -805,7 +805,7 @@ body.backend-supabase .github-only { display: none !important; }
 .run-check[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--on-done); }
 .run-sets { font-size: 1.25rem; font-weight: 800; margin-top: 2px; }
 .run-details { margin-top: 8px; }
-.run-details summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
+.run-details summary { cursor: pointer; color: var(--accent-ink); font-weight: 600; font-size: .9rem; }
 .run-details img { margin: 8px 0; border-radius: var(--radius-sm); max-height: 220px; object-fit: cover; }
 .run-details .exercise-desc { margin: 8px 0; }
 
@@ -876,7 +876,7 @@ body.backend-supabase .github-only { display: none !important; }
 .card-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: auto; }
 .card-foot .meta { margin: 0; }
 .chevron { color: var(--text-muted); font-size: 1.4rem; flex: none; }
-.link-text { color: var(--accent); font-weight: 600; }
+.link-text { color: var(--accent-ink); font-weight: 600; }
 
 /* ---------- Cronômetro ---------- */
 .run-timer { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
@@ -1043,8 +1043,8 @@ body.sheet-open { overflow: hidden; }
 .week-day.done .week-day-dot { background: var(--done); border-color: var(--done); color: var(--on-done); font-size: 1rem; }
 .week-day.missed .week-day-dot { border-style: dashed; opacity: .7; }
 .week-day.future .week-day-dot { opacity: .45; }
-.week-day.is-today .week-day-label { color: var(--accent); }
-.week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent); }
+.week-day.is-today .week-day-label { color: var(--accent-ink); }
+.week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent-ink); }
 .week-day.is-today.done .week-day-dot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--done) 35%, transparent); }
 
 .last-workout {
@@ -1086,7 +1086,7 @@ body.sheet-open { overflow: hidden; }
 .onboarding-welcome .lead { font-size: 1.05rem; }
 .onboarding-welcome .profiles { margin-top: 12px; }
 .brand-logo-xl { width: 96px; height: 96px; border-radius: 26px; box-shadow: var(--shadow-hover); }
-.accent { color: var(--accent); }
+.accent { color: var(--accent-ink); }
 .onboarding-actions { display: flex; gap: 10px; justify-content: space-between; align-items: center; margin-top: 4px; }
 .onboarding-actions .btn-primary { flex: 1; }
 .steps { display: flex; gap: 6px; }
@@ -1115,7 +1115,7 @@ body.sheet-open { overflow: hidden; }
 }
 .equip-option-icon { font-size: 1.3rem; flex: none; }
 .equip-option input:checked + span { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
-.equip-option input:checked + span::after { content: "✓"; margin-left: auto; color: var(--accent); font-weight: 800; }
+.equip-option input:checked + span::after { content: "✓"; margin-left: auto; color: var(--accent-ink); font-weight: 800; }
 .equip-option input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
 
 /* ---------- Filtro de equipamentos ---------- */
@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=33") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=35") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -1182,7 +1182,7 @@ body.sheet-open { overflow: hidden; }
 .week-day.done .week-day-dot .mi { font-size: 20px; }
 .icon-btn-sm .mi { font-size: 18px; }
 .segmented button .mi { font-size: 22px; }
-.equip-option-icon.mi { font-size: 24px; color: var(--accent); width: 24px; }
+.equip-option-icon.mi { font-size: 24px; color: var(--accent-ink); width: 24px; }
 .equip-chip .mi-inline { color: var(--text-muted); }
 .settings-icon .mi { font-size: 22px; }
 
@@ -1213,7 +1213,7 @@ body.sheet-open { overflow: hidden; }
 /* ---------- Carga ---------- */
 .load-field { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; font-size: .72rem; color: var(--text-muted); font-weight: 600; }
 .load-field .input-sm { width: 100%; max-width: 200px; }
-.run-load { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-size: .85rem; vertical-align: middle; }
+.run-load { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-ink); font-size: .85rem; vertical-align: middle; }
 
 /* ---------- RIR / descanso / observações ---------- */
 .extra-fields { display: grid; grid-template-columns: 1.4fr 1fr 1.2fr; gap: 8px; margin-top: 8px; }
@@ -1231,7 +1231,7 @@ body.sheet-open { overflow: hidden; }
   font-size: .9rem;
 }
 .workout-notes p { margin: 0; white-space: pre-line; }
-.workout-notes .mi { color: var(--accent); }
+.workout-notes .mi { color: var(--accent-ink); }
 .my-note .subsection-title { display: block; margin-bottom: 8px; }
 .my-note .meta { margin-top: 4px; }
 .note-box { margin: 8px 0 0; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); white-space: pre-line; }
@@ -1284,7 +1284,7 @@ body.sheet-open { overflow: hidden; }
 .home-structure-count strong { font-size: 1.6rem; color: var(--text); }
 .home-structure .meta { margin: 0; }
 .ex-note-preview { display: flex; gap: 4px; align-items: flex-start; margin-top: 6px; padding: 6px 10px; border-radius: 8px; background: color-mix(in srgb, var(--accent) 8%, var(--surface-2)); font-size: .85rem; color: var(--text); white-space: pre-line; }
-.ex-note-preview .mi { color: var(--accent); }
+.ex-note-preview .mi { color: var(--accent-ink); }
 .ex-note-preview.hidden { display: none; }
 .my-note h3 label { cursor: pointer; }
 
@@ -1292,7 +1292,7 @@ body.sheet-open { overflow: hidden; }
 .confirm-sheet { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 4px 0 8px; }
 .confirm-sheet h2 { font-size: 1.3rem; font-weight: 800; }
 .confirm-sheet p { margin: 0; color: var(--text-muted); }
-.confirm-icon { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.confirm-icon { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-ink); }
 .confirm-icon .mi { font-size: 32px; }
 .confirm-icon.danger { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
 .confirm-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
@@ -1616,7 +1616,7 @@ body.sheet-open { overflow: hidden; }
 .btn { border-radius: var(--btn-radius); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
 .motivation { background: var(--accent-container); color: var(--on-accent-container); }
-.motivation .mi { color: var(--accent); }
+.motivation .mi { color: var(--accent-ink); }
 .badge-live { background: var(--accent-container); color: var(--on-accent-container); }
 .resume-banner { background: var(--accent-container); color: var(--on-accent-container); }
 
@@ -1644,13 +1644,13 @@ body.sheet-open { overflow: hidden; }
 :root[data-style="energia"] .stat-tile, :root[data-style="energia"] .group-card, :root[data-style="energia"] .item-row,
 :root[data-style="energia"] .run-item, :root[data-style="energia"] .last-workout, :root[data-style="energia"] .home-structure,
 :root[data-style="energia"] .structure-progress, :root[data-style="energia"] .settings-list { border-color: transparent; box-shadow: none; }
-:root[data-style="energia"] .motivation, :root[data-style="energia"] .structure-card { background: linear-gradient(135deg, #ff5a1f, #ff8a3d); color: #ffffff; border-color: transparent; }
+:root[data-style="energia"] .motivation, :root[data-style="energia"] .structure-card { background: linear-gradient(135deg, #c2410c, #b93a0b); color: #ffffff; border-color: transparent; }
 :root[data-style="energia"] .motivation .mi { color: #ffffff; }
 :root[data-style="energia"] .structure-card .meta, :root[data-style="energia"] .structure-card .exercise-desc { color: rgba(255,255,255,.9); }
 :root[data-style="energia"] .structure-card .progress { background: rgba(0,0,0,.25); }
 :root[data-style="energia"] .structure-card .letter-chip { background: #0d0e10; color: #ffffff; }
 :root[data-style="energia"] .run-timer-value { font-size: 3.2rem; line-height: .95; }
-:root[data-style="energia"] .run-sets { color: var(--accent); }
+:root[data-style="energia"] .run-sets { color: var(--accent-ink); }
 :root[data-style="energia"] .stat-tile-value, :root[data-style="energia"] .week-stat-value { font-size: 2rem; }
 
 /* ---------- Esportivo: linhas grossas, cantos retos, pôster ---------- */
@@ -1660,7 +1660,7 @@ body.sheet-open { overflow: hidden; }
 :root[data-style="esportivo"] .app-header .btn-primary { background: var(--accent); color: #111111; border-color: var(--accent); }
 :root[data-style="esportivo"] .bottom-nav { background: #111111; border-top: 0; }
 :root[data-style="esportivo"] .bottom-nav a { color: #8a8a85; }
-:root[data-style="esportivo"] .bottom-nav a.active { color: var(--accent); }
+:root[data-style="esportivo"] .bottom-nav a.active { color: var(--accent-ink); }
 :root[data-style="esportivo"] .exercise-card, :root[data-style="esportivo"] .workout-card, :root[data-style="esportivo"] .week-card,
 :root[data-style="esportivo"] .stat-tile, :root[data-style="esportivo"] .group-card, :root[data-style="esportivo"] .item-row,
 :root[data-style="esportivo"] .run-item, :root[data-style="esportivo"] .last-workout, :root[data-style="esportivo"] .home-structure,
@@ -1669,10 +1669,10 @@ body.sheet-open { overflow: hidden; }
 :root[data-style="esportivo"] .btn { border-width: 2px; text-transform: uppercase; letter-spacing: .04em; font-weight: 800; }
 :root[data-style="esportivo"] .btn:not(.btn-primary):not(.btn-ghost) { border-color: var(--border); }
 :root[data-style="esportivo"] .chip { border: 2px solid var(--border); border-radius: 0; text-transform: uppercase; font-size: .78rem; }
-:root[data-style="esportivo"] .chip[aria-pressed="true"] { background: var(--text); color: var(--accent); }
+:root[data-style="esportivo"] .chip[aria-pressed="true"] { background: var(--text); color: var(--accent-ink); }
 :root[data-style="esportivo"] .motivation { transform: rotate(-.6deg); }
 :root[data-style="esportivo"] .structure-card { background: var(--surface); }
-:root[data-style="esportivo"] .letter-chip, :root[data-style="esportivo"] .letter-index { border-radius: 0; background: var(--text); color: var(--accent); }
+:root[data-style="esportivo"] .letter-chip, :root[data-style="esportivo"] .letter-index { border-radius: 0; background: var(--text); color: var(--accent-ink); }
 :root[data-style="esportivo"] .group-chip, :root[data-style="esportivo"] .equip-chip, :root[data-style="esportivo"] .badge { border-radius: 0; }
 :root[data-style="esportivo"] .week-day-dot, :root[data-style="esportivo"] .run-check, :root[data-style="esportivo"] .avatar, :root[data-style="esportivo"] .item-index { border-radius: 0; }
 :root[data-style="esportivo"] .run-item.done { background: var(--surface); }
@@ -1718,7 +1718,7 @@ body.sheet-open { overflow: hidden; }
 .mini-esportivo .n i { background: #111111; border-radius: 0; }
 .mini-esportivo .n i:first-child { background: #ff5a1f; }
 @media (max-width: 360px) { .style-options { gap: 6px; } .style-desc { display: none; } }
-.eyebrow-text { margin: 0 0 4px; font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.eyebrow-text { margin: 0 0 4px; font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
 
 /* ---------- Ajuda para instalar ---------- */
 .install-help { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-bottom: 8px; text-align: center; }
@@ -1744,7 +1744,7 @@ body.sheet-open { overflow: hidden; }
 .band[aria-checked="true"] { border-color: var(--accent); background: var(--accent-container); color: var(--on-accent-container); }
 :root[data-style="esportivo"] .band, :root[data-style="esportivo"] .band-dot { border-radius: 0; }
 .ex-load-preview { display: inline-flex; gap: 4px; align-items: center; margin-top: 6px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: .82rem; font-weight: 700; color: var(--text); }
-.ex-load-preview .mi { color: var(--accent); }
+.ex-load-preview .mi { color: var(--accent-ink); }
 .ex-load-preview.hidden { display: none; }
 
 /* ---------- Séries, descanso e dicas ---------- */
@@ -1765,7 +1765,7 @@ body.sheet-open { overflow: hidden; }
   display: grid; place-items: center;
 }
 .set-check svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
-.set-row.done .set-check { background: var(--success, #2e9e44); border-color: var(--success, #2e9e44); color: #fff; }
+.set-row.done .set-check { background: var(--success); border-color: var(--success); color: var(--on-success); }
 .run-sets-done { font-size: .85rem; font-weight: 700; color: var(--success, #2e9e44); }
 .run-sets-done:empty { display: none; }
 .rest-bar {
@@ -1998,7 +1998,7 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 .today-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--accent); }
 .today-card.done::before { background: var(--success); }
 .today-card h2 { font-family: var(--font-display); text-transform: var(--display-transform); letter-spacing: var(--display-tracking); font-weight: var(--display-weight); font-size: var(--fs-xl); line-height: 1.15; }
-.today-card > .meta:first-child { font-weight: var(--fw-bold); color: var(--accent); font-size: var(--fs-xs); letter-spacing: var(--label-tracking); text-transform: uppercase; }
+.today-card > .meta:first-child { font-weight: var(--fw-bold); color: var(--accent-ink); font-size: var(--fs-xs); letter-spacing: var(--label-tracking); text-transform: uppercase; }
 .today-actions { margin-top: var(--space-2); }
 :root[data-style="esportivo"] .today-card::before { width: 8px; }
 
@@ -2072,9 +2072,9 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 /* ---------- Listas de configurações e de ações ---------- */
 .settings-list { padding: 0; }
 .settings-item { min-height: 60px; padding: var(--space-3) var(--space-4); gap: var(--space-3); border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent); }
-.settings-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--tint); color: var(--accent); flex: none; }
+.settings-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: grid; place-items: center; background: var(--tint); color: var(--accent-ink); flex: none; }
 :root[data-style="esportivo"] .settings-item { border-bottom: 2px solid var(--border); }
-:root[data-style="esportivo"] .settings-icon { border-radius: 0; background: var(--text); color: var(--accent); }
+:root[data-style="esportivo"] .settings-icon { border-radius: 0; background: var(--text); color: var(--accent-ink); }
 .action-sheet .settings-list { margin-top: var(--space-2); }
 
 /* ---------- Gráficos ---------- */
@@ -2124,7 +2124,86 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 .finish-card .meta { margin: 0 0 var(--space-2); max-width: 30ch; }
 .finish-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: var(--pill-radius); background: var(--tint); color: var(--text-muted); }
 .finish-card.complete { border-style: solid; border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, var(--card-bg)); }
-.finish-card.complete .finish-icon { background: var(--success); color: #fff; animation: pop .4s var(--ease-spring); }
+.finish-card.complete .finish-icon { background: var(--success); color: var(--on-success); animation: pop .4s var(--ease-spring); }
 .finish-discard { color: var(--danger); }
 :root[data-style="esportivo"] .finish-icon { border-radius: 0; }
 .toast { pointer-events: none; }
+
+/* Tipo de exercício */
+.type-tag { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; width: fit-content; padding: 2px 10px; min-height: 24px; border-radius: var(--pill-radius); font-size: var(--fs-xs); font-weight: var(--fw-bold); background: var(--tint); color: var(--text-muted); }
+.type-tag.type-tempo { background: color-mix(in srgb, #1e66d0 16%, var(--tint)); color: color-mix(in srgb, #1e66d0 70%, var(--text)); }
+.sheet-head + .type-tag { margin-bottom: var(--space-2); }
+
+/* Séries de tempo: botão de cronômetro */
+.set-row.timed { grid-template-columns: 24px 1fr auto 40px; }
+.set-row.timed.weighted { grid-template-columns: 24px 1fr 1fr auto 40px; }
+.set-timer {
+  min-width: 64px; height: 40px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; gap: 2px;
+  border: 0; border-radius: var(--pill-radius); font: inherit; font-weight: var(--fw-heavy); font-variant-numeric: tabular-nums; cursor: pointer;
+  background: var(--accent); color: var(--accent-contrast);
+  background-image: linear-gradient(90deg, rgba(0,0,0,.18) var(--p, 0%), transparent var(--p, 0%));
+}
+.set-timer.running { animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { filter: brightness(1.12); } }
+
+/* Recordes */
+.set-pr { grid-column: 2 / -1; font-size: var(--fs-xs); font-weight: var(--fw-heavy); color: #a86b00; display: inline-flex; align-items: center; gap: 4px; animation: pop .4s var(--ease-spring); }
+.pr-badge { display: inline-flex; align-items: center; gap: 4px; width: fit-content; padding: 2px 10px; border-radius: var(--pill-radius); font-size: var(--fs-xs); font-weight: var(--fw-heavy); background: color-mix(in srgb, #f2c500 28%, var(--tint)); color: var(--text); }
+.pr-line { margin: 0; font-size: var(--fs-sm); display: flex; align-items: center; gap: 4px; }
+.pr-line .mi, .set-pr .mi, .pr-badge .mi { color: #d9a300; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .set-pr { color: #ffd34d; } }
+:root[data-theme="dark"] .set-pr { color: #ffd34d; }
+
+/* Bi-set / super-série */
+.ss-tag { display: inline-flex; align-items: center; gap: 4px; width: fit-content; padding: 2px 10px; border-radius: var(--pill-radius); font-size: var(--fs-xs); font-weight: var(--fw-heavy); background: var(--accent-container); color: var(--on-accent-container); }
+.in-ss { position: relative; }
+.in-ss::after { content: ""; position: absolute; left: -9px; top: 0; bottom: 0; width: 4px; border-radius: 2px; background: var(--accent); }
+.in-ss.ss-first::after { top: 18px; }
+.in-ss.ss-last::after { bottom: 18px; }
+.item-list .in-ss:not(.ss-last), .run-list .in-ss:not(.ss-last) { margin-bottom: calc(var(--space-2) * -1 + 2px); }
+.item-list:has(.in-ss), .run-list:has(.in-ss) { padding-left: 10px; }
+.link-row { list-style: none; display: flex; justify-content: center; margin: -2px 0; }
+.link-btn { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 var(--space-3); border-radius: var(--pill-radius); border: 1px dashed var(--border); background: var(--bg); color: var(--text-muted); font: inherit; font-size: var(--fs-xs); font-weight: var(--fw-bold); cursor: pointer; }
+.link-row.linked .link-btn { border-style: solid; border-color: var(--accent); color: var(--accent-ink); }
+:root[data-style="esportivo"] .in-ss::after { border-radius: 0; }
+
+/* ---------- Acessibilidade: contraste (WCAG AA) ----------
+   --accent é a cor de preenchimento; --accent-ink é a versão segura para texto sobre o fundo. */
+:root { --accent-ink: var(--accent); --on-success: #ffffff; }
+:root[data-style="energia"] { --accent: #c2410c; }
+:root[data-style="esportivo"] { --accent-ink: #c2410c; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --on-success: #0d0e10; }
+  :root[data-style="energia"]:not([data-theme="light"]) { --accent: #ff5a1f; --accent-contrast: #0d0e10; }
+  :root[data-style="esportivo"]:not([data-theme="light"]) { --accent-ink: #ff6a33; }
+}
+:root[data-theme="dark"] { --on-success: #0d0e10; }
+:root[data-style="energia"][data-theme="dark"] { --accent: #ff5a1f; --accent-contrast: #0d0e10; }
+:root[data-style="energia"][data-theme="light"] { --accent: #c2410c; }
+:root[data-style="esportivo"][data-theme="dark"] { --accent-ink: #ff6a33; }
+:root[data-style="esportivo"][data-theme="light"] { --accent-ink: #c2410c; }
+/* Badges de dificuldade e etiqueta de tipo: texto mais escuro/claro que a cor do selo */
+.badge-iniciante { color: color-mix(in srgb, var(--c-iniciante) 70%, var(--text)); }
+.badge-intermediario { color: color-mix(in srgb, var(--c-intermediario) 70%, var(--text)); }
+.badge-avancado { color: color-mix(in srgb, var(--c-avancado) 70%, var(--text)); }
+.type-tag.type-tempo { color: color-mix(in srgb, #1e66d0 45%, var(--text)); }
+/* Dias futuros da semana e descanso no Esportivo */
+.week-day.future .week-day-dot { color: var(--text-muted); opacity: 1; }
+:root[data-style="esportivo"] .stat-btn .stat-label { color: #111; }
+.stat-btn .stat-value { color: var(--accent-ink); }
+:root[data-style="esportivo"] .stat-btn .stat-value { color: #111; }
+.exercise-title h2.exercise-name { font-size: 1.1rem; margin: 0; }
+:root[data-style="esportivo"] .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+:root[data-style="esportivo"] .bottom-nav a.active, :root[data-style="esportivo"] .app-header .accent { color: #ff5a1f; }
+.stat-btn .stat-value, .stat-btn .stat-label { color: var(--text); }
+.stat-btn .stat-value .mi { color: var(--accent-ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --danger: #ff6b7d; } }
+:root[data-theme="dark"] { --danger: #ff6b7d; }
+:root[data-theme="light"] { --danger: #d7263d; }
+/* Vermelho sólido com texto branco legível em qualquer tema */
+.btn-danger-solid, .toast.error { background: #c81e3a; border-color: #c81e3a; color: #fff; }
+/* Área de toque mínima (~44px) nos botões de ícone pequenos */
+.icon-btn-sm { width: 40px; height: 40px; }
+.icon-btn-sm::after, .run-menu::after { content: ""; position: absolute; inset: -4px; }
+.icon-btn-sm, .run-menu { position: relative; }
+.stat-label { letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; }

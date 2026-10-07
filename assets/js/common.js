@@ -65,6 +65,17 @@
     return needed.every((id) => has.has(id)) && (!any.length || any.some((id) => has.has(id)));
   }
 
+  // Tipos de exercício: como cada série é medida.
+  const EXERCISE_TYPES = {
+    reps: ["Repetições", "repeat", "Séries contadas em repetições"],
+    unilateral: ["Repetições por lado", "swap_horiz", "Repetições contadas em cada lado (braço/perna)"],
+    tempo: ["Tempo", "timer", "Séries medidas em segundos, com cronômetro"],
+  };
+
+  function exerciseType(ex) {
+    return EXERCISE_TYPES[ex?.type] ? ex.type : "reps";
+  }
+
   // Equipamentos em que faz sentido registrar o peso usado.
   const WEIGHTED = ["halter", "anilha", "kettlebell", "barra", "caneleira", "roldana", "leg-press", "estacao"];
 
@@ -241,6 +252,8 @@
     icon,
     canDo,
     BAND_COLORS,
+    EXERCISE_TYPES,
+    exerciseType,
     usesWeight,
     usesBand,
     loadText,
