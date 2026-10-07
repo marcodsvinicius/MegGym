@@ -178,3 +178,26 @@ test("cartão de instalar: fecha e continua em Configurações", () =>
     await page.click("#install-setting");
     await page.waitForSelector(".install-help"); // sem instalação com 1 toque no teste → abre o passo a passo
   }));
+
+test("terminar antes registra só os exercícios feitos; descartar não registra", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page);
+    await page.click(".today-card [data-start-workout]");
+    await page.waitForSelector("#finish-card");
+    assert.ok(await page.locator("#finish-btn").isDisabled(), "sem nada feito não termina");
+    await page.locator("[data-toggle]").first().click();
+    await page.click("#finish-btn");
+    await page.click('[data-confirm="yes"]');
+    await page.waitForURL(/atividade\?feito=/);
+    assert.equal(await page.evaluate(() => MegStore.history()[0].exercises.length), 1);
+
+    await page.goto(server.url + "#/inicio");
+    await page.waitForSelector(".today-card");
+    const id = await page.evaluate(() => MegStore.workouts()[0].id);
+    await page.evaluate((w) => MegStore.startSession(MegStore.currentUser().id, w), id);
+    await page.goto(server.url + `#/treinos/${id}/executar`);
+    await page.click("#cancel-run");
+    await page.click('[data-confirm="yes"]');
+    await page.waitForURL(new RegExp(`treinos/${id}$`));
+    assert.equal(await page.evaluate(() => MegStore.history().length), 1, "descartado não vai pro histórico");
+  }));

@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=32") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=33") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2112,3 +2112,19 @@ body.resting .app-main { padding-bottom: calc(var(--nav-h) + 96px); }
 :root[data-style="esportivo"] .btn-primary:disabled { border-color: var(--border); background: var(--surface); }
 /* Área fixa de ações: fundo sólido do app para não misturar com a lista atrás */
 .sticky-cta { background: var(--bg); backdrop-filter: none; border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -10px 16px -6px var(--bg); }
+
+/* Cartão de fim de treino (no fim da lista, não fixo) */
+.finish-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-2);
+  padding: var(--space-6) var(--card-pad) var(--space-4);
+  background: var(--card-bg); border: var(--card-border-w) dashed var(--card-border); border-radius: var(--radius);
+}
+:root[data-style="suave"] .finish-card, :root[data-style="energia"] .finish-card { border: 2px dashed color-mix(in srgb, var(--text) 18%, transparent); }
+.finish-card h2 { margin: 0; font-family: var(--font-display); text-transform: var(--display-transform); letter-spacing: var(--display-tracking); font-weight: var(--display-weight); font-size: var(--fs-xl); }
+.finish-card .meta { margin: 0 0 var(--space-2); max-width: 30ch; }
+.finish-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: var(--pill-radius); background: var(--tint); color: var(--text-muted); }
+.finish-card.complete { border-style: solid; border-color: var(--success); background: color-mix(in srgb, var(--success) 8%, var(--card-bg)); }
+.finish-card.complete .finish-icon { background: var(--success); color: #fff; animation: pop .4s var(--ease-spring); }
+.finish-discard { color: var(--danger); }
+:root[data-style="esportivo"] .finish-icon { border-radius: 0; }
+.toast { pointer-events: none; }

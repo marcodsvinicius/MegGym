@@ -1553,10 +1553,13 @@
       <p class="meta run-rest-info">${icon("timer", "mi-inline")} Descanso entre séries: ${restSecondsOf(w)}s · toque em ${icon("more_vert", "mi-inline")} para pular, trocar ou mudar a ordem</p>
       <ol class="run-list" id="run-list"></ol>
       ${w.notes ? `<section class="workout-notes">${icon("info", "mi-inline")} <p>${escapeHtml(w.notes)}</p></section>` : ""}
-      <div class="sticky-cta">
+      <section class="finish-card" id="finish-card" aria-labelledby="finish-title">
+        <span class="finish-icon" id="finish-icon">${icon("flag")}</span>
+        <h2 id="finish-title"></h2>
+        <p class="meta" id="finish-text"></p>
         <button class="btn btn-primary btn-block btn-lg" type="button" id="finish-btn"></button>
-        <button class="btn btn-ghost btn-block" type="button" id="cancel-run">Cancelar treino</button>
-      </div>`;
+        <button class="btn btn-ghost btn-block finish-discard" type="button" id="cancel-run">${icon("delete", "mi-inline")} Descartar treino</button>
+      </section>`;
 
     function itemHtml({ i, item, ex, swapped, skipped, done }, pos, total) {
       const g = findGroup(ex.group);
@@ -1604,10 +1607,16 @@
       const total = list.length;
       $("run-count").textContent = `${done} de ${total} exercícios`;
       $("run-bar").style.width = `${total ? (done / total) * 100 : 0}%`;
-      const btn = $("finish-btn");
+      // Cartão no fim da lista (não fica fixo): terminar quando quiser ou descartar.
       const complete = total > 0 && done === total;
-      btn.disabled = !complete;
-      btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `Faltam ${total - done}`;
+      $("finish-card").classList.toggle("complete", complete);
+      $("finish-title").textContent = complete ? "Tudo feito!" : done ? "Quer terminar agora?" : "Fim da lista";
+      $("finish-text").textContent = complete
+        ? "Todos os exercícios concluídos. Registre o treino no seu histórico."
+        : `Você fez ${done} de ${total} exercícios. Pode terminar antes e registrar só o que fez.`;
+      const btn = $("finish-btn");
+      btn.disabled = done === 0;
+      btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `${icon("flag", "mi-inline")} Terminar com ${done} de ${total}`;
     }
 
     const save = (changes) => (session = Store.updateSession(user.id, changes));
@@ -1702,8 +1711,21 @@
       updateProgress();
     });
 
-    $("finish-btn").addEventListener("click", () => {
-      const list = runItems(w, session).filter((x) => !x.skipped);
+    $("finish-btn").addEventListener("click", async () => {
+      const all = runItems(w, session).filter((x) => !x.skipped);
+      // Terminar antes: registra só os exercícios marcados como feitos.
+      const list = all.filter((x) => x.done);
+      if (!list.length) return;
+      if (list.length < all.length) {
+        const ok = await confirmSheet({
+          icon: "flag",
+          title: "Terminar antes?",
+          text: `Você fez ${list.length} de ${all.length} exercícios. Só os feitos vão para o histórico.`,
+          confirmLabel: "Terminar e registrar",
+          cancelLabel: "Continuar treinando",
+        });
+        if (!ok) return;
+      }
       const snapshot = list.map(({ i, item, ex, swapped }) => ({
         exerciseId: ex.id,
         name: ex.name,
@@ -1735,16 +1757,16 @@
       const done = list.filter((x) => x.done).length;
       const ok = await confirmSheet({
         icon: "cancel",
-        title: "Cancelar treino?",
-        text: `Você fez ${done} de ${list.length} exercícios em ${$("run-timer").textContent}. Ao cancelar, este treino não será registrado no seu histórico.`,
-        confirmLabel: "Cancelar treino",
+        title: "Descartar treino?",
+        text: `Você fez ${done} de ${list.length} exercícios em ${$("run-timer").textContent}. Ao descartar, este treino não será registrado no seu histórico.`,
+        confirmLabel: "Descartar treino",
         cancelLabel: "Continuar treinando",
         danger: true,
       });
       if (!ok) return;
       Store.cancelSession(user.id);
       stopRest();
-      toast("Treino cancelado.");
+      toast("Treino descartado.");
       location.hash = `#/treinos/${encodeURIComponent(w.id)}`;
     });
 
