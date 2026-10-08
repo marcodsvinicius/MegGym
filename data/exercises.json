@@ -105,7 +105,7 @@
     {
       "id": "supino-chao",
       "group": "peito",
-      "name": "Supino no chão (floor press)",
+      "name": "Supino no chão",
       "description": "Deitado no chão, joelhos flexionados e halteres na altura do peito. Empurrar os halteres para cima e descer controladamente até os braços/cotovelos tocarem suavemente o chão.",
       "sets": "4",
       "reps": "10-12",
@@ -222,7 +222,7 @@
     {
       "id": "puxada-alta-roldana",
       "group": "costas",
-      "name": "Puxada alta",
+      "name": "Puxada frontal",
       "description": "Com a roldana presa no alto da porta, sente ou ajoelhe de frente para ela. Puxe a alça até a altura do peito, levando os cotovelos para baixo, e volte controlando.",
       "sets": "4",
       "reps": "10-12",
@@ -518,7 +518,7 @@
     {
       "id": "triceps-pushdown",
       "group": "triceps",
-      "name": "Tríceps na roldana/elástico (extensão para baixo)",
+      "name": "Tríceps pulley (roldana/elástico)",
       "description": "Manter os cotovelos próximos ao corpo e estender os braços para baixo, contraindo o tríceps. Retornar lentamente sem deixar os cotovelos avançarem.",
       "sets": "3",
       "reps": "12-15",
@@ -589,7 +589,7 @@
     {
       "id": "agachamento-bulgaro",
       "group": "quadriceps",
-      "name": "Afundo búlgaro com halteres",
+      "name": "Agachamento búlgaro com halteres",
       "description": "Apoiar o pé traseiro em uma superfície firme. Flexionar os joelhos e descer controladamente, mantendo o equilíbrio. Subir pressionando o chão com a perna da frente.",
       "sets": "3",
       "reps": "8-12 cada perna",
@@ -665,7 +665,7 @@
     {
       "id": "step-up",
       "group": "quadriceps",
-      "name": "Step-up",
+      "name": "Subida no banco (step-up)",
       "description": "Halteres nas mãos, de frente para o banco. Suba apoiando o pé inteiro e empurrando com a perna da frente, desça devagar e alterne.",
       "sets": "3",
       "reps": "10-12 cada perna",
@@ -682,7 +682,7 @@
     {
       "id": "reverse-nordic-curl",
       "group": "quadriceps",
-      "name": "Reverse nordic curl",
+      "name": "Nórdico reverso",
       "description": "Ajoelhado, manter o quadril estendido e inclinar o tronco lentamente para trás, controlando o movimento com os quadríceps. Retornar à posição inicial.",
       "sets": "3",
       "reps": "8-15",
@@ -742,7 +742,7 @@
     {
       "id": "rdl-halteres",
       "group": "posterior",
-      "name": "RDL com halteres",
+      "name": "Terra romeno com halteres",
       "description": "Levantamento terra romeno: joelhos levemente dobrados, empurre o quadril para trás descendo os halteres até o meio da canela, coluna neutra, e suba.",
       "sets": "4",
       "reps": "8-12",
@@ -758,7 +758,7 @@
     {
       "id": "rdl-unilateral",
       "group": "posterior",
-      "name": "RDL unilateral",
+      "name": "Stiff unilateral",
       "description": "Em uma perna só, halter na mão oposta. Incline o tronco à frente levando a outra perna para trás, até o tronco ficar quase paralelo ao chão, e volte.",
       "sets": "3",
       "reps": "8-10 cada perna",
@@ -793,7 +793,7 @@
     {
       "id": "kettlebell-rdl",
       "group": "posterior",
-      "name": "Kettlebell RDL",
+      "name": "Terra romeno com kettlebell",
       "description": "Segure o kettlebell com as duas mãos à frente. Empurre o quadril para trás com os joelhos levemente dobrados e suba contraindo glúteos.",
       "sets": "4",
       "reps": "10-12",
@@ -809,7 +809,7 @@
     {
       "id": "flexao-joelho-elastico",
       "group": "posterior",
-      "name": "Flexão de joelho com elástico",
+      "name": "Flexora com elástico",
       "description": "Flexionar o joelho contra a resistência do elástico, aproximando o calcanhar do glúteo. Controlar principalmente a volta.",
       "sets": "4",
       "reps": "10-15",
@@ -875,7 +875,7 @@
     {
       "id": "kettlebell-swing",
       "group": "gluteos",
-      "name": "Kettlebell swing",
+      "name": "Swing com kettlebell",
       "description": "Pés afastados, kettlebell à frente. Leve-o entre as pernas dobrando o quadril e projete o quadril para frente, balançando o peso até a altura do peito.",
       "sets": "4",
       "reps": "15-20",
@@ -967,7 +967,7 @@
     {
       "id": "ab-wheel",
       "group": "abdomen",
-      "name": "Ab wheel",
+      "name": "Roda abdominal",
       "description": "Ajoelhado, segure a roda à frente. Role para frente estendendo o corpo sem deixar o quadril cair e volte puxando com o abdômen.",
       "sets": "3",
       "reps": "8-12",
@@ -1061,7 +1061,7 @@
     {
       "id": "bird-dog",
       "group": "lombar",
-      "name": "Bird dog",
+      "name": "Perdigueiro (bird dog)",
       "description": "De quatro apoios, estenda ao mesmo tempo um braço à frente e a perna oposta para trás, mantendo o tronco estável. Volte e alterne.",
       "sets": "3",
       "reps": "10-12 cada lado",
