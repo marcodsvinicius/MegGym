@@ -128,7 +128,7 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=_kpKlYexyXs",
+      "video": "https://www.youtube.com/watch?v=Q6sNArHlLmA",
       "equipment": [
         "halter",
         "banco"
@@ -161,7 +161,7 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=-uBR4AQpeeQ",
+      "video": "https://www.youtube.com/watch?v=GCe5qx6HA6I",
       "equipment": [],
       "equipmentAny": [
         "roldana",
@@ -229,7 +229,7 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=SapM-j_3M20",
+      "video": "https://youtube.com/shorts/GeYOqae2kNg",
       "equipment": [
         "roldana"
       ],
@@ -245,7 +245,7 @@
       "rest": "60s",
       "difficulty": "iniciante",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=zw0lUIPCq-U",
+      "video": "https://www.youtube.com/watch?v=zxndd6x_NL8",
       "equipment": [
         "roldana"
       ],
@@ -460,7 +460,7 @@
       "rest": "45-60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "https://youtube.com/shorts/mfXokM_VnMY",
+      "video": "https://youtube.com/shorts/TSRGZuN1WjE",
       "equipment": [
         "halter"
       ],
@@ -749,7 +749,7 @@
       "rest": "60-90s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=OE6ulD2F-dc",
+      "video": "https://www.youtube.com/watch?v=xAL7lHwj30E",
       "equipment": [
         "halter"
       ],
@@ -882,7 +882,7 @@
       "rest": "60s",
       "difficulty": "intermediario",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=7LiW_5-N8b0",
+      "video": "https://www.youtube.com/watch?v=OPcG_thX6Dc",
       "equipment": [
         "kettlebell"
       ],
@@ -958,7 +958,7 @@
       "rest": "45s",
       "difficulty": "iniciante",
       "image": "",
-      "video": "https://www.youtube.com/watch?v=KmY5b2tZTU4",
+      "video": "https://youtube.com/shorts/dbBZusTG3Xk",
       "equipment": [
         "roldana"
       ],
@@ -1084,6 +1084,1583 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=vDXe2eBowUg",
       "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-joelhos",
+      "group": "peito",
+      "name": "Flexão com joelhos no chão",
+      "description": "Apoie os joelhos no chão e as mãos um pouco além da largura dos ombros. Desça o peito até perto do chão mantendo quadril e tronco alinhados e empurre de volta.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/yrehRkNFB_s",
+      "equipment": [],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-inclinada",
+      "group": "peito",
+      "name": "Flexão inclinada",
+      "description": "Mãos apoiadas no banco ou num degrau, corpo reto. Desça o peito até a borda do apoio e empurre. Quanto mais alto o apoio, mais fácil.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/TfzlcE4293c",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-declinada",
+      "group": "peito",
+      "name": "Flexão declinada",
+      "description": "Pés apoiados no banco e mãos no chão. Desça o peito controlando o movimento e empurre. Trabalha mais a parte de cima do peito.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/kXknwF6RhPA",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "ombros",
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-aberta",
+      "group": "peito",
+      "name": "Flexão com pegada aberta",
+      "description": "Mãos bem mais abertas que os ombros. Desça devagar até o peito quase encostar no chão e empurre, mantendo o abdômen firme.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/QoLEmXs3KNQ",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-explosiva",
+      "group": "peito",
+      "name": "Flexão explosiva",
+      "description": "Desça como na flexão comum e empurre o chão com força, tirando as mãos do chão por um instante. Aterrisse com os cotovelos levemente dobrados.",
+      "sets": "3",
+      "reps": "6-10",
+      "rest": "90-120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/EnZkAuwYag8",
+      "equipment": [],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-elastico",
+      "group": "peito",
+      "name": "Flexão com elástico",
+      "description": "Passe o elástico pelas costas, segurando as pontas embaixo das mãos. Faça a flexão normalmente: o elástico aumenta a carga na subida.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/1XRvzkfA2cI",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "supino-inclinado-halteres",
+      "group": "peito",
+      "name": "Supino inclinado com halteres",
+      "description": "Banco inclinado entre 30° e 45°. Desça os halteres ao lado do peito com os cotovelos um pouco abaixo da linha dos ombros e empurre para cima.",
+      "sets": "4",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/wkUemXl4vFI",
+      "equipment": [
+        "halter",
+        "banco"
+      ],
+      "groups": [
+        "ombros",
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "crucifixo-inclinado",
+      "group": "peito",
+      "name": "Crucifixo inclinado com halteres",
+      "description": "No banco inclinado, braços abertos com cotovelos levemente dobrados. Desça em arco até sentir o peito alongar e volte juntando os halteres acima do peito.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/BNBsJFYBpqk",
+      "equipment": [
+        "halter",
+        "banco"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "supino-elastico",
+      "group": "peito",
+      "name": "Supino em pé com elástico",
+      "description": "Elástico preso atrás de você na altura do peito. Dê um passo à frente e empurre as mãos para a frente até estender os braços. Volte devagar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=YufvEbOOnCI",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "mergulho-paralelas",
+      "group": "peito",
+      "name": "Mergulho nas paralelas",
+      "description": "Nas paralelas da praça, incline o tronco um pouco à frente e desça até os cotovelos formarem 90°. Empurre de volta sem travar os cotovelos.",
+      "sets": "3",
+      "reps": "6-12",
+      "rest": "90-120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/qyr4VaEhG3g",
+      "equipment": [
+        "estacao"
+      ],
+      "groups": [
+        "triceps",
+        "ombros"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "barra-fixa-pronada",
+      "group": "costas",
+      "name": "Barra fixa pronada",
+      "description": "Mãos viradas para a frente, um pouco além da largura dos ombros. Puxe o corpo até o queixo passar da barra, levando os cotovelos para baixo. Desça até estender os braços.",
+      "sets": "4",
+      "reps": "4-10",
+      "rest": "120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/hxIF6qwBr2M",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "barra-fixa-supinada",
+      "group": "costas",
+      "name": "Barra fixa supinada",
+      "description": "Mãos viradas para você, na largura dos ombros. Puxe até o queixo passar da barra e desça com controle. Costuma ser mais fácil que a pronada.",
+      "sets": "4",
+      "reps": "5-10",
+      "rest": "120s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/uECWARnxI_U",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "barra-fixa-neutra",
+      "group": "costas",
+      "name": "Barra fixa com pegada neutra",
+      "description": "Palmas viradas uma para a outra (barras paralelas ou alça). Puxe até o queixo passar das mãos e desça devagar.",
+      "sets": "4",
+      "reps": "5-10",
+      "rest": "120s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/5fNcfoDfBo4",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "barra-fixa-negativa",
+      "group": "costas",
+      "name": "Barra fixa negativa",
+      "description": "Suba na barra com ajuda de um banco ou de um pulo e desça o mais devagar possível, em 3 a 5 segundos. Ótimo para quem ainda não faz a barra completa.",
+      "sets": "3",
+      "reps": "4-6",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/dyPdKvlZF2A",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "barra-fixa-elastico",
+      "group": "costas",
+      "name": "Barra fixa com elástico",
+      "description": "Prenda o elástico na barra e apoie o joelho ou o pé nele. O elástico ajuda na subida. Use elásticos mais finos conforme ficar mais forte.",
+      "sets": "3",
+      "reps": "6-10",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/2il8VBUTBog",
+      "equipment": [
+        "barra-fixa",
+        "elastico"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "pendurado-barra",
+      "group": "costas",
+      "name": "Suspensão na barra",
+      "description": "Fique pendurado na barra com braços estendidos e ombros levemente puxados para baixo. Fortalece a pegada e prepara para a barra fixa.",
+      "sets": "3",
+      "reps": "20-40s",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/9eY15prKcUY",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "type": "tempo"
+    },
+    {
+      "id": "remada-invertida",
+      "group": "costas",
+      "name": "Remada invertida",
+      "description": "Deitado embaixo de uma barra baixa (ou mesa firme), corpo reto e calcanhares no chão. Puxe o peito até a barra e desça devagar. Pés mais próximos deixam mais fácil.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/_roWXwr8nrY",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "puxada-elastico",
+      "group": "costas",
+      "name": "Puxada alta com elástico",
+      "description": "Elástico preso no alto (porta ou barra). Ajoelhado, puxe as mãos até a altura do peito levando os cotovelos para baixo e para trás.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/R5_xSY4UPFw",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "pulldown-bracos-estendidos",
+      "group": "costas",
+      "name": "Pulldown com braços estendidos (elástico)",
+      "description": "Elástico preso no alto, braços quase estendidos. Leve as mãos até as coxas em arco, contraindo as costas, e volte devagar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/Oz_C4Mu_ajc",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "remada-serrote-kettlebell",
+      "group": "costas",
+      "name": "Remada com kettlebell",
+      "description": "Tronco inclinado à frente com apoio de uma mão no banco. Puxe o kettlebell até o quadril com o cotovelo junto ao corpo.",
+      "sets": "3",
+      "reps": "10-12 cada lado",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/peEwTXzj3Ks",
+      "equipment": [
+        "kettlebell",
+        "banco"
+      ],
+      "groups": [
+        "biceps"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "flexao-pike",
+      "group": "ombros",
+      "name": "Flexão pike",
+      "description": "Quadril alto, corpo em forma de V invertido. Dobre os cotovelos levando a cabeça em direção ao chão, entre as mãos, e empurre de volta.",
+      "sets": "3",
+      "reps": "6-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/eG20L9cl81w",
+      "equipment": [],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-pike-elevada",
+      "group": "ombros",
+      "name": "Flexão pike com pés no banco",
+      "description": "Pés no banco e mãos no chão, quadril bem alto. Desça a cabeça até perto do chão e empurre. Variação mais pesada da pike.",
+      "sets": "3",
+      "reps": "5-10",
+      "rest": "120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/gOK3XC8Iins",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "desenvolvimento-elastico",
+      "group": "ombros",
+      "name": "Desenvolvimento com elástico",
+      "description": "Pise no elástico e segure as pontas na altura dos ombros. Empurre as mãos para cima até estender os braços e desça devagar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/c-E72n42kD0",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "triceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "elevacao-lateral-elastico",
+      "group": "ombros",
+      "name": "Elevação lateral com elástico",
+      "description": "Pise no elástico e eleve os braços para os lados até a altura dos ombros, cotovelos levemente dobrados. Desça controlando.",
+      "sets": "3",
+      "reps": "12-20",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/Og66WHEt9O0",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "elevacao-lateral-inclinada",
+      "group": "ombros",
+      "name": "Elevação lateral inclinada",
+      "description": "Segure num apoio e incline o corpo para o lado. Com o halter na mão de fora, eleve o braço até a altura do ombro. Aumenta a tensão no começo do movimento.",
+      "sets": "3",
+      "reps": "10-15 cada lado",
+      "rest": "45-60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/B763tIXVfRY",
+      "equipment": [
+        "halter"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "crucifixo-inverso-elastico",
+      "group": "ombros",
+      "name": "Crucifixo inverso com elástico",
+      "description": "Segure o elástico à frente, na altura do peito, braços estendidos. Abra os braços para os lados juntando as escápulas e volte devagar.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/8nvzTG1Ir0w",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "costas"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "encolhimento-halteres",
+      "group": "ombros",
+      "name": "Encolhimento com halteres",
+      "description": "Em pé, halteres ao lado do corpo. Suba os ombros em direção às orelhas, segure um instante e desça. Não gire os ombros.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/i80MM-yLnhU",
+      "equipment": [
+        "halter"
+      ],
+      "groups": [
+        "costas"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "y-t-w-chao",
+      "group": "ombros",
+      "name": "Y-T-W deitado",
+      "description": "Deitado de barriga para baixo, eleve os braços formando as letras Y, T e W, segurando cada posição por 2 segundos. Pode usar anilhas leves.",
+      "sets": "3",
+      "reps": "8 de cada",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/GR7a0SKrwGg",
+      "equipment": [],
+      "groups": [
+        "costas"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-elastico",
+      "group": "biceps",
+      "name": "Rosca direta com elástico",
+      "description": "Pise no elástico e segure as pontas com as palmas para a frente. Dobre os cotovelos sem tirá-los do lado do corpo e desça devagar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/Jcp707EYkcg",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-inclinada",
+      "group": "biceps",
+      "name": "Rosca no banco inclinado",
+      "description": "Sentado no banco inclinado, braços pendendo para trás. Dobre os cotovelos sem movê-los para a frente. Alonga bem o bíceps.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/mdBQqKdPLHY",
+      "equipment": [
+        "halter",
+        "banco"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-inversa",
+      "group": "biceps",
+      "name": "Rosca inversa",
+      "description": "Pegada com as palmas para baixo. Dobre os cotovelos mantendo os punhos firmes. Trabalha também o antebraço.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/nuCsXf93-1A",
+      "equipment": [
+        "halter"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-21",
+      "group": "biceps",
+      "name": "Rosca 21",
+      "description": "7 repetições da metade de baixo, 7 da metade de cima e 7 completas, sem descanso entre elas. Use carga mais leve que na rosca comum.",
+      "sets": "3",
+      "reps": "21",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/KMmKHgjskJ8",
+      "equipment": [
+        "halter"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-toalha-barra",
+      "group": "biceps",
+      "name": "Barra fixa supinada fechada",
+      "description": "Na barra, mãos viradas para você e bem próximas. Puxe o corpo focando em dobrar os cotovelos. Muito puxado para o bíceps.",
+      "sets": "3",
+      "reps": "5-10",
+      "rest": "90-120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/oPC_QP2SS0I",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "groups": [
+        "costas"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "rosca-kettlebell",
+      "group": "biceps",
+      "name": "Rosca com kettlebell",
+      "description": "Segure o kettlebell pela alça com as duas mãos ou uma de cada vez. Dobre os cotovelos sem balançar o corpo.",
+      "sets": "3",
+      "reps": "10-12",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/3vQnhAcfd5k",
+      "equipment": [
+        "kettlebell"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "mergulho-banco",
+      "group": "triceps",
+      "name": "Mergulho no banco",
+      "description": "Mãos na borda do banco atrás de você e pernas à frente. Desça dobrando os cotovelos até cerca de 90° e empurre de volta. Pernas dobradas deixam mais fácil.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/p_DeBmkbCUc",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "peito"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-diamante",
+      "group": "triceps",
+      "name": "Flexão diamante",
+      "description": "Mãos juntas embaixo do peito, formando um losango com indicadores e polegares. Desça mantendo os cotovelos perto do corpo e empurre.",
+      "sets": "3",
+      "reps": "6-12",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=kGhDnFwMY3E",
+      "equipment": [],
+      "groups": [
+        "peito"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexao-fechada",
+      "group": "triceps",
+      "name": "Flexão fechada",
+      "description": "Mãos na largura dos ombros e cotovelos colados ao corpo durante toda a descida. Empurre até estender os braços.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/e70A6fwnpWc",
+      "equipment": [],
+      "groups": [
+        "peito"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "triceps-coice",
+      "group": "triceps",
+      "name": "Tríceps coice",
+      "description": "Tronco inclinado com apoio no banco, cotovelo colado ao corpo. Estenda o braço para trás até ficar reto e volte devagar.",
+      "sets": "3",
+      "reps": "10-12 cada lado",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/JKrjAtGqkxU",
+      "equipment": [
+        "halter",
+        "banco"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "triceps-elastico-cabeca",
+      "group": "triceps",
+      "name": "Tríceps acima da cabeça com elástico",
+      "description": "Pise no elástico atrás de você e segure-o atrás da cabeça. Estenda os braços para cima mantendo os cotovelos apontados para a frente.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/bn2lMbwJHv8",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "triceps-banco-chao",
+      "group": "triceps",
+      "name": "Tríceps no chão (extensão de cotovelo)",
+      "description": "Em posição de prancha nos antebraços, empurre o chão até estender os cotovelos e volte. Exercício avançado sem equipamento.",
+      "sets": "3",
+      "reps": "6-10",
+      "rest": "90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/S0c-E9AgAKU",
+      "equipment": [],
+      "groups": [
+        "abdomen"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "mergulho-paralelas-triceps",
+      "group": "triceps",
+      "name": "Paralelas com tronco reto",
+      "description": "Nas paralelas, tronco bem reto e cotovelos para trás. Desça até 90° e suba. Com o tronco reto, o tríceps trabalha mais que o peito.",
+      "sets": "3",
+      "reps": "6-12",
+      "rest": "90-120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=U2vfMmWsEP0",
+      "equipment": [
+        "estacao"
+      ],
+      "groups": [
+        "peito"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-livre",
+      "group": "quadriceps",
+      "name": "Agachamento livre",
+      "description": "Pés na largura dos ombros, braços à frente. Desça empurrando o quadril para trás até pelo menos as coxas ficarem paralelas ao chão e suba.",
+      "sets": "4",
+      "reps": "15-20",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/oqxnH2D_vzI",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-salto",
+      "group": "quadriceps",
+      "name": "Agachamento com salto",
+      "description": "Agache e suba saltando o mais alto possível. Aterrisse suave, com os joelhos dobrados, e já emende na próxima.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/PHrKn4JaAG4",
+      "equipment": [],
+      "groups": [
+        "gluteos",
+        "panturrilha"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-bulgaro-livre",
+      "group": "quadriceps",
+      "name": "Agachamento búlgaro sem peso",
+      "description": "Pé de trás apoiado no banco. Desça até o joelho de trás quase tocar o chão e suba empurrando com a perna da frente.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/ZpIMkV6cf7c",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "afundo-livre",
+      "group": "quadriceps",
+      "name": "Afundo sem peso",
+      "description": "Um pé à frente e outro atrás. Desça até os dois joelhos formarem 90° e suba sem mudar os pés de lugar.",
+      "sets": "3",
+      "reps": "12 cada perna",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=rDTxIKKoWuE",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "afundo-alternado-salto",
+      "group": "quadriceps",
+      "name": "Afundo com salto alternado",
+      "description": "Na posição de afundo, salte trocando as pernas no ar e aterrisse já no afundo do outro lado.",
+      "sets": "3",
+      "reps": "16-20",
+      "rest": "90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/_FfqwaxubkU",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-elastico",
+      "group": "quadriceps",
+      "name": "Agachamento com elástico",
+      "description": "Pise no elástico e segure as pontas na altura dos ombros. Agache e suba: a resistência aumenta no fim da subida.",
+      "sets": "4",
+      "reps": "12-15",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/Yq9gvBIeSAw",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-pistol",
+      "group": "quadriceps",
+      "name": "Agachamento pistol (com apoio)",
+      "description": "Numa perna só, a outra estendida à frente. Desça segurando num apoio ou sentando no banco e suba. Avance até fazer sem apoio.",
+      "sets": "3",
+      "reps": "5-8 cada perna",
+      "rest": "90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/9oORpocMe_k",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "subida-step",
+      "group": "quadriceps",
+      "name": "Subida no step",
+      "description": "Suba no step com uma perna, empurrando pelo calcanhar, e desça devagar. Alterne ou faça todas de um lado antes de trocar.",
+      "sets": "3",
+      "reps": "12 cada perna",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/p1T2iHr6NM0",
+      "equipment": [
+        "step"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "agachamento-sissy",
+      "group": "quadriceps",
+      "name": "Agachamento sissy",
+      "description": "Segure num apoio, suba nas pontas dos pés e incline o corpo para trás enquanto dobra os joelhos à frente. Volte devagar.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/UcEITFFWnAY",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "agachamento-kettlebell-sumo",
+      "group": "quadriceps",
+      "name": "Agachamento sumô com kettlebell",
+      "description": "Pés bem abertos e pontas viradas para fora, kettlebell entre as pernas. Desça com o tronco ereto e suba apertando os glúteos.",
+      "sets": "4",
+      "reps": "10-15",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/CplMI2at5AE",
+      "equipment": [
+        "kettlebell"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "stiff-elastico",
+      "group": "posterior",
+      "name": "Stiff com elástico",
+      "description": "Pise no elástico e segure as pontas. Com joelhos levemente dobrados, leve o quadril para trás descendo o tronco e suba contraindo posteriores e glúteos.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/KYKXu8QUQ04",
+      "equipment": [
+        "elastico"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexora-caneleira",
+      "group": "posterior",
+      "name": "Flexora com caneleira",
+      "description": "Deitado de barriga para baixo, caneleira no tornozelo. Dobre o joelho trazendo o calcanhar em direção ao glúteo e desça devagar.",
+      "sets": "3",
+      "reps": "12-15 cada perna",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/nV7FL6w-oOc",
+      "equipment": [
+        "caneleira"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "flexora-toalha",
+      "group": "posterior",
+      "name": "Flexora deslizando no chão",
+      "description": "Deitado de barriga para cima, calcanhares numa toalha em piso liso e quadril elevado. Puxe os calcanhares em direção ao glúteo e estenda devagar.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/d_Glfss5Rww",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "flexora-bola",
+      "group": "posterior",
+      "name": "Flexora na bola suíça",
+      "description": "Deitado, calcanhares na bola e quadril elevado. Puxe a bola em direção ao glúteo dobrando os joelhos e volte sem baixar o quadril.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/Hq-fW5C09GE",
+      "equipment": [
+        "bola-suica"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "good-morning",
+      "group": "posterior",
+      "name": "Good morning",
+      "description": "Mãos atrás da cabeça ou halter no peito, joelhos levemente dobrados. Incline o tronco à frente levando o quadril para trás e volte.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/sAAn3y-qxP4",
+      "equipment": [],
+      "groups": [
+        "lombar",
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "nordico",
+      "group": "posterior",
+      "name": "Flexão nórdica",
+      "description": "Ajoelhado, com os calcanhares presos (sob um sofá ou por alguém). Desça o tronco à frente o mais devagar possível e use as mãos para voltar.",
+      "sets": "3",
+      "reps": "4-8",
+      "rest": "120s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/9HQ6_NFBu8U",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "ponte-unilateral-banco",
+      "group": "posterior",
+      "name": "Ponte com pé no banco",
+      "description": "Deitado, calcanhar no banco e outra perna para cima. Suba o quadril empurrando pelo calcanhar e desça devagar.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=0hfmJ4Rdp7U",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "gluteos"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "ponte-gluteo",
+      "group": "gluteos",
+      "name": "Ponte de glúteo",
+      "description": "Deitado, joelhos dobrados e pés no chão. Suba o quadril até alinhar com joelhos e ombros, aperte os glúteos por um segundo e desça.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/1satDE63Bwc",
+      "equipment": [],
+      "groups": [
+        "posterior"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "ponte-unilateral",
+      "group": "gluteos",
+      "name": "Ponte de glúteo unilateral",
+      "description": "Como a ponte comum, mas com uma perna estendida no ar. Suba empurrando pelo calcanhar de apoio.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/0e1SXFq806U",
+      "equipment": [],
+      "groups": [
+        "posterior"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "coice-quatro-apoios",
+      "group": "gluteos",
+      "name": "Glúteo quatro apoios (coice)",
+      "description": "De quatro, joelho dobrado a 90°. Empurre o pé em direção ao teto sem arquear a lombar e desça devagar.",
+      "sets": "3",
+      "reps": "15 cada perna",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/cSwjlFzeXk4",
+      "equipment": [],
+      "equipmentAny": [
+        "caneleira",
+        "elastico"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "coice-perna-estendida",
+      "group": "gluteos",
+      "name": "Glúteo quatro apoios com perna estendida",
+      "description": "De quatro, estenda a perna para trás e eleve até a altura do quadril. Controle a descida sem encostar o pé no chão.",
+      "sets": "3",
+      "reps": "15 cada perna",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/gu0v9JufRx0",
+      "equipment": [],
+      "equipmentAny": [
+        "caneleira",
+        "elastico"
+      ],
+      "groups": [
+        "posterior"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "abducao-deitado",
+      "group": "gluteos",
+      "name": "Abdução de quadril deitado de lado",
+      "description": "Deitado de lado, pernas estendidas. Eleve a perna de cima sem girar o pé para cima e desça devagar. Use caneleira para aumentar a carga.",
+      "sets": "3",
+      "reps": "15-20 cada perna",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/Dp4BuzLKYHI",
+      "equipment": [],
+      "equipmentAny": [
+        "caneleira"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "abducao-elastico-sentado",
+      "group": "gluteos",
+      "name": "Abdução sentado com elástico",
+      "description": "Sentado na borda do banco ou cadeira, elástico acima dos joelhos. Abra os joelhos para os lados e volte devagar.",
+      "sets": "3",
+      "reps": "20-25",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/eYfKoMrbSUA",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "concha",
+      "group": "gluteos",
+      "name": "Concha (clamshell)",
+      "description": "Deitado de lado, joelhos dobrados e elástico acima deles. Abra o joelho de cima mantendo os pés juntos e volte.",
+      "sets": "3",
+      "reps": "15-20 cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/445OPP7pNd4",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "passada-lateral-elastico",
+      "group": "gluteos",
+      "name": "Caminhada lateral com elástico",
+      "description": "Elástico acima dos joelhos ou nos tornozelos, meio agachado. Dê passos para o lado sem juntar os pés. Volte para o outro lado.",
+      "sets": "3",
+      "reps": "12 passos cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/RKlOEZ6QskI",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "elevacao-pelvica-elastico",
+      "group": "gluteos",
+      "name": "Elevação pélvica com elástico",
+      "description": "Costas apoiadas no banco, elástico passado sobre o quadril e preso pelas mãos ou sob o banco. Suba o quadril e segure no alto.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=QkiBC2r_AZk",
+      "equipment": [
+        "elastico",
+        "banco"
+      ],
+      "groups": [
+        "posterior"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "hip-thrust-unilateral",
+      "group": "gluteos",
+      "name": "Hip thrust unilateral",
+      "description": "Costas apoiadas no banco, uma perna no chão e a outra no ar. Suba o quadril até alinhar com o tronco e desça devagar.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/CoxH4FQaKNM",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "posterior"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "agachamento-sumo-pulso",
+      "group": "gluteos",
+      "name": "Agachamento sumô com pulso",
+      "description": "Na posição de sumô, desça e faça pequenos movimentos de sobe e desce na parte de baixo, sem subir completamente.",
+      "sets": "3",
+      "reps": "20-30",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/7efNOmA0ClA",
+      "equipment": [],
+      "groups": [
+        "quadriceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "extensao-quadril-bola",
+      "group": "gluteos",
+      "name": "Ponte com pés na bola suíça",
+      "description": "Deitado, pés sobre a bola. Suba o quadril mantendo a bola estável, aperte os glúteos e desça.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/1047mY6u0Y0",
+      "equipment": [
+        "bola-suica"
+      ],
+      "groups": [
+        "posterior"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "fire-hydrant",
+      "group": "gluteos",
+      "name": "Abdução em quatro apoios (hidrante)",
+      "description": "De quatro, abra a perna para o lado com o joelho dobrado até a altura do quadril, sem girar o tronco. Volte devagar.",
+      "sets": "3",
+      "reps": "15 cada perna",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/kug_JWy3y10",
+      "equipment": [],
+      "equipmentAny": [
+        "caneleira",
+        "elastico"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "panturrilha-step",
+      "group": "panturrilha",
+      "name": "Panturrilha no step",
+      "description": "Pontas dos pés na borda do step e calcanhares para fora. Desça o calcanhar abaixo da linha do degrau e suba o máximo possível.",
+      "sets": "4",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/QDM1QyLPkIk",
+      "equipment": [
+        "step"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "panturrilha-unilateral-step",
+      "group": "panturrilha",
+      "name": "Panturrilha unilateral no step",
+      "description": "Numa perna só, ponta do pé na borda do step. Desça alongando bem e suba. Segure um halter na mão do mesmo lado para mais carga.",
+      "sets": "3",
+      "reps": "12-15 cada perna",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/1AuzVwnEOWA",
+      "equipment": [
+        "step"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "pular-corda",
+      "group": "panturrilha",
+      "name": "Pular corda",
+      "description": "Saltos curtos na ponta dos pés, girando a corda com os punhos. Ótimo para aquecer e para o condicionamento.",
+      "sets": "5",
+      "reps": "1 min",
+      "rest": "30-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/0bRV-Nz381Y",
+      "equipment": [
+        "corda"
+      ],
+      "type": "tempo"
+    },
+    {
+      "id": "panturrilha-salto",
+      "group": "panturrilha",
+      "name": "Saltitos na ponta dos pés",
+      "description": "Pequenos saltos seguidos usando só os tornozelos, joelhos quase retos. Mantenha o ritmo constante.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/SjHRwhGXBl8",
+      "equipment": [],
+      "type": "tempo"
+    },
+    {
+      "id": "abdominal-supra",
+      "group": "abdomen",
+      "name": "Abdominal supra",
+      "description": "Deitado, joelhos dobrados. Tire os ombros do chão contraindo o abdômen, sem puxar o pescoço com as mãos. Desça devagar.",
+      "sets": "3",
+      "reps": "15-20",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/MKq4WH-eBAQ",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "abdominal-infra",
+      "group": "abdomen",
+      "name": "Abdominal infra (elevação de pernas)",
+      "description": "Deitado, mãos sob o quadril. Eleve as pernas estendidas até 90° e desça devagar sem encostar no chão.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "45-60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=lsfYFbfE45o",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "abdominal-bicicleta",
+      "group": "abdomen",
+      "name": "Abdominal bicicleta",
+      "description": "Deitado, mãos atrás da cabeça. Leve o cotovelo em direção ao joelho oposto enquanto estende a outra perna, alternando.",
+      "sets": "3",
+      "reps": "20-30",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/6s4cDQw1RwU",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "abdominal-obliquo",
+      "group": "abdomen",
+      "name": "Abdominal oblíquo",
+      "description": "Deitado, joelhos dobrados e caídos para um lado. Suba o tronco contraindo a lateral do abdômen. Faça os dois lados.",
+      "sets": "3",
+      "reps": "15 cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/ARcKSp-cVCY",
+      "equipment": [],
+      "type": "unilateral"
+    },
+    {
+      "id": "abdominal-remador",
+      "group": "abdomen",
+      "name": "Abdominal remador",
+      "description": "Sentado, tronco inclinado para trás. Traga os joelhos ao peito e estenda as pernas, sem apoiar os pés no chão.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "45-60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/2ephPjg2CZs",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "elevacao-pernas-barra",
+      "group": "abdomen",
+      "name": "Elevação de pernas na barra",
+      "description": "Pendurado na barra, eleve as pernas (dobradas ou estendidas) até a altura do quadril ou mais. Desça sem balançar.",
+      "sets": "3",
+      "reps": "8-12",
+      "rest": "60-90s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://youtube.com/shorts/AVZGBvjazDU",
+      "equipment": [
+        "barra-fixa"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "prancha-toque-ombro",
+      "group": "abdomen",
+      "name": "Prancha com toque no ombro",
+      "description": "Em prancha com braços estendidos, toque o ombro oposto alternando as mãos, sem deixar o quadril balançar.",
+      "sets": "3",
+      "reps": "20-30",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/rkHEQ0L1HnU",
+      "equipment": [],
+      "groups": [
+        "ombros"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "escalador",
+      "group": "abdomen",
+      "name": "Escalador (mountain climber)",
+      "description": "Em prancha alta, leve os joelhos ao peito alternando rápido, como se corresse. Quadril baixo e firme.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/hfEXhscZUTY",
+      "equipment": [],
+      "type": "tempo"
+    },
+    {
+      "id": "hollow-hold",
+      "group": "abdomen",
+      "name": "Canoinha (hollow hold)",
+      "description": "Deitado, lombar colada ao chão, eleve pernas e ombros com os braços estendidos para trás. Segure a posição.",
+      "sets": "3",
+      "reps": "20-40s",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/X67v1Z5wYps",
+      "equipment": [],
+      "type": "tempo"
+    },
+    {
+      "id": "abdominal-v",
+      "group": "abdomen",
+      "name": "Abdominal canivete",
+      "description": "Deitado e estendido, suba tronco e pernas ao mesmo tempo, tentando tocar os pés com as mãos. Desça controlando.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60s",
+      "difficulty": "avancado",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=iP2fjvG0g3w",
+      "equipment": [],
+      "type": "reps"
+    },
+    {
+      "id": "russian-twist",
+      "group": "abdomen",
+      "name": "Giro russo",
+      "description": "Sentado, tronco inclinado para trás e pés no ar ou no chão. Gire o tronco levando as mãos (ou um peso) de um lado ao outro.",
+      "sets": "3",
+      "reps": "20-30",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=IJDOoVyVjhc",
+      "equipment": [],
+      "equipmentAny": [
+        "anilha",
+        "halter",
+        "kettlebell"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "abdominal-elastico-pallof",
+      "group": "abdomen",
+      "name": "Pallof press com elástico",
+      "description": "Elástico preso ao lado, na altura do peito. Empurre as mãos para a frente sem deixar o tronco girar e volte.",
+      "sets": "3",
+      "reps": "10-12 cada lado",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/EDiCq-WvK3c",
+      "equipment": [
+        "elastico"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "burpee",
+      "group": "abdomen",
+      "name": "Burpee",
+      "description": "Agache, apoie as mãos, jogue os pés para trás, faça uma flexão, traga os pés de volta e salte. Ritmo constante.",
+      "sets": "3",
+      "reps": "10-15",
+      "rest": "60-90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/OC8SuAknPJ4",
+      "equipment": [],
+      "groups": [
+        "peito",
+        "quadriceps"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "ponte-lombar-banco",
+      "group": "lombar",
+      "name": "Hiperextensão no banco",
+      "description": "Deitado de barriga para baixo com o quadril na ponta do banco e alguém ou algo segurando os pés. Desça o tronco e suba até alinhar com as pernas.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/CiCULFFNyG0",
+      "equipment": [
+        "banco"
+      ],
+      "groups": [
+        "gluteos",
+        "posterior"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "prancha-elevacao-perna",
+      "group": "lombar",
+      "name": "Prancha com elevação de perna",
+      "description": "Em prancha nos antebraços, eleve uma perna estendida, segure 2 segundos e troque, sem girar o quadril.",
+      "sets": "3",
+      "reps": "10 cada perna",
+      "rest": "45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://youtube.com/shorts/wuvVQuyVuyY",
+      "equipment": [],
+      "groups": [
+        "abdomen",
+        "gluteos"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "superman-alternado",
+      "group": "lombar",
+      "name": "Superman alternado",
+      "description": "Deitado de barriga para baixo, eleve o braço direito e a perna esquerda juntos, segure e troque.",
+      "sets": "3",
+      "reps": "12 cada lado",
+      "rest": "45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://youtube.com/shorts/OI7i8ayfVEQ",
+      "equipment": [],
+      "groups": [
+        "gluteos"
+      ],
       "type": "reps"
     }
   ]

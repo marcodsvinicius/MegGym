@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v48**.
+- Versão atual: **v49**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
