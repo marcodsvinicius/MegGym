@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>MegGym — Cadastro de exercícios</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
   <script src="assets/js/theme.js?v=49"></script>
   <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=49" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css?v=49">
@@ -13,7 +14,7 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="./"><span class="brand-mark">🏋️</span> MegGym <small style="font-weight:600;color:var(--text-muted)">admin</small></a>
+      <a class="brand" href="./"><span class="brand-mark mi" aria-hidden="true">fitness_center</span> MegGym <small style="font-weight:600;color:var(--text-muted)">admin</small></a>
       <span class="status-pill"><span class="status-dot" id="status-dot"></span><span id="status-text">Desconectado</span></span>
     </div>
   </header>
@@ -214,13 +215,32 @@
                   <option value="avancado">Avançado</option>
                 </select>
               </div>
-              <div class="field span-6">
+              <div class="field span-4">
                 <label for="ex-type">Tipo</label>
                 <select class="select" id="ex-type">
                   <option value="reps">Repetições</option>
                   <option value="unilateral">Repetições por lado</option>
                   <option value="tempo">Tempo (cronômetro)</option>
                 </select>
+              </div>
+              <div class="field span-4">
+                <label for="ex-pattern">Padrão de movimento</label>
+                <select class="select" id="ex-pattern">
+                  <option value="">Automático (pelo grupo)</option>
+                  <option value="empurrar">Empurrar</option>
+                  <option value="puxar">Puxar</option>
+                  <option value="agachar">Agachar</option>
+                  <option value="quadril">Quadril (dobradiça, ponte)</option>
+                  <option value="isolado">Isolado</option>
+                  <option value="core">Core</option>
+                  <option value="condicionamento">Condicionamento (cardio)</option>
+                </select>
+                <span class="hint">Usado pelo treinador para ordenar e variar o treino.</span>
+              </div>
+              <div class="field span-4">
+                <span class="label">Impacto</span>
+                <label class="check-chip"><input type="checkbox" id="ex-impact"><span>Tem saltos ou impacto</span></label>
+                <span class="hint">Fica de fora quando a pessoa pede treino sem impacto.</span>
               </div>
               <fieldset class="field span-12 fieldset">
                 <legend>Equipamentos</legend>

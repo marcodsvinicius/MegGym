@@ -357,7 +357,7 @@
 
   /* ================= Formulário de exercício ================= */
 
-  const exFields = ["group", "name", "description", "sets", "reps", "rest", "difficulty", "type", "image", "video"];
+  const exFields = ["group", "name", "description", "sets", "reps", "rest", "difficulty", "type", "pattern", "image", "video"];
 
   // Equipamentos: caixas de seleção montadas a partir da lista do app (common.js).
   function renderEquipmentChecks(selected = []) {
@@ -406,6 +406,7 @@
     state.editingExerciseId = id;
     exFields.forEach((f) => ($(`ex-${f}`).value = ex[f] || ""));
     if (!ex.type) $("ex-type").value = "reps";
+    $("ex-impact").checked = Boolean(ex.impact);
     renderEquipmentChecks(ex.equipment || []);
     $("ex-image-file").value = "";
     $("exercise-form-title").textContent = `Editando: ${ex.name}`;
@@ -456,6 +457,7 @@
     const values = {};
     exFields.forEach((f) => (values[f] = $(`ex-${f}`).value.trim()));
     values.equipment = readEquipmentChecks();
+    values.impact = $("ex-impact").checked;
     const file = $("ex-image-file").files[0];
     if (!validateExercise(values, file)) return;
 

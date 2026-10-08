@@ -611,7 +611,7 @@
 
       ${todayCardHtml(history, trainedDays.has(dayKey(today)))}
 
-      ${activeWorkout ? "" : `<a class="coach-card" href="#/assistente">
+      ${activeWorkout ? "" : `<a class="coach-card" href="#/treinador">
         <span class="coach-card-icon" aria-hidden="true">${icon("bolt")}</span>
         <span class="item-main"><strong>Montar um treino agora</strong><span class="meta">Diga o tempo, o que quer treinar e o que tem em casa.</span></span>
         <span class="chevron" aria-hidden="true">›</span>
@@ -1121,7 +1121,7 @@
       ${empty(
         "flag",
         "Você ainda não segue nenhum treino. Escolha uma divisão pronta (como ABC) ou monte a sua.",
-        `<a class="btn btn-primary" href="#/treinos?aba=explorar">${icon("explore", "mi-inline")} Explorar</a><a class="btn" href="#/treinos?aba=salvos">Meus salvos</a>`
+        `<a class="btn btn-primary" href="#/treinador">${icon("bolt", "mi-inline")} Montar com o treinador</a><a class="btn" href="#/treinos?aba=explorar">${icon("explore", "mi-inline")} Explorar</a><a class="btn" href="#/treinos?aba=salvos">Meus salvos</a>`
       )}`;
   }
 
@@ -2655,11 +2655,26 @@
 
       <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
       ${
+        workout?.assistant
+          ? `<section class="coach-save-card">
+              <span class="coach-card-icon" aria-hidden="true">${icon("bookmark")}</span>
+              <div class="item-main"><strong>Gostou deste treino?</strong><span class="meta">Ele foi montado pelo treinador. Salve para fazer de novo quando quiser.</span></div>
+              <button class="btn btn-sm btn-primary" type="button" id="save-coach-workout">Salvar</button>
+            </section>`
+          : ""
+      }
+      ${
         workout
           ? `<div class="sticky-cta"><a class="btn btn-primary btn-block btn-lg" href="#/treinos/${encodeURIComponent(workout.id)}">${icon("replay", "mi-inline")} Fazer este treino de novo</a></div>`
           : `<p class="meta">Este treino foi excluído.</p>`
       }`;
     $("share-btn").addEventListener("click", () => shareSummary(h));
+    $("save-coach-workout")?.addEventListener("click", () => {
+      const { id: _id, assistant, ownerId, createdBy, createdAt, updatedAt, ...data } = workout;
+      const saved = Store.saveWorkout({ ...data, name: workout.name.replace(/^Treino montado/, "Treino") }, user);
+      toast("Treino salvo nos seus treinos!", "success");
+      location.hash = `#/treinos/${encodeURIComponent(saved.id)}`;
+    });
   }
 
   function renderSettings() {
@@ -2793,7 +2808,7 @@
     });
   }
 
-  /* ================= Assistente de treino ================= */
+  /* ================= Treinador (assistente de treino) ================= */
   // Monta um treino na hora a partir de regras (sem IA): tempo, grupos, equipamentos, nível e objetivo.
 
   const COACH_TIMES = [[15, "15 min"], [30, "30 min"], [45, "45 min"], [60, "1 hora"]];
@@ -2804,6 +2819,7 @@
     empurrar: ["Empurrar", ["peito", "ombros", "triceps"]],
     puxar: ["Puxar", ["costas", "biceps"]],
     core: ["Abdômen e lombar", ["abdomen", "lombar"]],
+    cardio: ["Cardio", ["cardio"]],
   };
   // [rótulo, séries, repetições, descanso em segundos]
   const COACH_GOALS = {
@@ -2859,8 +2875,7 @@
       (ex) =>
         canDo(ex, p.equipment) &&
         !(p.noImpact && ex.impact) &&
-        !(p.level === "iniciante" && ex.difficulty === "avancado") &&
-        coachPattern(ex) !== "condicionamento"
+        !(p.level === "iniciante" && ex.difficulty === "avancado")
     );
   }
 
@@ -2876,12 +2891,17 @@
   }
 
   function coachPick(group, p, chosen, recent) {
-    const ids = new Set(chosen.map((c) => c.id));
     const first = !chosen.some((c) => c.group === group);
     // No máximo 2 variações do mesmo exercício (ex.: duas flexões) por treino.
-    const options = coachPool(p).filter((ex) => ex.group === group && !ids.has(ex.id) && chosen.filter((c) => coachFamily(c) === coachFamily(ex)).length < 2);
+    const options = coachOptions(group, p, chosen).filter((ex) => chosen.filter((c) => coachFamily(c) === coachFamily(ex)).length < 2);
     if (!options.length) return null;
     return options.map((ex) => [coachScore(ex, p, chosen, recent, first), ex]).sort((a, b) => b[0] - a[0])[0][1];
+  }
+
+  // Exercícios possíveis de um grupo (os de cardio só entram quando o grupo é Cardio).
+  function coachOptions(group, p, chosen = []) {
+    const ids = new Set(chosen.map((c) => c.id));
+    return coachPool(p).filter((ex) => ex.group === group && !ids.has(ex.id) && (group === "cardio" || coachPattern(ex) !== "condicionamento"));
   }
 
   // Treino de 15 min: 2 séries por exercício, em bi-set.
@@ -2940,11 +2960,14 @@
       }
     }
     if (p.warmup) {
+      const prefer = ["pular-corda", "polichinelo", "marcha-estacionaria"];
+      const rank = (ex) => (prefer.includes(ex.id) ? prefer.indexOf(ex.id) : 9);
       const warm = exercises()
-        .filter((ex) => coachPattern(ex) === "condicionamento" && canDo(ex, p.equipment) && !(p.noImpact && ex.impact) && ex.id !== "burpee")
-        .sort((a, b) => (b.id === "pular-corda") - (a.id === "pular-corda"))[0];
+        .filter((ex) => coachPattern(ex) === "condicionamento" && canDo(ex, p.equipment) && !(p.noImpact && ex.impact) && ex.id !== "burpee" && !chosen.includes(ex))
+        .sort((a, b) => rank(a) - rank(b))[0];
       if (warm) items.unshift({ exerciseId: warm.id, sets: "2", reps: "45s", load: "", rir: "", rest: "", warmup: true });
     }
+    coach.wanted = count;
     return items;
   }
 
@@ -2954,7 +2977,7 @@
     const title = focus && focus[1].length === p.groups.length && focus[1].every((g) => p.groups.includes(g)) ? focus[0] : names.slice(0, 3).join(" + ") + (names.length > 3 ? " +" : "");
     return {
       name: `Treino montado — ${title}`,
-      description: `Montado pelo assistente: ${COACH_GOALS[p.goal][0].toLowerCase()}, cerca de ${p.time} min.`,
+      description: `Montado pelo treinador: ${COACH_GOALS[p.goal][0].toLowerCase()}, cerca de ${p.time} min.`,
       notes: "",
       restSeconds: COACH_GOALS[p.goal][3],
       visibility: "private",
@@ -2969,6 +2992,11 @@
     const has = new Set(p.equipment);
     const used = equipmentLabels([...(ex.equipment || []), ...(ex.equipmentAny || []).filter((id) => has.has(id))]);
     return `${group ? group.name : ""} · ${used.length ? `com ${used.join(" e ").toLowerCase()}` : "peso do corpo"}`;
+  }
+
+  function coachEquipChanged() {
+    const a = [...coach.p.equipment].sort().join();
+    return a !== [...(user.equipment || [])].sort().join();
   }
 
   function coachSavePrefs() {
@@ -3019,6 +3047,7 @@
   function coachOptionsHtml(step) {
     const p = coach.p;
     const chip = (attr, value, label, on) => `<button class="chip" type="button" ${attr}="${escapeHtml(String(value))}" aria-pressed="${on}">${escapeHtml(label)}</button>`;
+    const toggle = (key, label, on) => `<label class="coach-switch"><span>${escapeHtml(label)}</span><input type="checkbox" role="switch" data-coach-toggle="${key}" ${on ? "checked" : ""}></label>`;
     const next = (label = "Continuar", disabled = false) => `<button class="btn btn-primary btn-block" type="button" data-coach-next ${disabled ? "disabled" : ""}>${label}</button>`;
     switch (step) {
       case "tempo":
@@ -3037,21 +3066,35 @@
         return `
           <div class="chips coach-choices">
             ${chip("data-coach-bodyweight", 1, "Só o peso do corpo", !p.equipment.length)}
-            ${Object.entries(EQUIPMENT).filter(([id]) => id !== "leg-press").map(([id, label]) => chip("data-coach-equip", id, label, p.equipment.includes(id))).join("")}
+            ${Object.entries(EQUIPMENT).map(([id, label]) => chip("data-coach-equip", id, label, p.equipment.includes(id))).join("")}
           </div>
+          ${coachEquipChanged() ? toggle("saveEquip", "Salvar no meu perfil", coach.saveEquip) : ""}
           ${next()}`;
       case "nivel":
         return `<div class="chips coach-choices">${Object.entries(DIFFICULTIES).map(([id, label]) => chip("data-coach-level", id, label, p.level === id)).join("")}</div>`;
       case "objetivo":
         return `
           <div class="chips coach-choices">${Object.entries(COACH_GOALS).map(([id, [label]]) => chip("data-coach-goal", id, label, p.goal === id)).join("")}</div>
-          <div class="chips coach-choices">
-            ${chip("data-coach-toggle", "noImpact", "Evitar impacto (sem saltos)", p.noImpact)}
-            ${chip("data-coach-toggle", "warmup", "Incluir aquecimento", p.warmup)}
+          <div class="coach-switches">
+            ${toggle("noImpact", "Evitar impacto (sem saltos)", p.noImpact)}
+            ${toggle("warmup", "Incluir aquecimento", p.warmup)}
           </div>
           ${next(`${icon("bolt", "mi-inline")} Montar treino`)}`;
     }
     return "";
+  }
+
+  // "Por que esse treino?": as regras que valeram nesta montagem.
+  function coachWhy(p, items) {
+    const [label, , reps, rest] = COACH_GOALS[p.goal];
+    const main = items.filter((it) => !it.warmup);
+    const list = [`${main.length} exercícios para caber em ${p.time} min.`];
+    list.push(p.time <= 15 ? "Treino curto: 2 séries por exercício, em bi-set, para ganhar tempo." : `${label}: ${coachSets(p)} séries de ${reps} repetições e ${rest}s de descanso.`);
+    list.push("Exercícios compostos e com carga primeiro; isolados e abdômen no fim.");
+    if (main.some((it) => it.reps !== reps && !it.reps.endsWith(" cada lado"))) list.push("Exercícios com o peso do corpo ou por tempo usam a faixa própria deles.");
+    if (p.noImpact) list.push("Sem saltos, como você pediu.");
+    if (Store.history(user.id).length) list.push("Evitei repetir os exercícios dos seus últimos treinos.");
+    return list;
   }
 
   function coachResultHtml() {
@@ -3065,8 +3108,7 @@
     const minutes = coachMinutes(items, w.restSeconds);
     const pool = coachPool(p);
     const missing = p.groups.filter((g) => !pool.some((ex) => ex.group === g)).map(findGroup).filter(Boolean).map((g) => g.name);
-    const rows = items
-      .map((it, i) => {
+    const row = (it, i) => {
         const ex = findExercise(it.exerciseId);
         if (!ex) return "";
         const linked = i > 0 && items[i - 1].linkNext;
@@ -3075,19 +3117,26 @@
             <button class="coach-item-main" type="button" data-coach-ex="${i}">
               <strong>${escapeHtml(ex.name)}</strong>
               <span class="meta">${escapeHtml(setsReps(it.sets, it.reps))}</span>
-              <span class="meta coach-why">${escapeHtml(coachReason(ex, p, it))}${it.linkNext ? " · bi-set com o próximo" : ""}</span>
+              ${it.warmup ? "" : `<span class="meta coach-why">${escapeHtml(coachReason(ex, p, it))}${it.linkNext ? " · bi-set com o próximo" : ""}</span>`}
             </button>
             ${it.warmup ? "" : `<button class="icon-btn" type="button" data-coach-swap="${i}" aria-label="Trocar ${escapeHtml(ex.name)}" title="Trocar">${icon("swap_horiz")}</button>`}
           </li>`;
-      })
-      .join("");
+      };
+    const warm = items.map((it, i) => (it.warmup ? row(it, i) : "")).join("");
+    const rows = items.map((it, i) => (it.warmup ? "" : row(it, i))).join("");
     return `
       ${coachBubble(`Pronto! Montei <strong>${items.length} exercícios</strong>, cerca de ${minutes} min, com descanso de ${w.restSeconds}s.`)}
       ${missing.length ? `<p class="coach-hint">${icon("info", "mi-inline")} Sem exercícios de ${escapeHtml(missing.join(", "))} com os equipamentos escolhidos.</p>` : ""}
+      ${!missing.length && coach.wanted && items.filter((it) => !it.warmup).length < coach.wanted - 1 ? `<p class="coach-hint">${icon("info", "mi-inline")} Com essas escolhas há poucos exercícios para ${p.time} min. Faça o circuito 2 vezes ou marque mais equipamentos.</p>` : ""}
       <section class="coach-result">
         <h2>${escapeHtml(w.name.replace(/^Treino montado — /, ""))}</h2>
         <div class="group-chips">${groupChips(w.groups.map(findGroup).filter(Boolean))}</div>
+        ${warm ? `<h3 class="coach-block-title">Aquecimento</h3><ul class="coach-list coach-warmup">${warm}</ul><h3 class="coach-block-title">Treino</h3>` : ""}
         <ol class="coach-list">${rows}</ol>
+        <details class="coach-explain">
+          <summary>${icon("lightbulb", "mi-inline")} Por que esse treino?</summary>
+          <ul>${coachWhy(p, items).map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+        </details>
       </section>
       <div class="coach-actions">
         <button class="btn btn-primary btn-lg btn-block" type="button" data-coach-start>${icon("play_arrow", "mi-inline")} Começar agora</button>
@@ -3101,7 +3150,7 @@
 
   function renderCoach() {
     setTab("inicio");
-    setHeader("Assistente", { back: "#/inicio" });
+    setHeader("Treinador", { back: "#/inicio" });
     if (!coach) coach = { step: "inicio", p: coachDefaults() };
     const firstName = escapeHtml(user.name.split(" ")[0]);
     let html = "";
@@ -3114,6 +3163,14 @@
           ${hasPrefs ? `<button class="btn btn-block" type="button" data-coach-repeat>${icon("replay", "mi-inline")} Igual da última vez (${escapeHtml(coachAnswer("grupos"))}, ${coach.p.time} min)</button>` : ""}
           <a class="btn btn-block" href="#/inicio">Agora não</a>
         </div>`;
+    } else if (coach.step === "resultado") {
+      // No resultado, as respostas viram uma linha de resumo (tocar em uma volta para a pergunta).
+      const steps = COACH_STEPS.filter((s) => s !== "nivel" || coach.p.level);
+      html = `
+        <div class="coach-summary" role="group" aria-label="Suas escolhas (toque para alterar)">
+          ${steps.map((s) => `<button class="coach-answer coach-answer-sm" type="button" data-coach-goto="${s}" aria-label="Alterar: ${escapeHtml(coachAnswer(s))}">${escapeHtml(coachAnswer(s))}${icon("edit_note", "mi-inline")}</button>`).join("")}
+        </div>
+        ${coachResultHtml()}`;
     } else {
       const current = COACH_STEPS.indexOf(coach.step);
       const done = coach.step === "resultado" ? COACH_STEPS : COACH_STEPS.slice(0, current);
@@ -3125,19 +3182,30 @@
           <div class="coach-msg coach-user"><button class="coach-answer" type="button" data-coach-goto="${s}" aria-label="Alterar: ${escapeHtml(COACH_QUESTIONS[s])}">${escapeHtml(coachAnswer(s))}${icon("edit_note", "mi-inline")}</button></div>`
         )
         .join("");
-      html += coach.step === "resultado" ? coachResultHtml() : `${coachBubble(escapeHtml(COACH_QUESTIONS[coach.step]))}<div class="coach-options">${coachOptionsHtml(coach.step)}</div>`;
+      html += `<div class="coach-current" tabindex="-1">${coachBubble(escapeHtml(COACH_QUESTIONS[coach.step]))}</div><div class="coach-options">${coachOptionsHtml(coach.step)}</div>`;
     }
     app.innerHTML = `<div class="coach">${html}</div>`;
-    const last = app.querySelector(".coach-options, .coach-result, .coach-actions");
-    if (last && coach.step !== "inicio" && coach.step !== "tempo") last.scrollIntoView({ block: "nearest" });
+    // Leva o foco (e o leitor de tela) até a pergunta nova ou ao resultado.
+    if (coach.moved) {
+      coach.moved = false;
+      const target = app.querySelector(".coach-current, .coach-result");
+      if (target) {
+        if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+        if (coach.step === "resultado") window.scrollTo(0, 0);
+        else target.scrollIntoView({ block: "nearest" });
+      }
+    }
   }
 
-  // Salva o treino do assistente (escondido das listas) e começa. O anterior é apagado se não estiver em andamento.
+  // Salva o treino do treinador (escondido das listas) e começa. O anterior é apagado se não estiver
+  // em andamento nem no histórico (no histórico ele continua podendo ser refeito ou salvo).
   function coachStart() {
     const w = coachWorkout(coach.p, coach.result);
     const session = Store.session(user.id);
     const old = user.coachWorkoutId;
-    if (old && session?.workoutId !== old && Store.getWorkout(old)) Store.deleteWorkout(old);
+    const inHistory = Store.history(user.id).some((h) => h.workoutId === old);
+    if (old && session?.workoutId !== old && !inHistory && Store.getWorkout(old)) Store.deleteWorkout(old);
     const saved = Store.saveWorkout({ ...w, assistant: true }, user);
     user = Store.updateUser(user.id, { coachWorkoutId: saved.id });
     coach = null;
@@ -3145,10 +3213,11 @@
   }
 
   function handleCoachClick(e) {
-    const el = e.target.closest("button");
+    const el = e.target.closest("button, input[data-coach-toggle]");
     if (!el || !coach) return;
     const p = coach.p;
     const d = el.dataset;
+    const before = coach.step;
     if (d.coachEx) {
       const it = coach.result[Number(d.coachEx)];
       return openSheet(it.exerciseId, { sets: it.sets, reps: it.reps });
@@ -3161,11 +3230,12 @@
       coach.result = coachBuild(p);
     } else if (d.coachTime) {
       p.time = Number(d.coachTime);
+      coach.moved = true;
       return coachNext();
     } else if (d.coachFocus) {
+      // Atalho só marca os grupos; dá para ajustar antes de continuar.
       p.focus = d.coachFocus;
       p.groups = [...COACH_FOCUS[d.coachFocus][1]];
-      return coachNext();
     } else if (d.coachGroup) {
       p.focus = "";
       p.groups = p.groups.includes(d.coachGroup) ? p.groups.filter((g) => g !== d.coachGroup) : [...p.groups, d.coachGroup];
@@ -3175,12 +3245,20 @@
       p.equipment = p.equipment.includes(d.coachEquip) ? p.equipment.filter((x) => x !== d.coachEquip) : [...p.equipment, d.coachEquip];
     } else if (d.coachLevel) {
       p.level = d.coachLevel;
+      coach.moved = true;
       return coachNext();
     } else if (d.coachGoal) {
       p.goal = d.coachGoal;
     } else if (d.coachToggle) {
-      p[d.coachToggle] = !p[d.coachToggle];
+      if (d.coachToggle === "saveEquip") coach.saveEquip = el.checked;
+      else p[d.coachToggle] = el.checked;
+      return;
     } else if ("coachNext" in d) {
+      if (coach.step === "equipamentos" && coach.saveEquip && coachEquipChanged()) {
+        user = Store.updateUser(user.id, { equipment: [...p.equipment] });
+        toast("Equipamentos salvos no seu perfil.", "success");
+      }
+      coach.moved = true;
       return coachNext();
     } else if (d.coachGoto) {
       coach.step = d.coachGoto;
@@ -3188,13 +3266,7 @@
     } else if ("coachRegen" in d) {
       coach.result = coachBuild(p);
     } else if (d.coachSwap) {
-      const i = Number(d.coachSwap);
-      const cur = findExercise(coach.result[i].exerciseId);
-      const chosen = coach.result.map((it) => findExercise(it.exerciseId)).filter(Boolean);
-      const options = coachPool(p).filter((ex) => ex.group === cur.group && !chosen.some((c) => c.id === ex.id));
-      if (!options.length) return toast("Não há outro exercício desse grupo com seus equipamentos.");
-      const ex = options[Math.floor(Math.random() * options.length)];
-      coach.result[i] = { ...coachItem(ex, p), ...(coach.result[i].linkNext ? { linkNext: true } : {}) };
+      return coachSwap(Number(d.coachSwap));
     } else if ("coachSave" in d) {
       const saved = Store.saveWorkout(coachWorkout(p, coach.result), user);
       coach = null;
@@ -3206,11 +3278,35 @@
     } else if ("coachRestart" in d) {
       coach.step = "tempo";
     } else return;
+    if (coach.step !== before) coach.moved = true;
+    renderCoach();
+  }
+
+  // Trocar exercício: mostra as alternativas do mesmo grupo para a pessoa escolher.
+  async function coachSwap(i) {
+    const p = coach.p;
+    const cur = findExercise(coach.result[i].exerciseId);
+    const chosen = coach.result.map((it) => findExercise(it.exerciseId)).filter(Boolean);
+    const { ids: recent } = coachRecent();
+    const options = coachOptions(cur.group, p, chosen)
+      .map((ex) => [coachScore(ex, p, chosen, recent, false), ex])
+      .sort((a, b) => b[0] - a[0])
+      .slice(0, 6)
+      .map(([, ex]) => ex);
+    if (!options.length) return toast("Não há outro exercício desse grupo com seus equipamentos.");
+    const id = await actionSheet({
+      title: `Trocar ${cur.name}`,
+      text: "Escolha outro exercício do mesmo grupo.",
+      actions: options.map((ex) => ({ id: ex.id, icon: "swap_horiz", label: ex.name, hint: `${DIFFICULTIES[ex.difficulty] || ""} · ${coachReason(ex, p, {}).split(" · ")[1]}` })),
+    });
+    const ex = id && findExercise(id);
+    if (!ex || !coach) return;
+    coach.result[i] = { ...coachItem(ex, p), ...(coach.result[i].linkNext ? { linkNext: true } : {}) };
     renderCoach();
   }
 
   app.addEventListener("click", (e) => {
-    if (location.hash.startsWith("#/assistente")) handleCoachClick(e);
+    if (/^#\/(treinador|assistente)/.test(location.hash)) handleCoachClick(e);
   });
 
   /* ================= Rotas ================= */
@@ -3257,6 +3353,7 @@
       case "inicio":
         renderHome();
         break;
+      case "treinador":
       case "assistente":
         renderCoach();
         break;

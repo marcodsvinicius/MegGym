@@ -65,6 +65,12 @@
       "name": "Lombar / Core",
       "icon": "self_improvement",
       "color": "#5c7cfa"
+    },
+    {
+      "id": "cardio",
+      "name": "Cardio",
+      "icon": "directions_run",
+      "color": "#d62246"
     }
   ],
   "exercises": [
@@ -782,24 +788,6 @@
       "pattern": "isolado",
       "impact": false,
       "type": "tempo"
-    },
-    {
-      "id": "leg-press",
-      "group": "quadriceps",
-      "name": "Leg press",
-      "description": "Sentado na máquina, pés na plataforma na largura dos ombros. Desça até os joelhos formarem cerca de 90° e empurre sem travar os joelhos.",
-      "sets": "4",
-      "reps": "10-12",
-      "rest": "90s",
-      "difficulty": "iniciante",
-      "image": "",
-      "video": "https://www.youtube.com/watch?v=EiltwxxREDc",
-      "equipment": [
-        "leg-press"
-      ],
-      "pattern": "agachar",
-      "impact": false,
-      "type": "reps"
     },
     {
       "id": "stiff-halteres",
@@ -2652,7 +2640,7 @@
     },
     {
       "id": "pular-corda",
-      "group": "panturrilha",
+      "group": "cardio",
       "name": "Pular corda",
       "description": "Saltos curtos na ponta dos pés, girando a corda com os punhos. Ótimo para aquecer e para o condicionamento.",
       "sets": "5",
@@ -2666,7 +2654,10 @@
       ],
       "pattern": "condicionamento",
       "impact": true,
-      "type": "tempo"
+      "type": "tempo",
+      "groups": [
+        "panturrilha"
+      ]
     },
     {
       "id": "panturrilha-salto",
@@ -2682,7 +2673,10 @@
       "equipment": [],
       "pattern": "condicionamento",
       "impact": true,
-      "type": "tempo"
+      "type": "tempo",
+      "groups": [
+        "cardio"
+      ]
     },
     {
       "id": "abdominal-supra",
@@ -2803,7 +2797,7 @@
     },
     {
       "id": "escalador",
-      "group": "abdomen",
+      "group": "cardio",
       "name": "Escalador (mountain climber)",
       "description": "Em prancha alta, leve os joelhos ao peito alternando rápido, como se corresse. Quadril baixo e firme.",
       "sets": "3",
@@ -2815,7 +2809,10 @@
       "equipment": [],
       "pattern": "condicionamento",
       "impact": false,
-      "type": "tempo"
+      "type": "tempo",
+      "groups": [
+        "abdomen"
+      ]
     },
     {
       "id": "hollow-hold",
@@ -2890,7 +2887,7 @@
     },
     {
       "id": "burpee",
-      "group": "abdomen",
+      "group": "cardio",
       "name": "Burpee",
       "description": "Agache, apoie as mãos, jogue os pés para trás, faça uma flexão, traga os pés de volta e salte. Ritmo constante.",
       "sets": "3",
@@ -2902,7 +2899,8 @@
       "equipment": [],
       "groups": [
         "peito",
-        "quadriceps"
+        "quadriceps",
+        "abdomen"
       ],
       "pattern": "condicionamento",
       "impact": true,
@@ -2968,6 +2966,100 @@
       "pattern": "core",
       "impact": false,
       "type": "reps"
+    },
+    {
+      "id": "polichinelo",
+      "group": "cardio",
+      "name": "Polichinelo",
+      "description": "Salte abrindo pernas e braços ao mesmo tempo e volte fechando. Ritmo constante, aterrissando na ponta dos pés.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "30-45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "panturrilha"
+      ],
+      "pattern": "condicionamento",
+      "impact": true,
+      "type": "tempo"
+    },
+    {
+      "id": "polichinelo-sem-salto",
+      "group": "cardio",
+      "name": "Polichinelo sem salto",
+      "description": "Abra uma perna de cada vez para o lado enquanto eleva os braços, alternando os lados. Boa opção para apartamento.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "30-45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [],
+      "pattern": "condicionamento",
+      "impact": false,
+      "type": "tempo"
+    },
+    {
+      "id": "corrida-estacionaria",
+      "group": "cardio",
+      "name": "Corrida estacionária (skipping)",
+      "description": "Corra no lugar elevando os joelhos até a altura do quadril, braços acompanhando o movimento. Mantenha o tronco firme.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "30-45s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "quadriceps"
+      ],
+      "pattern": "condicionamento",
+      "impact": true,
+      "type": "tempo"
+    },
+    {
+      "id": "marcha-estacionaria",
+      "group": "cardio",
+      "name": "Marcha estacionária",
+      "description": "Marche no lugar elevando bem os joelhos, em ritmo acelerado, sem saltar. Bom para aquecer ou para quem evita impacto.",
+      "sets": "3",
+      "reps": "45-60s",
+      "rest": "30-45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "quadriceps"
+      ],
+      "pattern": "condicionamento",
+      "impact": false,
+      "type": "tempo"
+    },
+    {
+      "id": "soco-no-ar",
+      "group": "cardio",
+      "name": "Socos no ar (shadow boxing)",
+      "description": "Base firme com um pé à frente, alterne socos rápidos no ar girando o tronco. Mantenha o abdômen contraído e não trave os cotovelos.",
+      "sets": "3",
+      "reps": "30-45s",
+      "rest": "30-45s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "ombros",
+        "abdomen"
+      ],
+      "pattern": "condicionamento",
+      "impact": false,
+      "type": "tempo"
     }
   ]
 }

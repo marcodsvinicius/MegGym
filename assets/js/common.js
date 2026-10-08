@@ -19,14 +19,13 @@
     barra: "Barra reta",
     "barra-fixa": "Barra fixa",
     kettlebell: "Kettlebell",
-    estacao: "Estação de treinos",
+    estacao: "Paralelas / estação",
     corda: "Corda de pular",
     "bola-suica": "Bola suíça",
     step: "Step",
     caneleira: "Caneleira",
     roldana: "Roldana de porta",
     "roda-abdominal": "Roda abdominal",
-    "leg-press": "Máquina de leg press",
   };
 
   // Nomes de ícones do Material Symbols (https://fonts.google.com/icons).
@@ -45,7 +44,6 @@
     caneleira: "straighten",
     roldana: "settings_input_component",
     "roda-abdominal": "trip_origin",
-    "leg-press": "airline_seat_recline_extra",
   };
 
   // Ícone do Material Symbols. Valores que não são nomes de ícone (ex.: emoji antigo) viram texto.
@@ -106,7 +104,7 @@
   }
 
   // Equipamentos em que faz sentido registrar o peso usado.
-  const WEIGHTED = ["halter", "anilha", "kettlebell", "barra", "caneleira", "roldana", "leg-press", "estacao"];
+  const WEIGHTED = ["halter", "anilha", "kettlebell", "barra", "caneleira", "roldana", "estacao"];
 
   // Cores comuns de elástico (da mais leve à mais pesada, varia por marca).
   const BAND_COLORS = {
