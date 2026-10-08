@@ -39,8 +39,8 @@ test("treinador: limitações no perfil e no tour chegam ao treinador", async ()
     await page.click('[data-lim="region"][data-lim-id="joelho"]');
     assert.match(await page.textContent('[data-lim="region"][data-lim-id="joelho"]'), /dói/);
     await page.click('#limits-form [type="submit"]');
-    await page.waitForFunction(() => location.hash === "#/atividade/configuracoes");
-    assert.match(await page.textContent("#app"), /Joelho \(evitar\)/);
+    // Espera a tela de Configurações aparecer (o endereço muda antes de a tela ser desenhada).
+    await page.waitForFunction(() => location.hash === "#/atividade/configuracoes" && /Joelho \(evitar\)/.test(document.querySelector("#app").textContent));
     const saved = await page.evaluate(() => MegStore.currentUser().limits);
     assert.equal(saved.regions.joelho, "evitar");
     // O treinador já começa com a limitação marcada.
