@@ -89,8 +89,22 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5,
+        "abdomen": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 1
+      },
+      "position": "prancha",
+      "complexity": 1,
       "impact": false,
+      "easier": "flexao-joelhos",
+      "harder": "flexao-elastico",
       "type": "reps"
     },
     {
@@ -108,8 +122,19 @@
         "halter",
         "banco"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
+      "easier": "supino-chao",
       "type": "reps"
     },
     {
@@ -126,8 +151,17 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "harder": "supino-halteres",
       "type": "reps"
     },
     {
@@ -145,7 +179,16 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "peito-iso",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -163,7 +206,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "peito-iso",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -183,7 +235,16 @@
         "roldana",
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "peito-iso",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -202,7 +263,15 @@
         "halter",
         "banco"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -220,7 +289,18 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "ombros": 0.5,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -239,7 +319,17 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "peito": 0.5,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -257,7 +347,16 @@
       "equipment": [
         "roldana"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -275,7 +374,17 @@
       "equipment": [
         "roldana"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -293,7 +402,17 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "lombar": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -311,7 +430,17 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "lombar": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -329,7 +458,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "ombros": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -347,7 +484,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "ombros": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -365,7 +510,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "puxar",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "ombros": 1,
+        "costas": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -384,7 +538,16 @@
         "halter",
         "banco"
       ],
-      "pattern": "puxar",
+      "pattern": "ombro-posterior",
+      "muscles": {
+        "ombros": 1,
+        "costas": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -407,7 +570,14 @@
       "groups": [
         "costas"
       ],
-      "pattern": "puxar",
+      "pattern": "ombro-posterior",
+      "muscles": {
+        "ombros": 1,
+        "costas": 0.5
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -425,7 +595,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -443,7 +621,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -462,7 +648,15 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -480,7 +674,13 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -498,7 +698,13 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -516,7 +722,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "cotovelo": 2,
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "unilateral"
     },
@@ -534,7 +749,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "cotovelo": 2,
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -553,7 +777,15 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "cotovelo": 2
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -571,7 +803,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "cotovelo": 1,
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -591,7 +832,15 @@
         "roldana",
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -609,8 +858,22 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5,
+        "posterior": 0.5
+      },
+      "joints": {
+        "joelho": 1,
+        "lombar": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "agachamento-elastico",
+      "harder": "agachamento-salto",
       "type": "reps"
     },
     {
@@ -629,7 +892,18 @@
         "halter",
         "kettlebell"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5,
+        "abdomen": 0.5
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -650,7 +924,17 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -671,8 +955,20 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 2,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": false,
+      "easier": "agachamento-bulgaro-livre",
+      "harder": "agachamento-pistol",
       "type": "unilateral"
     },
     {
@@ -692,8 +988,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "afundo-reverso",
+      "harder": "afundo-alternado-salto",
       "type": "unilateral"
     },
     {
@@ -713,7 +1020,16 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "unilateral"
     },
@@ -734,8 +1050,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "afundo-livre",
+      "harder": "afundo",
       "type": "unilateral"
     },
     {
@@ -753,8 +1080,18 @@
         "halter",
         "banco"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "subida-step",
       "type": "unilateral"
     },
     {
@@ -769,7 +1106,15 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=ocZRAMlskbU",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "ajoelhado",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -785,8 +1130,18 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=ssqooGaxt2U",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "agachamento-livre",
       "type": "tempo"
     },
     {
@@ -803,8 +1158,20 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "good-morning",
+      "harder": "rdl-unilateral",
       "type": "reps"
     },
     {
@@ -821,7 +1188,17 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -842,8 +1219,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "lombar": 1,
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": false,
+      "easier": "stiff-halteres",
       "type": "unilateral"
     },
     {
@@ -860,7 +1248,18 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "quadriceps": 0.5,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -878,7 +1277,17 @@
       "equipment": [
         "kettlebell"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -896,7 +1305,15 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "flexao-joelho",
+      "muscles": {
+        "posterior": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -915,8 +1332,17 @@
         "halter",
         "banco"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
+      "easier": "ponte-unilateral",
+      "harder": "hip-thrust",
       "type": "reps"
     },
     {
@@ -933,7 +1359,14 @@
       "equipment": [
         "anilha"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -952,8 +1385,17 @@
         "halter",
         "banco"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
+      "easier": "elevacao-pelvica",
+      "harder": "hip-thrust-unilateral",
       "type": "reps"
     },
     {
@@ -970,7 +1412,17 @@
       "equipment": [
         "kettlebell"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -986,8 +1438,18 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=qYVo2f2ZKRU",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "easier": "panturrilha-sentado",
+      "harder": "panturrilha-step",
       "type": "reps"
     },
     {
@@ -1002,7 +1464,15 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=WjxmXe-Pmho",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -1020,8 +1490,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {},
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
+      "harder": "panturrilha-em-pe",
       "type": "reps"
     },
     {
@@ -1038,7 +1515,15 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "ajoelhado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1056,7 +1541,15 @@
       "equipment": [
         "roldana"
       ],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "ajoelhado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1074,8 +1567,19 @@
       "equipment": [
         "roda-abdominal"
       ],
-      "pattern": "core",
+      "pattern": "core-antiextensao",
+      "muscles": {
+        "abdomen": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "lombar": 2,
+        "ombro": 1
+      },
+      "position": "ajoelhado",
+      "complexity": 3,
       "impact": false,
+      "easier": "hollow-hold",
       "type": "reps"
     },
     {
@@ -1093,8 +1597,17 @@
       "groups": [
         "lombar"
       ],
-      "pattern": "core",
+      "pattern": "core-antiextensao",
+      "muscles": {
+        "abdomen": 1,
+        "lombar": 0.5
+      },
+      "joints": {},
+      "position": "prancha",
+      "complexity": 1,
       "impact": false,
+      "easier": "dead-bug",
+      "harder": "hollow-hold",
       "type": "tempo"
     },
     {
@@ -1109,7 +1622,15 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=pWGhRO5grqs",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-lateral",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "chao-lado",
+      "complexity": 1,
       "impact": false,
       "type": "tempo"
     },
@@ -1128,8 +1649,15 @@
       "groups": [
         "lombar"
       ],
-      "pattern": "core",
+      "pattern": "core-antiextensao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "harder": "prancha",
       "type": "unilateral"
     },
     {
@@ -1146,7 +1674,15 @@
       "equipment": [
         "bola-suica"
       ],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1162,7 +1698,16 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=PnmAX80Vjls",
       "equipment": [],
-      "pattern": "quadril",
+      "pattern": "core-extensao",
+      "muscles": {
+        "lombar": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1178,8 +1723,17 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=5oNxXM4cfiU",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-antirrotacao",
+      "muscles": {
+        "lombar": 1,
+        "abdomen": 0.5,
+        "gluteos": 0.5
+      },
+      "joints": {},
+      "position": "quatro-apoios",
+      "complexity": 1,
       "impact": false,
+      "harder": "superman-alternado",
       "type": "unilateral"
     },
     {
@@ -1194,8 +1748,19 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=vDXe2eBowUg",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-extensao",
+      "muscles": {
+        "lombar": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
+      "easier": "superman-alternado",
+      "harder": "ponte-lombar-banco",
       "type": "reps"
     },
     {
@@ -1213,8 +1778,20 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1
+      },
+      "position": "prancha",
+      "complexity": 1,
       "impact": false,
+      "easier": "flexao-inclinada",
+      "harder": "flexao",
       "type": "reps"
     },
     {
@@ -1234,8 +1811,19 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1
+      },
+      "position": "prancha",
+      "complexity": 1,
       "impact": false,
+      "harder": "flexao-joelhos",
       "type": "reps"
     },
     {
@@ -1256,8 +1844,21 @@
         "ombros",
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 2
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
+      "easier": "flexao-elastico",
+      "harder": "flexao-explosiva",
       "type": "reps"
     },
     {
@@ -1272,7 +1873,17 @@
       "image": "",
       "video": "https://youtube.com/shorts/QoLEmXs3KNQ",
       "equipment": [],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 2
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -1291,8 +1902,21 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 2,
+        "ombro": 2,
+        "cotovelo": 1
+      },
+      "position": "prancha",
+      "complexity": 3,
       "impact": true,
+      "easier": "flexao-declinada",
       "type": "reps"
     },
     {
@@ -1312,8 +1936,21 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 1
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
+      "easier": "flexao",
+      "harder": "flexao-declinada",
       "type": "reps"
     },
     {
@@ -1335,7 +1972,17 @@
         "ombros",
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -1354,7 +2001,16 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "peito-iso",
+      "muscles": {
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -1375,7 +2031,15 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "peito": 1,
+        "triceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1397,7 +2061,19 @@
         "triceps",
         "ombros"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "peito": 1,
+        "triceps": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "cotovelo": 1,
+        "punho": 1
+      },
+      "position": "pendurado",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -1418,8 +2094,20 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "abdomen": 0.5
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 1
+      },
+      "position": "pendurado",
+      "complexity": 3,
       "impact": false,
+      "easier": "barra-fixa-neutra",
       "type": "reps"
     },
     {
@@ -1439,8 +2127,20 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 1
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 1
+      },
+      "position": "pendurado",
+      "complexity": 2,
       "impact": false,
+      "easier": "barra-fixa-elastico",
+      "harder": "barra-fixa-neutra",
       "type": "reps"
     },
     {
@@ -1460,8 +2160,19 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pendurado",
+      "complexity": 2,
       "impact": false,
+      "easier": "barra-fixa-supinada",
+      "harder": "barra-fixa-pronada",
       "type": "reps"
     },
     {
@@ -1481,8 +2192,20 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 1
+      },
+      "position": "pendurado",
+      "complexity": 1,
       "impact": false,
+      "easier": "puxada-elastico",
+      "harder": "barra-fixa-elastico",
       "type": "reps"
     },
     {
@@ -1503,8 +2226,19 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pendurado",
+      "complexity": 1,
       "impact": false,
+      "easier": "barra-fixa-negativa",
+      "harder": "barra-fixa-supinada",
       "type": "reps"
     },
     {
@@ -1521,7 +2255,15 @@
       "equipment": [
         "barra-fixa"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pendurado",
+      "complexity": 1,
       "impact": false,
       "type": "tempo"
     },
@@ -1542,8 +2284,17 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "harder": "barra-fixa-negativa",
       "type": "reps"
     },
     {
@@ -1563,8 +2314,16 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {},
+      "position": "ajoelhado",
+      "complexity": 1,
       "impact": false,
+      "harder": "barra-fixa-negativa",
       "type": "reps"
     },
     {
@@ -1581,7 +2340,16 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1603,7 +2371,14 @@
       "groups": [
         "biceps"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -1622,8 +2397,19 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "punho": 1
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
+      "harder": "flexao-pike-elevada",
       "type": "reps"
     },
     {
@@ -1643,8 +2429,20 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "punho": 2,
+        "cervical": 1
+      },
+      "position": "prancha",
+      "complexity": 3,
       "impact": false,
+      "easier": "flexao-pike",
       "type": "reps"
     },
     {
@@ -1664,7 +2462,16 @@
       "groups": [
         "triceps"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "ombros": 1,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1682,7 +2489,15 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "ombros": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1700,7 +2515,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "ombros": 1
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
       "type": "unilateral"
     },
@@ -1721,7 +2544,14 @@
       "groups": [
         "costas"
       ],
-      "pattern": "puxar",
+      "pattern": "ombro-posterior",
+      "muscles": {
+        "ombros": 1,
+        "costas": 0.5
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1742,7 +2572,16 @@
       "groups": [
         "costas"
       ],
-      "pattern": "isolado",
+      "pattern": "ombro-lateral",
+      "muscles": {
+        "costas": 0.5,
+        "ombros": 1
+      },
+      "joints": {
+        "cervical": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1761,7 +2600,14 @@
       "groups": [
         "costas"
       ],
-      "pattern": "puxar",
+      "pattern": "ombro-posterior",
+      "muscles": {
+        "ombros": 1,
+        "costas": 0.5
+      },
+      "joints": {},
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1779,7 +2625,13 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1798,7 +2650,16 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 1
+      },
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1816,7 +2677,16 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1,
+        "punho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1834,7 +2704,15 @@
       "equipment": [
         "halter"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1855,7 +2733,17 @@
       "groups": [
         "costas"
       ],
-      "pattern": "puxar",
+      "pattern": "puxar-v",
+      "muscles": {
+        "biceps": 1,
+        "costas": 1
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 2
+      },
+      "position": "pendurado",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -1873,7 +2761,15 @@
       "equipment": [
         "kettlebell"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1894,8 +2790,19 @@
       "groups": [
         "peito"
       ],
-      "pattern": "empurrar",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1,
+        "peito": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "punho": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
+      "harder": "mergulho-paralelas-triceps",
       "type": "reps"
     },
     {
@@ -1913,8 +2820,21 @@
       "groups": [
         "peito"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "triceps": 1,
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 2,
+        "cotovelo": 1
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
+      "easier": "flexao-fechada",
+      "harder": "triceps-banco-chao",
       "type": "reps"
     },
     {
@@ -1932,8 +2852,20 @@
       "groups": [
         "peito"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-h",
+      "muscles": {
+        "triceps": 1,
+        "peito": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "cotovelo": 1
+      },
+      "position": "prancha",
+      "complexity": 1,
       "impact": false,
+      "harder": "flexao-diamante",
       "type": "reps"
     },
     {
@@ -1951,7 +2883,13 @@
         "halter",
         "banco"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -1969,7 +2907,16 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1
+      },
+      "joints": {
+        "ombro": 1,
+        "cotovelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -1988,8 +2935,19 @@
       "groups": [
         "abdomen"
       ],
-      "pattern": "empurrar",
+      "pattern": "cotovelo-extensao",
+      "muscles": {
+        "triceps": 1,
+        "abdomen": 0.5
+      },
+      "joints": {
+        "cotovelo": 2,
+        "punho": 1
+      },
+      "position": "prancha",
+      "complexity": 3,
       "impact": false,
+      "easier": "flexao-diamante",
       "type": "reps"
     },
     {
@@ -2009,8 +2967,21 @@
       "groups": [
         "peito"
       ],
-      "pattern": "empurrar",
+      "pattern": "empurrar-v",
+      "muscles": {
+        "triceps": 1,
+        "peito": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "ombro": 2,
+        "cotovelo": 1,
+        "punho": 1
+      },
+      "position": "pendurado",
+      "complexity": 3,
       "impact": false,
+      "easier": "mergulho-banco",
       "type": "reps"
     },
     {
@@ -2028,8 +2999,20 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "easier": "cadeirinha",
+      "harder": "agachamento-elastico",
       "type": "reps"
     },
     {
@@ -2048,8 +3031,20 @@
         "gluteos",
         "panturrilha"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5,
+        "panturrilha": 0.5
+      },
+      "joints": {
+        "joelho": 2,
+        "tornozelo": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": true,
+      "easier": "agachamento-halteres",
       "type": "reps"
     },
     {
@@ -2069,8 +3064,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 2,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "harder": "agachamento-bulgaro",
       "type": "unilateral"
     },
     {
@@ -2088,8 +3094,18 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "afundo-reverso",
       "type": "unilateral"
     },
     {
@@ -2107,8 +3123,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 2,
+        "tornozelo": 2
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": true,
+      "easier": "afundo",
       "type": "reps"
     },
     {
@@ -2128,8 +3155,20 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "easier": "agachamento-livre",
+      "harder": "agachamento-halteres",
       "type": "reps"
     },
     {
@@ -2147,8 +3186,20 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 2,
+        "quadril": 2,
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": false,
+      "easier": "agachamento-bulgaro",
       "type": "unilateral"
     },
     {
@@ -2168,8 +3219,18 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "step-up",
       "type": "unilateral"
     },
     {
@@ -2184,7 +3245,15 @@
       "image": "",
       "video": "https://youtube.com/shorts/UcEITFFWnAY",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "pe",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -2205,7 +3274,17 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2226,8 +3305,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "good-morning",
       "type": "reps"
     },
     {
@@ -2244,8 +3334,17 @@
       "equipment": [
         "caneleira"
       ],
-      "pattern": "isolado",
+      "pattern": "flexao-joelho",
+      "muscles": {
+        "posterior": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
+      "harder": "flexora-bola",
       "type": "unilateral"
     },
     {
@@ -2263,8 +3362,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "isolado",
+      "pattern": "flexao-joelho",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
+      "easier": "flexora-bola",
+      "harder": "nordico",
       "type": "reps"
     },
     {
@@ -2284,8 +3394,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "isolado",
+      "pattern": "flexao-joelho",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
+      "easier": "flexora-caneleira",
+      "harder": "flexora-toalha",
       "type": "reps"
     },
     {
@@ -2304,8 +3425,20 @@
         "lombar",
         "gluteos"
       ],
-      "pattern": "quadril",
+      "pattern": "dobradica",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1,
+        "lombar": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "stiff-elastico",
+      "harder": "stiff-halteres",
       "type": "reps"
     },
     {
@@ -2320,8 +3453,17 @@
       "image": "",
       "video": "https://youtube.com/shorts/9HQ6_NFBu8U",
       "equipment": [],
-      "pattern": "isolado",
+      "pattern": "flexao-joelho",
+      "muscles": {
+        "posterior": 1
+      },
+      "joints": {
+        "joelho": 2
+      },
+      "position": "ajoelhado",
+      "complexity": 3,
       "impact": false,
+      "easier": "flexora-toalha",
       "type": "reps"
     },
     {
@@ -2341,7 +3483,14 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "posterior": 1,
+        "gluteos": 1
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
       "type": "unilateral"
     },
@@ -2360,8 +3509,16 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "harder": "ponte-unilateral",
       "type": "reps"
     },
     {
@@ -2379,8 +3536,17 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "easier": "ponte-gluteo",
+      "harder": "elevacao-pelvica",
       "type": "unilateral"
     },
     {
@@ -2399,7 +3565,15 @@
         "caneleira",
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1
+      },
+      "joints": {
+        "punho": 1
+      },
+      "position": "quatro-apoios",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2422,7 +3596,17 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "isolado",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "lombar": 1
+      },
+      "position": "quatro-apoios",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2441,7 +3625,15 @@
       "equipmentAny": [
         "caneleira"
       ],
-      "pattern": "isolado",
+      "pattern": "abducao",
+      "muscles": {
+        "gluteos": 1
+      },
+      "joints": {
+        "quadril": 1
+      },
+      "position": "chao-lado",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2459,7 +3651,15 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "abducao",
+      "muscles": {
+        "gluteos": 1
+      },
+      "joints": {
+        "quadril": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2477,7 +3677,15 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "abducao",
+      "muscles": {
+        "gluteos": 1
+      },
+      "joints": {
+        "quadril": 1
+      },
+      "position": "chao-lado",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2495,7 +3703,16 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "abducao",
+      "muscles": {
+        "gluteos": 1,
+        "quadriceps": 0.5
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2517,7 +3734,14 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2538,8 +3762,16 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
+      "easier": "hip-thrust",
       "type": "unilateral"
     },
     {
@@ -2557,7 +3789,17 @@
       "groups": [
         "quadriceps"
       ],
-      "pattern": "agachar",
+      "pattern": "joelho",
+      "muscles": {
+        "gluteos": 1,
+        "quadriceps": 1
+      },
+      "joints": {
+        "joelho": 1,
+        "quadril": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2578,7 +3820,14 @@
       "groups": [
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 1
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -2598,7 +3847,16 @@
         "caneleira",
         "elastico"
       ],
-      "pattern": "isolado",
+      "pattern": "abducao",
+      "muscles": {
+        "gluteos": 1
+      },
+      "joints": {
+        "punho": 1,
+        "quadril": 1
+      },
+      "position": "quatro-apoios",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2616,8 +3874,18 @@
       "equipment": [
         "step"
       ],
-      "pattern": "isolado",
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "easier": "panturrilha-em-pe",
+      "harder": "panturrilha-unilateral-step",
       "type": "reps"
     },
     {
@@ -2634,8 +3902,17 @@
       "equipment": [
         "step"
       ],
-      "pattern": "isolado",
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 2
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": false,
+      "easier": "panturrilha-step",
       "type": "unilateral"
     },
     {
@@ -2652,12 +3929,21 @@
       "equipment": [
         "corda"
       ],
-      "pattern": "condicionamento",
-      "impact": true,
-      "type": "tempo",
       "groups": [
         "panturrilha"
-      ]
+      ],
+      "pattern": "cardio",
+      "muscles": {
+        "panturrilha": 0.5
+      },
+      "joints": {
+        "tornozelo": 2,
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 2,
+      "impact": true,
+      "type": "tempo"
     },
     {
       "id": "panturrilha-salto",
@@ -2671,12 +3957,20 @@
       "image": "",
       "video": "https://youtube.com/shorts/SjHRwhGXBl8",
       "equipment": [],
-      "pattern": "condicionamento",
-      "impact": true,
-      "type": "tempo",
       "groups": [
         "cardio"
-      ]
+      ],
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 2
+      },
+      "position": "pe",
+      "complexity": 1,
+      "impact": true,
+      "type": "tempo"
     },
     {
       "id": "abdominal-supra",
@@ -2690,8 +3984,18 @@
       "image": "",
       "video": "https://youtube.com/shorts/MKq4WH-eBAQ",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1,
+        "cervical": 1
+      },
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "harder": "abdominal-bicicleta",
       "type": "reps"
     },
     {
@@ -2706,7 +4010,15 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=lsfYFbfE45o",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -2722,8 +4034,19 @@
       "image": "",
       "video": "https://youtube.com/shorts/6s4cDQw1RwU",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1,
+        "cervical": 1
+      },
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
+      "easier": "abdominal-supra",
+      "harder": "abdominal-remador",
       "type": "reps"
     },
     {
@@ -2738,7 +4061,16 @@
       "image": "",
       "video": "https://youtube.com/shorts/ARcKSp-cVCY",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1,
+        "cervical": 1
+      },
+      "position": "chao-costas",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2754,8 +4086,18 @@
       "image": "",
       "video": "https://youtube.com/shorts/2ephPjg2CZs",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
+      "easier": "abdominal-bicicleta",
+      "harder": "abdominal-v",
       "type": "reps"
     },
     {
@@ -2772,7 +4114,16 @@
       "equipment": [
         "barra-fixa"
       ],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "ombro": 1,
+        "lombar": 1
+      },
+      "position": "pendurado",
+      "complexity": 3,
       "impact": false,
       "type": "reps"
     },
@@ -2791,7 +4142,17 @@
       "groups": [
         "ombros"
       ],
-      "pattern": "core",
+      "pattern": "core-antirrotacao",
+      "muscles": {
+        "abdomen": 1,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 1
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -2807,12 +4168,23 @@
       "image": "",
       "video": "https://youtube.com/shorts/hfEXhscZUTY",
       "equipment": [],
-      "pattern": "condicionamento",
-      "impact": false,
-      "type": "tempo",
       "groups": [
         "abdomen"
-      ]
+      ],
+      "pattern": "cardio",
+      "muscles": {
+        "abdomen": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {
+        "punho": 1,
+        "ombro": 1
+      },
+      "position": "prancha",
+      "complexity": 1,
+      "impact": false,
+      "harder": "burpee",
+      "type": "tempo"
     },
     {
       "id": "hollow-hold",
@@ -2826,8 +4198,18 @@
       "image": "",
       "video": "https://youtube.com/shorts/X67v1Z5wYps",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-antiextensao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "chao-costas",
+      "complexity": 2,
       "impact": false,
+      "easier": "prancha",
+      "harder": "ab-wheel",
       "type": "tempo"
     },
     {
@@ -2842,8 +4224,17 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=iP2fjvG0g3w",
       "equipment": [],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "chao-costas",
+      "complexity": 3,
       "impact": false,
+      "easier": "abdominal-remador",
       "type": "reps"
     },
     {
@@ -2863,7 +4254,15 @@
         "halter",
         "kettlebell"
       ],
-      "pattern": "core",
+      "pattern": "core-flexao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "sentado",
+      "complexity": 1,
       "impact": false,
       "type": "reps"
     },
@@ -2881,7 +4280,13 @@
       "equipment": [
         "elastico"
       ],
-      "pattern": "core",
+      "pattern": "core-antirrotacao",
+      "muscles": {
+        "abdomen": 1
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "unilateral"
     },
@@ -2902,8 +4307,21 @@
         "quadriceps",
         "abdomen"
       ],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {
+        "quadriceps": 0.5,
+        "peito": 0.5
+      },
+      "joints": {
+        "punho": 2,
+        "joelho": 2,
+        "tornozelo": 2,
+        "lombar": 1
+      },
+      "position": "pe",
+      "complexity": 2,
       "impact": true,
+      "easier": "escalador",
       "type": "reps"
     },
     {
@@ -2924,8 +4342,19 @@
         "gluteos",
         "posterior"
       ],
-      "pattern": "quadril",
+      "pattern": "core-extensao",
+      "muscles": {
+        "lombar": 1,
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {
+        "lombar": 2
+      },
+      "position": "banco",
+      "complexity": 2,
       "impact": false,
+      "easier": "superman",
       "type": "reps"
     },
     {
@@ -2944,7 +4373,16 @@
         "abdomen",
         "gluteos"
       ],
-      "pattern": "core",
+      "pattern": "core-antiextensao",
+      "muscles": {
+        "abdomen": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "prancha",
+      "complexity": 2,
       "impact": false,
       "type": "reps"
     },
@@ -2963,8 +4401,19 @@
       "groups": [
         "gluteos"
       ],
-      "pattern": "core",
+      "pattern": "core-extensao",
+      "muscles": {
+        "lombar": 1,
+        "gluteos": 0.5
+      },
+      "joints": {
+        "lombar": 1
+      },
+      "position": "chao-brucos",
+      "complexity": 1,
       "impact": false,
+      "easier": "bird-dog",
+      "harder": "superman",
       "type": "reps"
     },
     {
@@ -2982,8 +4431,18 @@
       "groups": [
         "panturrilha"
       ],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {
+        "panturrilha": 0.5
+      },
+      "joints": {
+        "tornozelo": 2,
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": true,
+      "easier": "polichinelo-sem-salto",
       "type": "tempo"
     },
     {
@@ -2999,8 +4458,13 @@
       "video": "",
       "equipment": [],
       "groups": [],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {},
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "polichinelo",
       "type": "tempo"
     },
     {
@@ -3018,8 +4482,18 @@
       "groups": [
         "quadriceps"
       ],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {
+        "quadriceps": 0.5
+      },
+      "joints": {
+        "tornozelo": 2,
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": true,
+      "easier": "marcha-estacionaria",
       "type": "tempo"
     },
     {
@@ -3037,8 +4511,13 @@
       "groups": [
         "quadriceps"
       ],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {},
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
+      "harder": "corrida-estacionaria",
       "type": "tempo"
     },
     {
@@ -3057,7 +4536,16 @@
         "ombros",
         "abdomen"
       ],
-      "pattern": "condicionamento",
+      "pattern": "cardio",
+      "muscles": {
+        "ombros": 0.5,
+        "abdomen": 0.5
+      },
+      "joints": {
+        "ombro": 1
+      },
+      "position": "pe",
+      "complexity": 1,
       "impact": false,
       "type": "tempo"
     }

@@ -2577,6 +2577,56 @@
     toast("Imagem do resumo salva.", "success");
   }
 
+  /* ---------- Dor por exercício ---------- */
+  // Escala de dor (modelo de monitoramento usado em fisioterapia): até 3 segue; 4 a 6 o treinador usa uma
+  // versão mais fácil; 7 ou mais tira o exercício e orienta procurar um profissional.
+  const PAIN_LEVELS = [
+    [0, "Sem dor", "check_circle"],
+    [2, "Leve (1 a 3)", "info"],
+    [5, "Moderada (4 a 6)", "error"],
+    [8, "Forte (7 a 10)", "error"],
+  ];
+  const painLabel = (score) => (score >= 7 ? "dor forte" : score >= 4 ? "dor moderada" : score > 0 ? "dor leve" : "");
+
+  function painSectionHtml(h) {
+    const ids = [...new Set((h.exercises || []).map((e) => e.exerciseId))].filter((exId) => findExercise(exId));
+    if (!ids.length) return "";
+    const log = user.painLog || {};
+    return `
+      <section class="subsection">
+        <h2 class="subsection-title">Sentiu dor em algum exercício?</h2>
+        <p class="meta">O treinador usa isso para trocar o exercício por uma versão mais fácil ou tirá-lo dos próximos treinos.</p>
+        <div class="chips pain-chips">
+          ${ids
+            .map((exId) => {
+              const score = log[exId]?.score || 0;
+              return `<button class="chip ${score >= 4 ? "chip-strong" : ""}" type="button" data-pain="${escapeHtml(exId)}" aria-pressed="${score > 0}">${escapeHtml(findExercise(exId).name)}${score ? ` · ${painLabel(score)}` : ""}</button>`;
+            })
+            .join("")}
+        </div>
+      </section>`;
+  }
+
+  async function askPain(exId, historyId) {
+    const ex = findExercise(exId);
+    const choice = await actionSheet({
+      title: `Dor em ${ex.name}`,
+      text: "Como foi a dor durante ou depois do exercício?",
+      actions: PAIN_LEVELS.map(([score, label, ic]) => ({ id: String(score), icon: ic, label })),
+    });
+    if (choice === null || choice === undefined) return;
+    const score = Number(choice);
+    const log = { ...(user.painLog || {}) };
+    if (score) log[exId] = { score, date: new Date().toISOString() };
+    else delete log[exId];
+    user = Store.updateUser(user.id, { painLog: log });
+    if (score >= 7) {
+      await confirmSheet({ icon: "error", title: "Dor forte: pare este exercício", text: "Ele sai dos próximos treinos. Se a dor continuar, piorar ou vier com inchaço, formigamento ou falta de força, procure um médico ou fisioterapeuta.", confirmLabel: "Entendi", cancelLabel: "Fechar" });
+    } else if (score >= 4) toast("Anotado. O treinador vai usar uma versão mais fácil dele.", "success");
+    else toast(score ? "Anotado. Se a dor aumentar, marque de novo." : "Dor removida.", "success");
+    renderHistoryDetail(historyId);
+  }
+
   function renderHistoryDetail(id, params = new URLSearchParams()) {
     setTab("atividade");
     const h = Store.getHistory(id);
@@ -2653,6 +2703,8 @@
         }
       </section>
 
+      ${painSectionHtml(h)}
+
       ${h.note ? `<section class="subsection"><h2 class="subsection-title">${icon("edit_note", "mi-inline")} Observações do treino</h2><p class="note-box">${escapeHtml(h.note)}</p></section>` : ""}
 
       <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
@@ -2671,6 +2723,7 @@
           : `<p class="meta">Este treino foi excluído.</p>`
       }`;
     $("share-btn").addEventListener("click", () => shareSummary(h));
+    app.querySelectorAll("[data-pain]").forEach((b) => b.addEventListener("click", () => askPain(b.dataset.pain, id)));
     $("save-coach-workout")?.addEventListener("click", () => {
       const { id: _id, assistant, ownerId, createdBy, createdAt, updatedAt, ...data } = workout;
       const saved = Store.saveWorkout({ ...data, name: workout.name.replace(/^Treino montado/, "Treino") }, user);
@@ -2823,103 +2876,223 @@
     core: ["Abdômen e lombar", ["abdomen", "lombar"]],
     cardio: ["Cardio", ["cardio"]],
   };
-  // [rótulo, séries, repetições, descanso em segundos]
+  // [rótulo, séries, repetições, descanso] dos exercícios compostos; COACH_ISO vale para os isolados.
   const COACH_GOALS = {
-    hipertrofia: ["Ganhar massa", "3", "8-12", 90],
-    forca: ["Força", "4", "6-8", 120],
+    hipertrofia: ["Ganhar massa", "3", "6-12", 90],
+    forca: ["Força", "4", "4-6", 150],
     resistencia: ["Resistência", "3", "15-20", 45],
   };
+  const COACH_ISO = { hipertrofia: ["3", "10-15", 60], forca: ["3", "8-12", 75], resistencia: ["2", "15-25", 40] };
   const COACH_BIG = ["peito", "costas", "quadriceps", "posterior", "gluteos"];
-  const COACH_PATTERN_BY_GROUP = { peito: "empurrar", costas: "puxar", quadriceps: "agachar", posterior: "quadril", gluteos: "quadril", abdomen: "core", lombar: "core" };
-  const COACH_ORDER = { agachar: 0, quadril: 0, empurrar: 0, puxar: 0, isolado: 1, core: 2, condicionamento: 3 };
-  const COACH_STEPS = ["tempo", "grupos", "equipamentos", "nivel", "objetivo"];
+  const COACH_STEPS = ["tempo", "grupos", "equipamentos", "nivel", "limitacoes", "objetivo"];
 
-  let coach = null; // { step, p, result }
+  // Padrões de movimento → família (usada para equilíbrio, ordem e bi-set).
+  const COACH_PATTERNS = {
+    "empurrar-h": "empurrar", "empurrar-v": "empurrar", "puxar-h": "puxar", "puxar-v": "puxar",
+    joelho: "joelho", "joelho-uni": "joelho", dobradica: "quadril", "extensao-quadril": "quadril",
+    "peito-iso": "isolado", "ombro-lateral": "isolado", "ombro-posterior": "isolado", "cotovelo-flexao": "isolado",
+    "cotovelo-extensao": "isolado", "flexao-joelho": "isolado", abducao: "isolado", panturrilha: "isolado",
+    "core-antiextensao": "core", "core-antirrotacao": "core", "core-lateral": "core", "core-flexao": "core", "core-extensao": "core",
+    cardio: "cardio",
+  };
+  const COACH_ORDER = { joelho: 0, quadril: 0, empurrar: 0, puxar: 0, isolado: 1, core: 2, cardio: 3 };
+  // Exercícios sem o padrão novo (antigos ou do admin): deduz pelo valor antigo ou pelo grupo.
+  const COACH_LEGACY = { empurrar: "empurrar-h", puxar: "puxar-h", agachar: "joelho", quadril: "extensao-quadril", core: "core-antiextensao", condicionamento: "cardio" };
+  const COACH_GROUP_PATTERN = {
+    peito: "empurrar-h", costas: "puxar-h", ombros: "ombro-lateral", biceps: "cotovelo-flexao", triceps: "cotovelo-extensao", quadriceps: "joelho",
+    posterior: "dobradica", gluteos: "extensao-quadril", panturrilha: "panturrilha", abdomen: "core-flexao", lombar: "core-extensao", cardio: "cardio",
+  };
 
-  const coachPattern = (ex) => ex.pattern || COACH_PATTERN_BY_GROUP[ex.group] || "isolado";
-  // "Família" = primeira palavra do nome (Flexão, Barra, Rosca…), para não repetir variações demais.
-  const coachFamily = (ex) => normalizeText(ex.name).split(" ")[0];
+  // Moldes por foco: vagas de padrão em ordem de prioridade (o tempo decide quantas entram).
+  const COACH_TEMPLATES = {
+    corpo: ["joelho", "puxar-h", "empurrar-h", "dobradica", "puxar-v", "empurrar-v", "joelho-uni", "extensao-quadril", "core-antiextensao", "ombro-posterior"],
+    superiores: ["puxar-h", "empurrar-h", "puxar-v", "empurrar-v", "ombro-posterior", "cotovelo-flexao", "cotovelo-extensao", "ombro-lateral", "peito-iso", "puxar-h"],
+    inferiores: ["joelho", "dobradica", "joelho-uni", "extensao-quadril", "flexao-joelho", "panturrilha", "abducao", "joelho", "extensao-quadril"],
+    empurrar: ["empurrar-h", "empurrar-v", "empurrar-h", "cotovelo-extensao", "ombro-lateral", "peito-iso", "cotovelo-extensao"],
+    puxar: ["puxar-v", "puxar-h", "ombro-posterior", "cotovelo-flexao", "puxar-h", "puxar-v", "cotovelo-flexao"],
+    core: ["core-antiextensao", "core-antirrotacao", "core-flexao", "core-lateral", "core-extensao", "core-antiextensao"],
+    cardio: ["cardio", "cardio", "cardio", "cardio", "cardio", "cardio", "cardio", "cardio"],
+  };
+  // Vagas de cada grupo quando a pessoa escolhe grupos avulsos.
+  const COACH_GROUP_SLOTS = {
+    peito: ["empurrar-h", "empurrar-h", "peito-iso"],
+    costas: ["puxar-v", "puxar-h", "puxar-h"],
+    ombros: ["empurrar-v", "ombro-lateral", "ombro-posterior"],
+    biceps: ["cotovelo-flexao", "cotovelo-flexao"],
+    triceps: ["cotovelo-extensao", "cotovelo-extensao"],
+    quadriceps: ["joelho", "joelho-uni", "joelho"],
+    posterior: ["dobradica", "flexao-joelho", "dobradica"],
+    gluteos: ["extensao-quadril", "abducao", "joelho-uni"],
+    panturrilha: ["panturrilha", "panturrilha"],
+    abdomen: ["core-antiextensao", "core-flexao", "core-antirrotacao", "core-lateral"],
+    lombar: ["core-antirrotacao", "core-extensao"],
+    cardio: ["cardio", "cardio", "cardio", "cardio", "cardio", "cardio"],
+  };
 
-  // Exercícios dos 2 últimos treinos feitos (para variar) e grupos treinados nas últimas 48h (para sugerir).
-  function coachRecent() {
+  // Dores e limitações. Adaptam o treino; não substituem avaliação de um profissional de saúde.
+  const COACH_REGIONS = { lombar: "Lombar", cervical: "Pescoço", ombro: "Ombro", cotovelo: "Cotovelo", punho: "Punho", quadril: "Quadril", joelho: "Joelho", tornozelo: "Tornozelo" };
+  const COACH_CONDITIONS = { pressao: "Pressão alta", idoso: "60 anos ou mais", chao: "Dificuldade de deitar no chão" };
+  const COACH_FLAGS = { forte: "Dor forte ou recente", irradia: "Dor que irradia ou formigamento", cirurgia: "Cirurgia ou lesão recente", gestacao: "Gestação", peito: "Dor no peito ou falta de ar ao esforço" };
+  const COACH_FLOOR = ["chao-costas", "chao-brucos", "chao-lado", "quatro-apoios", "prancha", "ajoelhado"];
+  // Volume semanal de referência por músculo (séries), por nível; limite de séries por músculo numa sessão.
+  const COACH_WEEKLY = { iniciante: 10, intermediario: 14, avancado: 16 };
+  const COACH_SESSION_MAX = 10;
+
+  let coach = null; // { step, p, result, meta }
+
+  function coachPattern(ex) {
+    if (COACH_PATTERNS[ex.pattern]) return ex.pattern;
+    return COACH_LEGACY[ex.pattern] || COACH_GROUP_PATTERN[ex.group] || "ombro-lateral";
+  }
+  const coachFamily = (ex) => COACH_PATTERNS[coachPattern(ex)];
+  const coachCompound = (ex) => COACH_ORDER[coachFamily(ex)] === 0;
+  function coachMuscles(ex) {
+    if (ex.muscles && Object.keys(ex.muscles).length) return ex.muscles;
+    const m = { [ex.group]: 1 };
+    (ex.groups || []).forEach((g) => (m[g] = m[g] || 0.5));
+    return m;
+  }
+  const coachJoints = (ex) => ex.joints || {};
+  const coachComplexity = (ex) => Number(ex.complexity) || { iniciante: 1, intermediario: 2, avancado: 3 }[ex.difficulty] || 2;
+  // Nome base (Flexão, Barra, Rosca…) e variação (duas primeiras palavras: "rosca martelo", "remada invertida").
+  const coachBase = (ex) => normalizeText(ex.name).split(" ")[0];
+  const coachVariant = (ex) => normalizeText(ex.name).split(" ").slice(0, 2).join(" ");
+  const coachKit = (ex) => [...(ex.equipment || []), ...(ex.equipmentAny || [])].sort().join();
+  const coachLimits = (p) => p.limits || { regions: {}, conditions: [], flags: [] };
+  const coachConservative = (p) => coachLimits(p).flags.length > 0;
+
+  // Do histórico: recência, volume da semana por músculo, músculos das últimas 48h, exercícios dominados e dores.
+  function coachHistory() {
     const history = Store.history(user.id);
-    const ids = new Set(history.slice(0, 2).flatMap((h) => (h.exercises || []).map((e) => e.exerciseId)));
+    const recent = new Set(history.slice(0, 2).flatMap((h) => (h.exercises || []).map((e) => e.exerciseId)));
     const since = Date.now() - 48 * 3600 * 1000;
-    const groupIds = new Set(history.filter((h) => new Date(h.finishedAt) >= since).flatMap((h) => (h.exercises || []).map((e) => e.group)));
-    return { ids, groupIds };
+    const weekStart = startOfWeek();
+    const groups48 = new Set();
+    const weekly = {};
+    const seen = {};
+    history.forEach((h) => {
+      const t = new Date(h.finishedAt);
+      (h.exercises || []).forEach((e) => {
+        (seen[e.exerciseId] = seen[e.exerciseId] || []).push(e);
+        const ex = findExercise(e.exerciseId);
+        if (!ex) return;
+        const muscles = coachMuscles(ex);
+        if (t >= since) Object.entries(muscles).forEach(([g, w]) => w >= 1 && groups48.add(g));
+        if (t >= weekStart) {
+          const sets = (e.setLog || []).length || parseInt(e.sets, 10) || 0;
+          Object.entries(muscles).forEach(([g, w]) => (weekly[g] = (weekly[g] || 0) + sets * w));
+        }
+      });
+    });
+    // Dominado: nas 2 últimas vezes, todas as séries (pelo menos 2) chegaram ao topo da faixa de repetições.
+    const mastered = new Set();
+    Object.entries(seen).forEach(([id, list]) => {
+      const last = list.slice(0, 2);
+      const done = last.length === 2 && last.every((e) => {
+        const top = Math.max(0, ...(String(e.reps).match(/\d+/g) || []).map(Number));
+        const log = e.setLog || [];
+        return top > 0 && log.length >= 2 && log.every((s) => parseInt(s.reps, 10) >= top);
+      });
+      if (done) mastered.add(id);
+    });
+    return { recent, groups48, weekly, mastered, pain: user.painLog || {} };
   }
 
-  function coachSuggestion() {
-    const { groupIds } = coachRecent();
-    if (!groupIds.size) return null;
-    const hit = (focus) => COACH_FOCUS[focus][1].some((g) => groupIds.has(g));
-    if (hit("superiores") && !hit("inferiores")) return ["inferiores", "Você treinou a parte de cima recentemente. Que tal pernas hoje?"];
-    if (hit("inferiores") && !hit("superiores")) return ["superiores", "Você treinou pernas recentemente. Que tal a parte de cima hoje?"];
-    return null;
+  // Motivo para o exercício ficar de fora ("" = pode entrar).
+  function coachBlock(ex, p, hist) {
+    const lim = coachLimits(p);
+    const j = coachJoints(ex);
+    const cx = coachComplexity(ex);
+    if (p.noImpact && ex.impact) return "impacto";
+    if ((hist.pain[ex.id]?.score || 0) >= 4) return "dor";
+    for (const [r, level] of Object.entries(lim.regions)) if (level === "evitar" && (j[r] || 0) >= 2) return r;
+    if (coachConservative(p) && (ex.impact || cx > 1 || Object.values(j).some((v) => v >= 2) || ex.position === "pendurado")) return "cuidadoso";
+    // Gestação: nada deitado de costas ou de bruços, sem abdominais de flexão e sem carga alta na lombar.
+    if (lim.flags.includes("gestacao") && (["chao-costas", "chao-brucos", "banco"].includes(ex.position) || coachPattern(ex) === "core-flexao" || (j.lombar || 0) >= 1)) return "gestacao";
+    if (lim.conditions.includes("idoso") && (ex.impact || cx > 2)) return "idade";
+    if (lim.conditions.includes("chao") && COACH_FLOOR.includes(ex.position)) return "chao";
+    if (p.level === "iniciante" && cx > 2) return "nivel";
+    return "";
   }
 
-  function coachDefaults() {
-    const saved = user.coachPrefs || {};
-    return {
-      time: saved.time || 30,
-      focus: saved.focus || "",
-      groups: saved.groups || [],
-      equipment: saved.equipment || user.equipment || [],
-      level: user.level || saved.level || "",
-      goal: saved.goal || "hipertrofia",
-      noImpact: Boolean(saved.noImpact),
-      warmup: saved.warmup !== false,
-    };
+  function coachPool(p, hist = coachHistory()) {
+    return exercises().filter((ex) => canDo(ex, p.equipment) && !coachBlock(ex, p, hist));
   }
 
-  function coachPool(p) {
-    return exercises().filter(
-      (ex) =>
-        canDo(ex, p.equipment) &&
-        !(p.noImpact && ex.impact) &&
-        !(p.level === "iniciante" && ex.difficulty === "avancado")
-    );
+  // Regiões com dor marcada que este exercício usa (ganham menos séries e mais reserva).
+  function coachCareRegions(ex, p) {
+    const j = coachJoints(ex);
+    return Object.keys(coachLimits(p).regions).filter((r) => (j[r] || 0) >= 1);
   }
 
-  function coachScore(ex, p, chosen, recent, first) {
-    let score = Math.random() * 2;
-    const pattern = coachPattern(ex);
-    if (first && COACH_ORDER[pattern] === 0) score += 2;
-    if (chosen.some((c) => coachFamily(c) === coachFamily(ex))) score -= 3;
-    if (recent.has(ex.id)) score -= 1.5;
-    if (p.goal === "forca") score += (usesWeight(ex) ? 1.5 : 0) - (ex.impact ? 1 : 0);
-    const lv = { iniciante: { iniciante: 1 }, intermediario: { intermediario: 0.8, iniciante: 0.3 }, avancado: { avancado: 1, intermediario: 0.6 } }[p.level] || {};
-    return score + (lv[ex.difficulty] || 0);
+  function coachSets(p, ex) {
+    if (p.time <= 15 || coachConservative(p)) return 2;
+    const base = Number(ex && !coachCompound(ex) ? COACH_ISO[p.goal][0] : COACH_GOALS[p.goal][1]);
+    return ex && coachCareRegions(ex, p).length ? Math.max(2, base - 1) : base;
   }
 
-  function coachPick(group, p, chosen, recent) {
-    const first = !chosen.some((c) => c.group === group);
-    // No máximo 2 variações do mesmo exercício (ex.: duas flexões) por treino.
-    const options = coachOptions(group, p, chosen).filter((ex) => chosen.filter((c) => coachFamily(c) === coachFamily(ex)).length < 2);
-    if (!options.length) return null;
-    return options.map((ex) => [coachScore(ex, p, chosen, recent, first), ex]).sort((a, b) => b[0] - a[0])[0][1];
+  function coachScore(ex, p, state, hist) {
+    let s = Math.random() * 1.5;
+    const target = COACH_WEEKLY[p.level] || 12;
+    Object.entries(coachMuscles(ex)).forEach(([g, w]) => {
+      if (!state.vol[g]) s += w * 0.6; // músculo ainda não trabalhado nesta sessão
+      if (w >= 1 && p.groups.includes(g)) s += Math.max(0, target - (hist.weekly[g] || 0)) / target; // falta volume na semana
+    });
+    const cx = coachComplexity(ex);
+    if (p.level === "iniciante") s -= (cx - 1) * 1.2;
+    else if (p.level === "avancado") s += (cx - 2) * 0.6;
+    else if (cx === 3) s -= state.complex ? 3 : 0.3; // intermediário: no máximo 1 exercício de técnica alta
+    if (hist.recent.has(ex.id)) s -= 1.5;
+    const j = coachJoints(ex);
+    s -= Object.values(j).reduce((a, v) => a + v, 0) * 0.15;
+    coachCareRegions(ex, p).forEach((r) => (s -= (j[r] || 0) * 1.2));
+    if ((hist.pain[ex.id]?.score || 0) > 0) s -= 1;
+    if (ex.easier && hist.mastered.has(ex.easier)) s += 2; // progressão: dominou a versão mais fácil
+    if (hist.mastered.has(ex.id) && ex.harder) s -= 1.5;
+    if (ex.harder && (hist.pain[ex.harder]?.score || 0) >= 4) s += 1.5; // versão mais fácil de um exercício que doeu
+    if (p.goal === "forca" && usesWeight(ex)) s += 1;
+    if (coachCompound(ex)) {
+      if (exerciseType(ex) === "tempo") s -= 2; // segurar (suspensão, cadeirinha) é complemento, não o principal
+      if (usesWeight(ex) || usesBand(ex)) s += 0.5; // carga ajustável permite progredir
+    }
+    return s;
   }
 
-  // Exercícios possíveis de um grupo (os de cardio só entram quando o grupo é Cardio).
-  function coachOptions(group, p, chosen = []) {
-    const ids = new Set(chosen.map((c) => c.id));
-    return coachPool(p).filter((ex) => ex.group === group && !ids.has(ex.id) && (group === "cardio" || coachPattern(ex) !== "condicionamento"));
+  function coachSlots(p) {
+    const focus = COACH_FOCUS[p.focus];
+    if (focus && focus[1].length === p.groups.length && focus[1].every((g) => p.groups.includes(g))) return COACH_TEMPLATES[p.focus].map((pattern) => ({ pattern }));
+    const sorted = [...p.groups].sort((a, b) => COACH_BIG.includes(b) - COACH_BIG.includes(a));
+    const listOf = (g) => COACH_GROUP_SLOTS[g] || [COACH_GROUP_PATTERN[g] || "ombro-lateral"];
+    const slots = [];
+    const max = Math.max(0, ...sorted.map((g) => listOf(g).length));
+    for (let i = 0; i < max; i++) sorted.forEach((g) => listOf(g)[i] && slots.push({ pattern: listOf(g)[i], group: g }));
+    return slots;
   }
 
-  // Treino de 15 min: 2 séries por exercício, em bi-set.
-  const coachSets = (p) => (p.time <= 15 ? 2 : Number((COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia)[1]));
-
-  // Duração estimada: séries × (45s de execução + descanso); no bi-set o primeiro exercício quase não descansa.
-  function coachMinutes(items, rest) {
-    const seconds = items.reduce((sum, it, i) => sum + (parseInt(it.sets, 10) || 3) * (45 + (it.warmup ? 15 : it.linkNext ? 10 : rest)), 0);
-    return Math.max(10, Math.round(seconds / 60 / 5) * 5);
+  function coachFits(ex, slot, state, p) {
+    if (state.ids.has(ex.id) || coachPattern(ex) !== slot.pattern) return false;
+    if (slot.group && ex.group !== slot.group && !((coachMuscles(ex)[slot.group] || 0) >= 1)) return false;
+    // O mesmo movimento só entra de novo se for de fato outro exercício: fora da mesma cadeia de
+    // progressão, com outro nome e com outra posição ou outro equipamento.
+    const near = (a, b) => a.easier === b.id || a.harder === b.id || b.easier === a.id || b.harder === a.id;
+    const same = state.list.filter((c) => coachPattern(c) === slot.pattern);
+    if (same.some((c) => near(c, ex) || coachVariant(c) === coachVariant(ex) || (coachCompound(ex) && c.position === ex.position && coachKit(c) === coachKit(ex)))) return false;
+    if (state.list.filter((c) => coachBase(c) === coachBase(ex)).length >= 2) return false;
+    // No máximo 1 exercício com demanda alta na lombar.
+    if ((coachJoints(ex).lombar || 0) >= 2 && state.lombar >= 1) return false;
+    // Até 10 séries diretas por músculo na sessão.
+    const sets = coachSets(p, ex);
+    return Object.entries(coachMuscles(ex)).every(([g, w]) => w < 1 || (state.vol[g] || 0) + sets <= COACH_SESSION_MAX);
   }
 
-  function coachItem(ex, p) {
-    const [, , reps] = COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia;
-    const sets = String(coachSets(p));
-    const pattern = coachPattern(ex);
-    const useDefault = exerciseType(ex) === "tempo" || pattern === "core" || pattern === "condicionamento";
+  function coachItem(ex, p, hist) {
+    const compound = coachCompound(ex);
+    const [, , cReps, cRest] = COACH_GOALS[p.goal];
+    const [, iReps, iRest] = COACH_ISO[p.goal];
+    const reps = compound ? cReps : iReps;
+    const fam = coachFamily(ex);
+    const lim = coachLimits(p);
+    const useDefault = exerciseType(ex) === "tempo" || fam === "core" || fam === "cardio";
     const exMax = Math.max(...(String(ex.reps).match(/\d+/g) || [99]).map(Number));
     // Sem carga para ajustar (peso do corpo), a faixa do objetivo pode não servir: na força ou quando
     // o exercício não chega nessas repetições, usa as do próprio exercício.
@@ -2927,50 +3100,157 @@
     const keep = useDefault || /^\d+$/.test(String(ex.reps).trim()) || (fixedLoad && (p.goal === "forca" || parseInt(reps, 10) > exMax));
     let r = keep ? ex.reps || "30s" : reps;
     if (r === reps && exerciseType(ex) === "unilateral") r += " cada lado";
-    return { exerciseId: ex.id, sets: useDefault ? String(Math.min(Number(ex.sets) || 3, coachSets(p))) : sets, reps: r, load: "", rir: "", rest: "" };
+    if (lim.conditions.includes("pressao") && exerciseType(ex) === "tempo" && fam !== "cardio") r = "20-30s";
+    const care = coachCareRegions(ex, p).length > 0 || coachConservative(p);
+    const sets = useDefault ? Math.min(Number(ex.sets) || 3, coachSets(p, ex)) : coachSets(p, ex);
+    const rest = (compound ? cRest : iRest) + (lim.conditions.includes("pressao") ? 30 : 0);
+    const workoutRest = cRest + (lim.conditions.includes("pressao") ? 30 : 0);
+    const item = { exerciseId: ex.id, sets: String(sets), reps: r, load: "", rir: useDefault ? "" : care || p.level === "iniciante" ? "3" : "2", rest: rest === workoutRest ? "" : `${rest}s` };
+    if (care) item.care = true;
+    if (hist.mastered.has(ex.id) && usesWeight(ex)) item.progress = true;
+    return item;
   }
 
-  // Monta a lista: grupos grandes ganham 2 vagas, os pequenos 1; compostos primeiro, abdômen no fim.
+  // Monta o treino: vagas por padrão de movimento, filtros de restrição, equilíbrio, volume e ordem.
   function coachBuild(p) {
-    // Quantos exercícios cabem no tempo: cada série leva ~45s mais o descanso do objetivo.
-    const [, goalSets, , goalRest] = COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia;
-    const perExercise = coachSets(p) * (45 + goalRest) * (p.time <= 15 ? 0.6 : 1); // bi-set economiza descanso
+    const hist = coachHistory();
+    const pool = coachPool(p, hist);
+    const restC = COACH_GOALS[p.goal][3];
+    const short = p.time <= 15;
+    const perExercise = coachSets(p) * (45 + restC * 0.85) * (short ? 0.6 : 1);
     const count = Math.min(10, Math.max(2, Math.round((p.time * 60 - (p.warmup ? 90 : 0)) / perExercise)));
-    const { ids: recent } = coachRecent();
-    const groupsSel = [...p.groups].sort((a, b) => COACH_BIG.includes(b) - COACH_BIG.includes(a));
-    const seq = [...groupsSel, ...groupsSel.filter((g) => COACH_BIG.includes(g))];
-    const chosen = [];
-    let progress = true;
-    while (chosen.length < count && progress) {
-      progress = false;
-      for (const g of seq) {
-        if (chosen.length >= count) break;
-        const ex = coachPick(g, p, chosen, recent);
-        if (ex) {
-          chosen.push(ex);
-          progress = true;
-        }
+    const state = { list: [], ids: new Set(), vol: {}, lombar: 0, complex: 0 };
+    const add = (ex) => {
+      state.list.push(ex);
+      state.ids.add(ex.id);
+      const sets = coachSets(p, ex);
+      Object.entries(coachMuscles(ex)).forEach(([g, w]) => (state.vol[g] = (state.vol[g] || 0) + sets * w));
+      if ((coachJoints(ex).lombar || 0) >= 2) state.lombar++;
+      if (coachComplexity(ex) === 3) state.complex++;
+    };
+    const best = (slot) =>
+      pool
+        .filter((ex) => coachFits(ex, slot, state, p))
+        .map((ex) => [coachScore(ex, p, state, hist), ex])
+        .sort((a, b) => b[0] - a[0])[0]?.[1];
+    const slots = coachSlots(p);
+    for (let pass = 0; pass < 3 && state.list.length < count; pass++) {
+      for (const slot of slots) {
+        if (state.list.length >= count) break;
+        const ex = best(slot);
+        if (ex) add(ex);
       }
     }
-    // Compostos primeiro (os com carga antes), isolados depois, abdômen no fim.
-    chosen.sort((a, b) => COACH_ORDER[coachPattern(a)] - COACH_ORDER[coachPattern(b)] || usesWeight(b) - usesWeight(a));
-    const items = chosen.map((ex) => coachItem(ex, p));
-    // Treino curto: junta os exercícios em bi-sets de grupos diferentes para ganhar tempo.
-    if (p.time <= 15) {
-      for (let i = 0; i + 1 < items.length; i += 2) {
-        if (chosen[i].group !== chosen[i + 1].group) items[i].linkNext = true;
+    // Equilíbrio: se o treino tem puxadas, puxar >= empurrar (protege ombros e postura).
+    let balanced = false;
+    if (slots.some((s) => COACH_PATTERNS[s.pattern] === "puxar")) {
+      const fam = (f) => state.list.filter((e) => coachFamily(e) === f);
+      for (let guard = 0; guard < 3 && fam("empurrar").length > fam("puxar").length; guard++) {
+        const push = fam("empurrar").pop();
+        const kind = fam("puxar").some((e) => coachPattern(e) === "puxar-h") ? "puxar-v" : "puxar-h";
+        const pull = best({ pattern: kind }) || best({ pattern: kind === "puxar-h" ? "puxar-v" : "puxar-h" });
+        if (!pull) break;
+        state.list.splice(state.list.indexOf(push), 1, pull);
+        state.ids.delete(push.id);
+        state.ids.add(pull.id);
+        balanced = true;
+      }
+    }
+    // Ordem: compostos (mais técnicos e com mais carga na lombar primeiro), isolados, core, cardio.
+    const chosen = state.list.slice().sort(
+      (a, b) =>
+        COACH_ORDER[coachFamily(a)] - COACH_ORDER[coachFamily(b)] ||
+        coachComplexity(b) - coachComplexity(a) ||
+        (coachJoints(b).lombar || 0) - (coachJoints(a).lombar || 0) ||
+        usesWeight(b) - usesWeight(a)
+    );
+    const items = chosen.map((ex) => coachItem(ex, p, hist));
+    // Treino curto: bi-sets só de exercícios que não disputam o mesmo músculo nem a lombar.
+    if (short) {
+      const ok = (a, b) =>
+        a && b && (coachFamily(a) !== coachFamily(b) || coachFamily(a) === "isolado") &&
+        !((coachJoints(a).lombar || 0) >= 2 && (coachJoints(b).lombar || 0) >= 2) &&
+        !Object.entries(coachMuscles(a)).some(([g, w]) => w >= 1 && (coachMuscles(b)[g] || 0) >= 1);
+      for (let i = 0; i + 1 < chosen.length; i += 2) {
+        if (!ok(chosen[i], chosen[i + 1])) {
+          const k = chosen.findIndex((c, idx) => idx > i + 1 && ok(chosen[i], c));
+          if (k > 0) {
+            [chosen[i + 1], chosen[k]] = [chosen[k], chosen[i + 1]];
+            [items[i + 1], items[k]] = [items[k], items[i + 1]];
+          }
+        }
+        if (ok(chosen[i], chosen[i + 1])) items[i].linkNext = true;
       }
     }
     if (p.warmup) {
-      const prefer = ["pular-corda", "polichinelo", "marcha-estacionaria"];
+      const prefer = ["pular-corda", "polichinelo", "marcha-estacionaria", "polichinelo-sem-salto"];
       const rank = (ex) => (prefer.includes(ex.id) ? prefer.indexOf(ex.id) : 9);
       const warm = exercises()
-        .filter((ex) => coachPattern(ex) === "condicionamento" && canDo(ex, p.equipment) && !(p.noImpact && ex.impact) && ex.id !== "burpee" && !chosen.includes(ex))
+        .filter((ex) => coachPattern(ex) === "cardio" && canDo(ex, p.equipment) && !coachBlock(ex, p, hist) && ex.id !== "burpee" && !state.ids.has(ex.id))
         .sort((a, b) => rank(a) - rank(b))[0];
       if (warm) items.unshift({ exerciseId: warm.id, sets: "2", reps: "45s", load: "", rir: "", rest: "", warmup: true });
     }
+    // O que ficou de fora por restrição, nos grupos escolhidos (para explicar).
+    const blocked = {};
+    exercises()
+      .filter((ex) => canDo(ex, p.equipment) && p.groups.includes(ex.group))
+      .forEach((ex) => {
+        const why = coachBlock(ex, p, hist);
+        if (why && why !== "nivel" && why !== "impacto") blocked[why] = (blocked[why] || 0) + 1;
+      });
     coach.wanted = count;
+    coach.meta = { hist, balanced, blocked };
     return items;
+  }
+
+  // Duração estimada: séries × (45s de execução + descanso); no bi-set o primeiro exercício quase não descansa.
+  function coachMinutes(items, rest) {
+    const seconds = items.reduce((sum, it) => {
+      const own = parseInt(String(it.rest || "").match(/\d+/)?.[0], 10) || rest;
+      return sum + (parseInt(it.sets, 10) || 3) * (45 + (it.warmup ? 15 : it.linkNext ? 10 : own));
+    }, 0);
+    return Math.max(10, Math.round(seconds / 60 / 5) * 5);
+  }
+
+  // Sugestão do que treinar: músculos com menos volume na semana e que não treinaram nas últimas 48h.
+  function coachSuggestion() {
+    const hist = coachHistory();
+    if (!Object.keys(hist.weekly).length && !hist.groups48.size) return null;
+    const target = COACH_WEEKLY[coach.p.level || user.level] || 12;
+    const big = (f) => COACH_FOCUS[f][1].filter((g) => COACH_BIG.includes(g));
+    const ranked = ["superiores", "inferiores", "corpo"]
+      .map((f) => {
+        const gs = big(f);
+        const fresh = gs.filter((g) => !hist.groups48.has(g));
+        const deficit = fresh.reduce((a, g) => a + Math.max(0, target - (hist.weekly[g] || 0)), 0) / gs.length;
+        return { f, deficit, fresh: fresh.length / gs.length };
+      })
+      .filter((x) => x.fresh >= 0.6)
+      .sort((a, b) => b.deficit - a.deficit);
+    if (!ranked.length) return ["core", "Você treinou bastante nos últimos 2 dias. Que tal um treino leve de abdômen e lombar, ou descansar?"];
+    const f = ranked[0].f;
+    const lacking = big(f)
+      .map((g) => [findGroup(g)?.name, Math.round(hist.weekly[g] || 0)])
+      .filter(([, v]) => v < target)
+      .slice(0, 3)
+      .map(([name, v]) => `${name} ${v} de ${target}`);
+    return [f, `${lacking.length ? `Séries nesta semana: ${lacking.join(", ")}. ` : ""}Que tal ${COACH_FOCUS[f][0].toLowerCase()} hoje?`];
+  }
+
+  function coachDefaults() {
+    const saved = user.coachPrefs || {};
+    const lim = user.limits || {};
+    return {
+      time: saved.time || 30,
+      focus: saved.focus || "",
+      groups: saved.groups || [],
+      equipment: saved.equipment || user.equipment || [],
+      level: user.level || saved.level || "",
+      limits: { regions: { ...(lim.regions || {}) }, conditions: [...(lim.conditions || [])], flags: [...(lim.flags || [])] },
+      goal: COACH_GOALS[saved.goal] ? saved.goal : "hipertrofia",
+      noImpact: Boolean(saved.noImpact),
+      warmup: saved.warmup !== false,
+    };
   }
 
   function coachWorkout(p, items) {
@@ -2981,9 +3261,9 @@
       name: `Treino montado — ${title}`,
       description: `Montado pelo treinador: ${COACH_GOALS[p.goal][0].toLowerCase()}, cerca de ${p.time} min.`,
       notes: "",
-      restSeconds: COACH_GOALS[p.goal][3],
+      restSeconds: COACH_GOALS[p.goal][3] + (coachLimits(p).conditions.includes("pressao") ? 30 : 0),
       visibility: "private",
-      items: items.map(({ warmup, ...it }) => it),
+      items: items.map(({ warmup, care, progress, ...it }) => it),
       groups: workoutGroups(items.filter((it) => !it.warmup)).map((g) => g.id),
     };
   }
@@ -2993,7 +3273,13 @@
     const group = findGroup(ex.group);
     const has = new Set(p.equipment);
     const used = equipmentLabels([...(ex.equipment || []), ...(ex.equipmentAny || []).filter((id) => has.has(id))]);
-    return `${group ? group.name : ""} · ${used.length ? `com ${used.join(" e ").toLowerCase()}` : "peso do corpo"}`;
+    const parts = [group ? group.name : "", used.length ? `com ${used.join(" e ").toLowerCase()}` : "peso do corpo"];
+    const hist = coach?.meta?.hist;
+    const easier = ex.easier && findExercise(ex.easier);
+    if (hist && easier && hist.mastered.has(easier.id)) parts.push(`evolução de ${easier.name}`);
+    if (item.progress) parts.push("você bateu o topo das repetições: tente aumentar a carga");
+    if (item.care) parts.push("adaptado: menos séries e 3 repetições de reserva");
+    return parts.filter(Boolean).join(" · ");
   }
 
   function coachEquipChanged() {
@@ -3002,13 +3288,14 @@
   }
 
   function coachSavePrefs() {
-    const { level, ...prefs } = coach.p;
-    user = Store.updateUser(user.id, { coachPrefs: prefs, ...(level ? { level } : {}) });
+    const { level, limits, ...prefs } = coach.p;
+    user = Store.updateUser(user.id, { coachPrefs: prefs, limits, ...(level ? { level } : {}) });
   }
 
   function coachNext() {
     let i = COACH_STEPS.indexOf(coach.step) + 1;
     if (COACH_STEPS[i] === "nivel" && user.level && !coach.askLevel) i++;
+    if (COACH_STEPS[i] === "limitacoes" && user.limits && !coach.askLimits) i++;
     coach.step = COACH_STEPS[i] || "resultado";
     if (coach.step === "resultado") {
       coachSavePrefs();
@@ -3032,6 +3319,15 @@
         return p.equipment.length ? equipmentLabels(p.equipment).join(", ") : "Só o peso do corpo";
       case "nivel":
         return DIFFICULTIES[p.level] || "";
+      case "limitacoes": {
+        const lim = coachLimits(p);
+        const parts = [
+          ...Object.entries(lim.regions).map(([k, v]) => `${COACH_REGIONS[k]} (${v === "evitar" ? "evitar" : "cuidado"})`),
+          ...lim.conditions.map((c) => COACH_CONDITIONS[c]),
+          ...(lim.flags.length ? ["modo cuidadoso"] : []),
+        ];
+        return parts.length ? parts.join(", ") : "Sem dores ou limitações";
+      }
       case "objetivo":
         return [COACH_GOALS[p.goal][0], p.noImpact ? "sem impacto" : "", p.warmup ? "com aquecimento" : ""].filter(Boolean).join(", ");
     }
@@ -3043,6 +3339,7 @@
     grupos: "O que você quer treinar hoje?",
     equipamentos: "O que você tem aí para usar?",
     nivel: "Qual é o seu nível?",
+    limitacoes: "Sente alguma dor ou tem alguma limitação?",
     objetivo: "Qual o objetivo do treino?",
   };
 
@@ -3074,6 +3371,26 @@
           ${next()}`;
       case "nivel":
         return `<div class="chips coach-choices">${Object.entries(DIFFICULTIES).map(([id, label]) => chip("data-coach-level", id, label, p.level === id)).join("")}</div>`;
+      case "limitacoes": {
+        const lim = coachLimits(p);
+        const none = !Object.keys(lim.regions).length && !lim.conditions.length && !lim.flags.length;
+        const region = ([id, label]) => {
+          const level = lim.regions[id];
+          const text = level ? `${label} · ${level === "evitar" ? "dói" : "incomoda"}` : label;
+          return `<button class="chip ${level === "evitar" ? "chip-strong" : ""}" type="button" data-coach-region="${id}" aria-pressed="${Boolean(level)}" aria-label="${escapeHtml(label)}: ${level === "evitar" ? "dói para treinar" : level ? "incomoda às vezes" : "sem dor"}">${escapeHtml(text)}</button>`;
+        };
+        return `
+          <p class="coach-hint">${icon("info", "mi-inline")} Isto adapta os exercícios, mas não substitui a avaliação de um médico ou fisioterapeuta.</p>
+          <div class="chips coach-choices">${chip("data-coach-nolimits", 1, "Nenhuma", none)}</div>
+          <p class="meta">Onde dói ou incomoda? Toque 1 vez para "incomoda às vezes" e 2 vezes para "dói para treinar".</p>
+          <div class="chips coach-choices">${Object.entries(COACH_REGIONS).map(region).join("")}</div>
+          <p class="meta">Outras condições</p>
+          <div class="chips coach-choices">${Object.entries(COACH_CONDITIONS).map(([id, label]) => chip("data-coach-cond", id, label, lim.conditions.includes(id))).join("")}</div>
+          <p class="meta">Algum destes?</p>
+          <div class="chips coach-choices">${Object.entries(COACH_FLAGS).map(([id, label]) => chip("data-coach-flag", id, label, lim.flags.includes(id))).join("")}</div>
+          ${lim.flags.length ? `<p class="coach-hint coach-alert">${icon("error", "mi-inline")} Procure um médico ou fisioterapeuta antes de treinar. Até lá, o treino fica no modo cuidadoso: só exercícios simples, sem impacto e com intensidade baixa.</p>` : ""}
+          ${next()}`;
+      }
       case "objetivo":
         return `
           <div class="chips coach-choices">${Object.entries(COACH_GOALS).map(([id, [label]]) => chip("data-coach-goal", id, label, p.goal === id)).join("")}</div>
@@ -3088,14 +3405,34 @@
 
   // "Por que esse treino?": as regras que valeram nesta montagem.
   function coachWhy(p, items) {
-    const [label, , reps, rest] = COACH_GOALS[p.goal];
+    const meta = coach.meta || {};
+    const hist = meta.hist || coachHistory();
+    const lim = coachLimits(p);
     const main = items.filter((it) => !it.warmup);
-    const list = [`${main.length} exercícios para caber em ${p.time} min.`];
-    list.push(p.time <= 15 ? "Treino curto: 2 séries por exercício, em bi-set, para ganhar tempo." : `${label}: ${coachSets(p)} séries de ${reps} repetições e ${rest}s de descanso.`);
-    list.push("Exercícios compostos e com carga primeiro; isolados e abdômen no fim.");
-    if (main.some((it) => it.reps !== reps && !it.reps.endsWith(" cada lado"))) list.push("Exercícios com o peso do corpo ou por tempo usam a faixa própria deles.");
+    const exs = main.map((it) => findExercise(it.exerciseId)).filter(Boolean);
+    const [label, cSets, cReps, cRest] = COACH_GOALS[p.goal];
+    const [iSets, iReps, iRest] = COACH_ISO[p.goal];
+    const list = [`${main.length} exercícios para caber em ${p.time} min, um por padrão de movimento, para trabalhar o corpo de forma completa sem repetir o mesmo movimento.`];
+    list.push(p.time <= 15 ? "Treino curto: 2 séries por exercício, em bi-set de músculos diferentes, para ganhar tempo." : `${label}: compostos com ${cSets} séries de ${cReps} e ${cRest}s de descanso; isolados com ${iSets} de ${iReps} e ${iRest}s.`);
+    list.push("Ordem: os mais técnicos e com mais carga primeiro, isolados depois, abdômen e core no fim.");
+    if (exs.some((e) => coachFamily(e) === "puxar")) list.push(meta.balanced ? "Troquei um empurrão por uma puxada: pelo menos tantas puxadas quanto empurrões, para equilibrar ombros e postura." : "Pelo menos tantas puxadas quanto empurrões, para equilibrar ombros e postura.");
+    list.push("No máximo um exercício pesado para a lombar e até 10 séries por músculo na sessão.");
+    if (Object.keys(hist.weekly).length) list.push("Dei preferência aos músculos com menos séries nesta semana.");
+    const regions = Object.entries(lim.regions);
+    const blocked = meta.blocked || {};
+    const outByRegion = regions.reduce((a, [r]) => a + (blocked[r] || 0), 0);
+    if (regions.length) list.push(`Adaptado para ${regions.map(([r, l]) => `${COACH_REGIONS[r].toLowerCase()} (${l === "evitar" ? "evitar" : "cuidado"})`).join(", ")}: ${outByRegion ? `${outByRegion} exercícios que forçam essas regiões ficaram de fora e ` : ""}os que usam essas articulações têm menos séries e 3 repetições de reserva.`);
+    if (coachConservative(p)) list.push("Modo cuidadoso: só exercícios simples, sem impacto e com intensidade baixa. Procure um profissional de saúde.");
+    if (lim.flags.includes("gestacao")) list.push("Gestação: sem exercícios deitado de costas ou de bruços, sem abdominais e sem carga na lombar. Siga a orientação do seu obstetra.");
+    if (lim.conditions.includes("chao")) list.push("Sem exercícios deitado no chão, de joelhos ou em quatro apoios.");
+    if (lim.conditions.includes("idoso")) list.push("Sem saltos e sem exercícios de técnica muito alta.");
+    if (lim.conditions.includes("pressao")) list.push("Pressão alta: isometrias curtas, descanso maior e respiração contínua (não prenda o ar).");
+    if (blocked.dor) list.push(`${blocked.dor} exercício${blocked.dor > 1 ? "s" : ""} saí${blocked.dor > 1 ? "ram" : "u"} porque você marcou dor; quando existe, entra a versão mais fácil.`);
+    const evolved = exs.filter((e) => e.easier && hist.mastered.has(e.easier));
+    if (evolved.length) list.push(`Progressão: você dominou ${evolved.map((e) => findExercise(e.easier)?.name).join(", ")}, então entrou a versão mais difícil.`);
     if (p.noImpact) list.push("Sem saltos, como você pediu.");
-    if (Store.history(user.id).length) list.push("Evitei repetir os exercícios dos seus últimos treinos.");
+    if (p.level === "iniciante") list.push("Nível iniciante: exercícios estáveis e de técnica simples, parando com 3 repetições de reserva.");
+    if (hist.recent.size) list.push("Evitei repetir os exercícios dos seus últimos treinos.");
     return list;
   }
 
@@ -3128,6 +3465,7 @@
     const rows = items.map((it, i) => (it.warmup ? "" : row(it, i))).join("");
     return `
       ${coachBubble(`Pronto! Montei <strong>${items.length} exercícios</strong>, cerca de ${minutes} min, com descanso de ${w.restSeconds}s.`)}
+      ${coachConservative(p) ? `<p class="coach-hint coach-alert">${icon("error", "mi-inline")} Modo cuidadoso: procure um médico ou fisioterapeuta antes de aumentar a intensidade. Pare se sentir dor.</p>` : ""}
       ${missing.length ? `<p class="coach-hint">${icon("info", "mi-inline")} Sem exercícios de ${escapeHtml(missing.join(", "))} com os equipamentos escolhidos.</p>` : ""}
       ${!missing.length && coach.wanted && items.filter((it) => !it.warmup).length < coach.wanted - 1 ? `<p class="coach-hint">${icon("info", "mi-inline")} Com essas escolhas há poucos exercícios para ${p.time} min. Faça o circuito 2 vezes ou marque mais equipamentos.</p>` : ""}
       <section class="coach-result">
@@ -3162,7 +3500,7 @@
   function coachEnter(params) {
     const fromNew = params.get("novo") === "1";
     if (coach && Boolean(coach.fromNew) !== fromNew) coach = null;
-    if (!coach && fromNew) coach = { step: "tempo", p: coachDefaults(), fromNew: true, askLevel: !user.level };
+    if (!coach && fromNew) coach = { step: "tempo", p: coachDefaults(), fromNew: true, askLevel: !user.level, askLimits: !user.limits };
     renderCoach();
   }
 
@@ -3244,6 +3582,7 @@
     if ("coachBegin" in d) {
       coach.step = "tempo";
       coach.askLevel = !user.level;
+      coach.askLimits = !user.limits;
     } else if ("coachRepeat" in d) {
       coach.step = "resultado";
       coach.result = coachBuild(p);
@@ -3266,6 +3605,20 @@
       p.level = d.coachLevel;
       coach.moved = true;
       return coachNext();
+    } else if ("coachNolimits" in d) {
+      p.limits = { regions: {}, conditions: [], flags: [] };
+    } else if (d.coachRegion) {
+      const lim = coachLimits(p);
+      const next = { undefined: "cuidado", cuidado: "evitar", evitar: undefined }[lim.regions[d.coachRegion]];
+      if (next) lim.regions[d.coachRegion] = next;
+      else delete lim.regions[d.coachRegion];
+      p.limits = lim;
+    } else if (d.coachCond || d.coachFlag) {
+      const lim = coachLimits(p);
+      const key = d.coachCond ? "conditions" : "flags";
+      const id = d.coachCond || d.coachFlag;
+      lim[key] = lim[key].includes(id) ? lim[key].filter((x) => x !== id) : [...lim[key], id];
+      p.limits = lim;
     } else if (d.coachGoal) {
       p.goal = d.coachGoal;
     } else if (d.coachToggle) {
@@ -3282,6 +3635,7 @@
     } else if (d.coachGoto) {
       coach.step = d.coachGoto;
       if (d.coachGoto === "nivel") coach.askLevel = true;
+      if (d.coachGoto === "limitacoes") coach.askLimits = true;
     } else if ("coachRegen" in d) {
       coach.result = coachBuild(p);
     } else if (d.coachSwap) {
@@ -3316,26 +3670,30 @@
     renderCoach();
   }
 
-  // Trocar exercício: mostra as alternativas do mesmo grupo para a pessoa escolher.
+  // Trocar exercício: alternativas do mesmo padrão de movimento, respeitando restrições e dores.
   async function coachSwap(i) {
     const p = coach.p;
+    const hist = coach.meta?.hist || coachHistory();
     const cur = findExercise(coach.result[i].exerciseId);
     const chosen = coach.result.map((it) => findExercise(it.exerciseId)).filter(Boolean);
-    const { ids: recent } = coachRecent();
-    const options = coachOptions(cur.group, p, chosen)
-      .map((ex) => [coachScore(ex, p, chosen, recent, false), ex])
+    const state = { list: chosen, ids: new Set(chosen.map((c) => c.id)), vol: {}, lombar: 0, complex: 0 };
+    const pool = coachPool(p, hist).filter((ex) => !state.ids.has(ex.id));
+    let options = pool.filter((ex) => coachPattern(ex) === coachPattern(cur));
+    if (!options.length) options = pool.filter((ex) => ex.group === cur.group && coachFamily(ex) !== "cardio");
+    options = options
+      .map((ex) => [coachScore(ex, p, state, hist), ex])
       .sort((a, b) => b[0] - a[0])
       .slice(0, 6)
       .map(([, ex]) => ex);
-    if (!options.length) return toast("Não há outro exercício desse grupo com seus equipamentos.");
+    if (!options.length) return toast("Não há outro exercício parecido com seus equipamentos e limitações.");
     const id = await actionSheet({
       title: `Trocar ${cur.name}`,
-      text: "Escolha outro exercício do mesmo grupo.",
+      text: "Outros exercícios do mesmo movimento.",
       actions: options.map((ex) => ({ id: ex.id, icon: "swap_horiz", label: ex.name, hint: `${DIFFICULTIES[ex.difficulty] || ""} · ${coachReason(ex, p, {}).split(" · ")[1]}` })),
     });
     const ex = id && findExercise(id);
     if (!ex || !coach) return;
-    coach.result[i] = { ...coachItem(ex, p), ...(coach.result[i].linkNext ? { linkNext: true } : {}) };
+    coach.result[i] = { ...coachItem(ex, p, hist), ...(coach.result[i].linkNext ? { linkNext: true } : {}) };
     renderCoach();
   }
 

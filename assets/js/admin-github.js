@@ -407,6 +407,9 @@
     exFields.forEach((f) => ($(`ex-${f}`).value = ex[f] || ""));
     if (!ex.type) $("ex-type").value = "reps";
     $("ex-impact").checked = Boolean(ex.impact);
+    $("ex-complexity").value = ex.complexity ? String(ex.complexity) : "";
+    $("ex-position").value = ex.position || "";
+    document.querySelectorAll("[data-joint]").forEach((s) => (s.value = String(ex.joints?.[s.dataset.joint] || 0)));
     renderEquipmentChecks(ex.equipment || []);
     $("ex-image-file").value = "";
     $("exercise-form-title").textContent = `Editando: ${ex.name}`;
@@ -458,6 +461,9 @@
     exFields.forEach((f) => (values[f] = $(`ex-${f}`).value.trim()));
     values.equipment = readEquipmentChecks();
     values.impact = $("ex-impact").checked;
+    values.complexity = Number($("ex-complexity").value) || undefined;
+    values.position = $("ex-position").value || undefined;
+    values.joints = Object.fromEntries([...document.querySelectorAll("[data-joint]")].map((s) => [s.dataset.joint, Number(s.value)]).filter(([, v]) => v > 0));
     const file = $("ex-image-file").files[0];
     if (!validateExercise(values, file)) return;
 
