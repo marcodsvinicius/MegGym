@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v50**.
+- Versão atual: **v51**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -38,7 +38,8 @@ Outros cuidados:
 - Ícones do mapa corporal: os SVGs usam `<use>`, então o CSS precisa mirar `#bm-sprite ...`.
 
 ## Testes
-- Comando: `npm test` (Playwright e axe-core, via `node --test`). São 22 testes, todos passando.
+- Comando: `npm test` (Playwright e axe-core, via `node --test`). São 24 testes, todos passando.
+- `tests/coach.test.mjs` monta 1.728 combinações no treinador (via `window.MegCoach.build`) e confere as regras de `tests/coach-rules.js` (equipamento, impacto, limitações, gestação, chão, dor, nível, lombar, volume por músculo, puxar >= empurrar, tempo). Ao mudar regras do treinador, atualize os dois.
 - Também rodam no GitHub Actions (`.github/workflows/testes.yml`).
 - Para tirar prints de telas: navegue antes para `#/x`, senão a tela não renderiza de novo quando o hash não muda.
 
@@ -53,8 +54,9 @@ Outros cuidados:
   - Tipos de exercício: repetições, unilateral e tempo (com cronômetro).
   - Bi-set e super-set.
 - **Durante o treino:** pular, trocar e reordenar exercícios. No fim da lista há um card para terminar antes ou descartar o treino. Ao terminar, é possível compartilhar um resumo em imagem.
+- **Tour de primeiro uso:** 5 passos (treino do dia, séries, opções, apresentação do Treinador e "Sente alguma dor?" com o seletor de limitações).
 - **Início:** card "Treino de hoje"; motivação dentro de "Sua semana"; card de instalação com botão de fechar (depois de fechado, a opção fica em Configurações).
-- **Atividade:** abas Resumo, Evolução e Histórico.
+- **Atividade:** abas Resumo, Evolução e Histórico. O Resumo mostra "Séries por músculo na semana" (mesmo cálculo do treinador, referência pelo nível) e um botão para montar treino com os músculos que mais faltam (`#/treinador?grupos=...`).
 - **Treinos:**
   - Abas Meu Treino, Explorar e Salvos.
   - Treino e Divisão (A/B/C…), cada um público ou privado; dá para salvar, seguir e copiar.
@@ -75,7 +77,7 @@ Outros cuidados:
   - Algoritmo (sem IA, `coachBuild` em `app.js`): moldes de vagas por padrão de movimento para cada foco (ou vagas por grupo); o tempo decide quantas vagas entram. Cada vaga pega o exercício de maior nota (músculos ainda não trabalhados, volume que falta na semana, nível e complexidade, recência, demanda articular, dor, progressão).
   - Regras: o mesmo movimento só se repete com outro exercício de fato (fora da cadeia, outro nome e, nos compostos, outra posição ou equipamento); puxar >= empurrar quando há costas; no máximo 1 exercício com lombar alta; até 10 séries por músculo na sessão (secundário conta 0,5); ordem compostos (mais técnicos primeiro) > isolados > core > cardio; bi-set só de músculos diferentes.
   - Prescrição por objetivo, diferente para compostos e isolados (`COACH_GOALS`, `COACH_ISO`), com descanso por item e RIR (3 para iniciante ou região com dor). Peso do corpo e exercícios por tempo usam as repetições do próprio exercício.
-  - Etapa "Sente alguma dor ou tem alguma limitação?" (salva em `user.limits`): regiões com "incomoda" (menos séries e RIR 3) ou "dói" (tira exercícios com exigência alta naquela articulação); condições (pressão alta, 60+, sem deitar no chão); sinais de alerta (dor forte, irradiada, cirurgia, gestação, dor no peito) ativam o modo cuidadoso e orientam procurar um profissional. Gestação tem regras próprias.
+  - Limitações (salvas em `user.limits`) são editadas no treinador, em Configurações > Dores e limitações (`#/atividade/limitacoes`) e no último passo do tour de primeiro uso; o seletor é compartilhado (`limitsPickerHtml`/`limitsApply`). Regras: regiões com "incomoda" (menos séries e RIR 3) ou "dói" (tira exercícios com exigência alta naquela articulação); condições (pressão alta, 60+, sem deitar no chão); sinais de alerta (dor forte, irradiada, cirurgia, gestação, dor no peito) ativam o modo cuidadoso e orientam procurar um profissional. Gestação tem regras próprias.
   - Dor por exercício: no resumo do treino feito, "Sentiu dor em algum exercício?" (salva em `user.painLog`). De 4 a 6, o exercício sai e entra a versão mais fácil; 7 ou mais, sai e orienta procurar um profissional.
   - Progressão: exercício com todas as séries no topo da faixa nas 2 últimas vezes é "dominado"; o treinador prefere a versão mais difícil da cadeia ou sugere aumentar a carga.
   - Sugestão na etapa de grupos: músculos com menos séries na semana e que não treinaram nas últimas 48h.

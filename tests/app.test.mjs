@@ -31,13 +31,14 @@ test("onboarding cria o perfil e mostra o início", () =>
     await page.click('#ob-equipment [type="submit"]');
     await page.click('#ob-style [type="submit"]');
     await page.waitForSelector("#app-shell:not(.hidden)");
-    // Dicas do primeiro uso: 3 passos e fecha.
+    // Dicas do primeiro uso: 3 dicas, o treinador e as limitações (última), e fecha.
     await page.waitForSelector(".tour");
-    await page.click("#tour-next");
-    await page.click("#tour-next");
+    for (let i = 0; i < 4; i++) await page.click("#tour-next");
     assert.match(await page.textContent("#tour-next"), /Começar a treinar/);
+    await page.click('[data-lim="region"][data-lim-id="lombar"]');
     await page.click("#tour-next");
     await page.waitForSelector("#sheet", { state: "hidden" });
+    assert.equal(await page.evaluate(() => MegStore.currentUser().limits.regions.lombar), "cuidado");
     assert.match(await page.textContent(".page-title"), /Ana/);
     assert.ok(await page.isVisible(".today-card"), "cartão Treino de hoje");
   }));

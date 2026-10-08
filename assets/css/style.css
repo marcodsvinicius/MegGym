@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=50") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=51") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2424,3 +2424,12 @@ body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inse
 .coach-feedback h3 { margin: 0; font-size: var(--fs-md); display: flex; align-items: center; gap: var(--space-2); }
 .coach-feedback .meta { margin: 0; }
 .coach-fb-text { min-height: 80px; }
+.limits-picker { display: grid; gap: var(--space-2); }
+.limits-picker .meta { margin: var(--space-1) 0 0; }
+.tour-limits { text-align: left; max-height: 45vh; overflow-y: auto; margin: var(--space-2) 0; }
+.week-muscle-list { list-style: none; margin: var(--space-2) 0; padding: 0; display: grid; gap: var(--space-2); }
+.week-muscle { display: grid; grid-template-columns: 9.5em 1fr auto; align-items: center; gap: var(--space-2); font-size: var(--fs-sm); }
+.week-muscle .meta { margin: 0; min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; }
+.week-muscle .progress { display: block; }
+.week-muscle.done .progress-bar { background: var(--success); }
+.week-muscles > .meta { margin: 0; }

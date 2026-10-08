@@ -2374,6 +2374,33 @@
       </section>`;
   }
 
+  // Séries por músculo nesta semana (secundário conta metade), comparadas com a referência do nível.
+  function weeklyMusclesHtml() {
+    const { weekly } = coachHistory();
+    const target = COACH_WEEKLY[user.level] || 12;
+    const list = groups().filter((g) => g.id !== "cardio");
+    const rows = list
+      .map((g) => {
+        const n = Math.round(weekly[g.id] || 0);
+        const pct = Math.min(100, Math.round((n / target) * 100));
+        return `
+          <li class="week-muscle ${n >= target ? "done" : ""}">
+            <span class="week-muscle-name">${escapeHtml(g.name)}</span>
+            <span class="progress" role="progressbar" aria-label="${escapeHtml(g.name)}: ${n} de ${target} séries" aria-valuemin="0" aria-valuemax="${target}" aria-valuenow="${Math.min(n, target)}"><span class="progress-bar" style="width:${pct}%"></span></span>
+            <span class="meta">${n}/${target}</span>
+          </li>`;
+      })
+      .join("");
+    const lacking = list.filter((g) => COACH_BIG.includes(g.id) && (weekly[g.id] || 0) < target / 2).sort((a, b) => (weekly[a.id] || 0) - (weekly[b.id] || 0));
+    return `
+      <section class="subsection week-muscles">
+        <div class="subsection-head"><h2 class="subsection-title">Séries por músculo na semana</h2></div>
+        <p class="meta">Referência para o nível ${escapeHtml((DIFFICULTIES[user.level] || "intermediário").toLowerCase())}: cerca de ${target} séries por músculo por semana. Exercícios que ajudam outro músculo contam metade.</p>
+        <ul class="week-muscle-list">${rows}</ul>
+        ${lacking.length ? `<a class="btn btn-block" href="#/treinador?grupos=${lacking.slice(0, 2).map((g) => g.id).join(",")}">${icon("bolt", "mi-inline")} Montar treino para ${escapeHtml(lacking.slice(0, 2).map((g) => g.name.toLowerCase()).join(" e "))}</a>` : ""}
+      </section>`;
+  }
+
   function renderActivity(params) {
     setHeader("Atividade", {
       action: `<a class="icon-btn" href="#/atividade/configuracoes" aria-label="Configurações" title="Configurações">
@@ -2418,6 +2445,7 @@
             <a class="link-btn" href="#/atividade/perfil">Editar perfil</a>
           </div>
         </section>
+        ${history.length ? weeklyMusclesHtml() : ""}
         <div class="stat-tiles">
           <div class="stat-tile"><span class="stat-tile-value">${history.length}</span><span class="stat-tile-label">treinos feitos</span></div>
           <div class="stat-tile"><span class="stat-tile-value">${thisWeek}</span><span class="stat-tile-label">últimos 7 dias</span></div>
@@ -2787,9 +2815,14 @@
             <span class="item-main"><span class="item-title">Meus equipamentos</span><br><span class="meta">${(user.equipment || []).length} selecionados</span></span>
             <span class="chevron" aria-hidden="true">›</span>
           </a>
+          <a class="settings-item" href="#/atividade/limitacoes">
+            <span class="settings-icon">${icon("self_improvement")}</span>
+            <span class="item-main"><span class="item-title">Dores e limitações</span><br><span class="meta">${escapeHtml(user.limits ? limitsSummary(user.limits) : "Ainda não informado")}</span></span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </a>
           <button class="settings-item" type="button" id="tour-again">
             <span class="settings-icon">${icon("lightbulb")}</span>
-            <span class="item-main"><span class="item-title">Ver dicas de novo</span><br><span class="meta">Como registrar séries, descanso e opções</span></span>
+            <span class="item-main"><span class="item-title">Ver dicas de novo</span><br><span class="meta">Séries, descanso, opções e o treinador</span></span>
           </button>
           <button class="settings-item settings-danger" type="button" id="logout-btn">
             <span class="settings-icon">${icon("logout")}</span>
@@ -3149,10 +3182,11 @@
         const push = fam("empurrar").pop();
         const kind = fam("puxar").some((e) => coachPattern(e) === "puxar-h") ? "puxar-v" : "puxar-h";
         const pull = best({ pattern: kind }) || best({ pattern: kind === "puxar-h" ? "puxar-v" : "puxar-h" });
-        if (!pull) break;
-        state.list.splice(state.list.indexOf(push), 1, pull);
+        // Sem puxada que caiba (ex.: costas já no limite de séries), o empurrão extra sai.
+        if (pull) state.list.splice(state.list.indexOf(push), 1, pull);
+        else state.list.splice(state.list.indexOf(push), 1);
         state.ids.delete(push.id);
-        state.ids.add(pull.id);
+        if (pull) state.ids.add(pull.id);
         balanced = true;
       }
     }
@@ -3319,15 +3353,8 @@
         return p.equipment.length ? equipmentLabels(p.equipment).join(", ") : "Só o peso do corpo";
       case "nivel":
         return DIFFICULTIES[p.level] || "";
-      case "limitacoes": {
-        const lim = coachLimits(p);
-        const parts = [
-          ...Object.entries(lim.regions).map(([k, v]) => `${COACH_REGIONS[k]} (${v === "evitar" ? "evitar" : "cuidado"})`),
-          ...lim.conditions.map((c) => COACH_CONDITIONS[c]),
-          ...(lim.flags.length ? ["modo cuidadoso"] : []),
-        ];
-        return parts.length ? parts.join(", ") : "Sem dores ou limitações";
-      }
+      case "limitacoes":
+        return limitsSummary(coachLimits(p));
       case "objetivo":
         return [COACH_GOALS[p.goal][0], p.noImpact ? "sem impacto" : "", p.warmup ? "com aquecimento" : ""].filter(Boolean).join(", ");
     }
@@ -3371,26 +3398,8 @@
           ${next()}`;
       case "nivel":
         return `<div class="chips coach-choices">${Object.entries(DIFFICULTIES).map(([id, label]) => chip("data-coach-level", id, label, p.level === id)).join("")}</div>`;
-      case "limitacoes": {
-        const lim = coachLimits(p);
-        const none = !Object.keys(lim.regions).length && !lim.conditions.length && !lim.flags.length;
-        const region = ([id, label]) => {
-          const level = lim.regions[id];
-          const text = level ? `${label} · ${level === "evitar" ? "dói" : "incomoda"}` : label;
-          return `<button class="chip ${level === "evitar" ? "chip-strong" : ""}" type="button" data-coach-region="${id}" aria-pressed="${Boolean(level)}" aria-label="${escapeHtml(label)}: ${level === "evitar" ? "dói para treinar" : level ? "incomoda às vezes" : "sem dor"}">${escapeHtml(text)}</button>`;
-        };
-        return `
-          <p class="coach-hint">${icon("info", "mi-inline")} Isto adapta os exercícios, mas não substitui a avaliação de um médico ou fisioterapeuta.</p>
-          <div class="chips coach-choices">${chip("data-coach-nolimits", 1, "Nenhuma", none)}</div>
-          <p class="meta">Onde dói ou incomoda? Toque 1 vez para "incomoda às vezes" e 2 vezes para "dói para treinar".</p>
-          <div class="chips coach-choices">${Object.entries(COACH_REGIONS).map(region).join("")}</div>
-          <p class="meta">Outras condições</p>
-          <div class="chips coach-choices">${Object.entries(COACH_CONDITIONS).map(([id, label]) => chip("data-coach-cond", id, label, lim.conditions.includes(id))).join("")}</div>
-          <p class="meta">Algum destes?</p>
-          <div class="chips coach-choices">${Object.entries(COACH_FLAGS).map(([id, label]) => chip("data-coach-flag", id, label, lim.flags.includes(id))).join("")}</div>
-          ${lim.flags.length ? `<p class="coach-hint coach-alert">${icon("error", "mi-inline")} Procure um médico ou fisioterapeuta antes de treinar. Até lá, o treino fica no modo cuidadoso: só exercícios simples, sem impacto e com intensidade baixa.</p>` : ""}
-          ${next()}`;
-      }
+      case "limitacoes":
+        return `${limitsPickerHtml(coachLimits(p))}${next()}`;
       case "objetivo":
         return `
           <div class="chips coach-choices">${Object.entries(COACH_GOALS).map(([id, [label]]) => chip("data-coach-goal", id, label, p.goal === id)).join("")}</div>
@@ -3434,6 +3443,89 @@
     if (p.level === "iniciante") list.push("Nível iniciante: exercícios estáveis e de técnica simples, parando com 3 repetições de reserva.");
     if (hist.recent.size) list.push("Evitei repetir os exercícios dos seus últimos treinos.");
     return list;
+  }
+
+  /* ---------- Dores e limitações (perfil, tour e treinador) ---------- */
+  const cloneLimits = (l) => ({ regions: { ...(l?.regions || {}) }, conditions: [...(l?.conditions || [])], flags: [...(l?.flags || [])] });
+
+  function limitsSummary(l) {
+    const lim = cloneLimits(l);
+    const parts = [
+      ...Object.entries(lim.regions).map(([k, v]) => `${COACH_REGIONS[k]} (${v === "evitar" ? "evitar" : "cuidado"})`),
+      ...lim.conditions.map((c) => COACH_CONDITIONS[c]),
+      ...(lim.flags.length ? ["modo cuidadoso"] : []),
+    ];
+    return parts.length ? parts.join(", ") : "Sem dores ou limitações";
+  }
+
+  function limitsPickerHtml(lim) {
+    const none = !Object.keys(lim.regions).length && !lim.conditions.length && !lim.flags.length;
+    const btn = (kind, id, label, on, cls = "", aria = "") =>
+      `<button class="chip ${cls}" type="button" data-lim="${kind}" data-lim-id="${id}" aria-pressed="${on}"${aria ? ` aria-label="${escapeHtml(aria)}"` : ""}>${escapeHtml(label)}</button>`;
+    const region = ([id, label]) => {
+      const level = lim.regions[id];
+      const text = level ? `${label} · ${level === "evitar" ? "dói" : "incomoda"}` : label;
+      return btn("region", id, text, Boolean(level), level === "evitar" ? "chip-strong" : "", `${label}: ${level === "evitar" ? "dói para treinar" : level ? "incomoda às vezes" : "sem dor"}`);
+    };
+    return `
+      <div class="limits-picker">
+        <p class="coach-hint">${icon("info", "mi-inline")} Isto adapta os exercícios do treinador, mas não substitui a avaliação de um médico ou fisioterapeuta.</p>
+        <div class="chips coach-choices">${btn("none", "1", "Nenhuma", none)}</div>
+        <p class="meta">Onde dói ou incomoda? Toque 1 vez para "incomoda às vezes" e 2 vezes para "dói para treinar".</p>
+        <div class="chips coach-choices">${Object.entries(COACH_REGIONS).map(region).join("")}</div>
+        <p class="meta">Outras condições</p>
+        <div class="chips coach-choices">${Object.entries(COACH_CONDITIONS).map(([id, label]) => btn("cond", id, label, lim.conditions.includes(id))).join("")}</div>
+        <p class="meta">Algum destes?</p>
+        <div class="chips coach-choices">${Object.entries(COACH_FLAGS).map(([id, label]) => btn("flag", id, label, lim.flags.includes(id))).join("")}</div>
+        ${lim.flags.length ? `<p class="coach-hint coach-alert">${icon("error", "mi-inline")} Procure um médico ou fisioterapeuta antes de treinar. Até lá, o treinador monta treinos no modo cuidadoso: só exercícios simples, sem impacto e com intensidade baixa.</p>` : ""}
+      </div>`;
+  }
+
+  // Aplica o toque num botão do seletor (região: sem dor → incomoda → dói → sem dor).
+  function limitsApply(el, lim) {
+    const { lim: kind, limId: id } = el.dataset;
+    if (kind === "none") {
+      lim.regions = {};
+      lim.conditions = [];
+      lim.flags = [];
+    } else if (kind === "region") {
+      const cur = lim.regions[id];
+      const next = !cur ? "cuidado" : cur === "cuidado" ? "evitar" : null;
+      if (next) lim.regions[id] = next;
+      else delete lim.regions[id];
+    } else {
+      const key = kind === "cond" ? "conditions" : "flags";
+      lim[key] = lim[key].includes(id) ? lim[key].filter((x) => x !== id) : [...lim[key], id];
+    }
+    return lim;
+  }
+
+  function renderEditLimits() {
+    setTab("atividade");
+    setHeader("Dores e limitações", { back: "#/atividade/configuracoes" });
+    const lim = cloneLimits(user.limits);
+    const draw = () => ($("limits-slot").innerHTML = limitsPickerHtml(lim));
+    app.innerHTML = `
+      <form class="form-stack" id="limits-form" novalidate>
+        <p class="page-subtitle" style="margin:0">O treinador usa isto para tirar exercícios que forçam a região com dor e deixar o treino mais leve onde incomoda.</p>
+        <div id="limits-slot"></div>
+        <div class="sticky-cta"><button class="btn btn-primary btn-block btn-lg" type="submit">Salvar</button></div>
+      </form>`;
+    draw();
+    $("limits-slot").addEventListener("click", (e) => {
+      const el = e.target.closest("[data-lim]");
+      if (!el) return;
+      limitsApply(el, lim);
+      draw();
+      $("limits-slot").querySelector(`[data-lim="${el.dataset.lim}"][data-lim-id="${el.dataset.limId}"]`)?.focus();
+    });
+    $("limits-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      user = Store.updateUser(user.id, { limits: lim });
+      if (coach) coach.p.limits = cloneLimits(lim);
+      toast("Dores e limitações salvas.", "success");
+      location.hash = "#/atividade/configuracoes";
+    });
   }
 
   /* ---------- Beta e feedback do treinador ---------- */
@@ -3567,6 +3659,9 @@
     const fromNew = params.get("novo") === "1";
     if (coach && Boolean(coach.fromNew) !== fromNew) coach = null;
     if (!coach && fromNew) coach = { step: "tempo", p: coachDefaults(), fromNew: true, askLevel: !user.level, askLimits: !user.limits };
+    // Vindo do resumo da semana: começa com os grupos que faltam já marcados.
+    const preset = (params.get("grupos") || "").split(",").filter((g) => findGroup(g));
+    if (preset.length) coach = { step: "tempo", p: { ...coachDefaults(), focus: "", groups: preset }, fromNew, askLevel: !user.level, askLimits: !user.limits };
     renderCoach();
   }
 
@@ -3681,20 +3776,8 @@
       p.level = d.coachLevel;
       coach.moved = true;
       return coachNext();
-    } else if ("coachNolimits" in d) {
-      p.limits = { regions: {}, conditions: [], flags: [] };
-    } else if (d.coachRegion) {
-      const lim = coachLimits(p);
-      const next = { undefined: "cuidado", cuidado: "evitar", evitar: undefined }[lim.regions[d.coachRegion]];
-      if (next) lim.regions[d.coachRegion] = next;
-      else delete lim.regions[d.coachRegion];
-      p.limits = lim;
-    } else if (d.coachCond || d.coachFlag) {
-      const lim = coachLimits(p);
-      const key = d.coachCond ? "conditions" : "flags";
-      const id = d.coachCond || d.coachFlag;
-      lim[key] = lim[key].includes(id) ? lim[key].filter((x) => x !== id) : [...lim[key], id];
-      p.limits = lim;
+    } else if (d.lim) {
+      p.limits = limitsApply(el, cloneLimits(coachLimits(p)));
     } else if (d.coachGoal) {
       p.goal = d.coachGoal;
     } else if (d.coachToggle) {
@@ -3778,6 +3861,20 @@
     if (/^#\/(treinador|assistente)/.test(location.hash)) handleCoachClick(e);
   });
 
+  // Para os testes automáticos: monta um treino com as escolhas dadas, sem mexer na tela.
+  window.MegCoach = {
+    build(prefs) {
+      const saved = coach;
+      coach = { p: { ...coachDefaults(), ...prefs } };
+      try {
+        const items = coachBuild(coach.p);
+        return { items, wanted: coach.wanted, blocked: coach.meta.blocked, minutes: coachMinutes(items, COACH_GOALS[coach.p.goal][3]) };
+      } finally {
+        coach = saved;
+      }
+    },
+  };
+
   /* ================= Rotas ================= */
 
   function route() {
@@ -3817,6 +3914,7 @@
         else if (parts[1] === "perfil") renderEditProfile();
         else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2], params);
         else if (parts[1] === "equipamentos") renderEditEquipment();
+        else if (parts[1] === "limitacoes") renderEditLimits();
         else renderActivity(params);
         break;
       case "inicio":
@@ -4277,16 +4375,20 @@
     }
   });
 
-  /* ---------- Primeiro uso: 3 dicas rápidas ---------- */
+  /* ---------- Primeiro uso: dicas rápidas, treinador e limitações ---------- */
 
   const TOUR = [
     ["today", "Seu treino do dia", "No Início aparece o Treino de hoje. Toque em Começar para iniciar, ou escolha outro em Treinos."],
     ["check_circle", "Registre cada série", "Abra o exercício, anote repetições e peso e marque a série. O descanso começa sozinho, e o app compara com a última vez."],
     ["more_vert", "Do seu jeito", "No menu ⋮ de cada exercício dá para pular, trocar por outro do mesmo grupo ou mudar a ordem. Ao terminar, compartilhe o resumo."],
+    ["bolt", "Conheça o Treinador (beta)", "Sem treino pronto? Toque em Montar um treino agora. Diga quanto tempo tem, o que quer treinar e o que tem em casa, e ele monta um treino completo, sem repetir movimento e respeitando suas dores. Ele está em testes: conte o que achou no fim."],
+    ["self_improvement", "Sente alguma dor?", ""],
   ];
 
   function showTour() {
     let step = 0;
+    let changed = false;
+    const lim = cloneLimits(user.limits);
     const draw = () => {
       const [ic, title, text] = TOUR[step];
       const last = step === TOUR.length - 1;
@@ -4295,12 +4397,24 @@
           <span class="tour-icon">${icon(ic)}</span>
           <p class="eyebrow-text">Dica ${step + 1} de ${TOUR.length}</p>
           <h2 id="sheet-title">${title}</h2>
-          <p class="tour-text">${text}</p>
+          ${last ? `<p class="tour-text">Conte para o treinador onde dói ou incomoda. Dá para mudar depois em Configurações.</p><div class="tour-limits" id="tour-limits">${limitsPickerHtml(lim)}</div>` : `<p class="tour-text">${text}</p>`}
           <div class="tour-dots" aria-hidden="true">${TOUR.map((_, i) => `<span class="${i === step ? "on" : ""}"></span>`).join("")}</div>
           <button class="btn btn-primary btn-block btn-lg" type="button" id="tour-next">${last ? "Começar a treinar" : "Próxima dica"}</button>
           ${last ? "" : `<button class="btn btn-ghost btn-block" type="button" id="tour-skip">Pular dicas</button>`}
         </div>`;
-      $("tour-next").addEventListener("click", () => (last ? closeSheet() : (step++, draw())));
+      $("tour-limits")?.addEventListener("click", (e) => {
+        const el = e.target.closest("[data-lim]");
+        if (!el) return;
+        limitsApply(el, lim);
+        changed = true;
+        $("tour-limits").innerHTML = limitsPickerHtml(lim);
+        $("tour-limits").querySelector(`[data-lim="${el.dataset.lim}"][data-lim-id="${el.dataset.limId}"]`)?.focus();
+      });
+      $("tour-next").addEventListener("click", () => {
+        if (!last) return step++, draw();
+        if (changed || !user.limits) user = Store.updateUser(user.id, { limits: lim });
+        closeSheet();
+      });
       $("tour-skip")?.addEventListener("click", () => closeSheet());
       $("tour-next").focus({ preventScroll: true });
     };
