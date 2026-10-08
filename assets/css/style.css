@@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=49") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=50") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2418,3 +2418,9 @@ body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inse
 .pain-chips { margin-top: var(--space-2); }
 .joint-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-2); }
 .joint-field { display: grid; gap: 4px; font-size: var(--fs-sm); font-weight: var(--fw-medium); }
+.beta-tag { display: inline-flex; align-items: center; min-height: 20px; padding: 0 8px; border-radius: var(--pill-radius); background: var(--accent-container); color: var(--on-accent-container); font-size: var(--fs-xs); font-weight: var(--fw-bold); letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; border: 0; }
+.beta-btn { min-height: 32px; padding: 0 12px; cursor: pointer; font: inherit; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.coach-feedback { display: grid; gap: var(--space-3); padding: var(--card-pad); border-radius: var(--radius); background: var(--card-bg); border: var(--card-border-w) dashed var(--card-border); }
+.coach-feedback h3 { margin: 0; font-size: var(--fs-md); display: flex; align-items: center; gap: var(--space-2); }
+.coach-feedback .meta { margin: 0; }
+.coach-fb-text { min-height: 80px; }

@@ -613,7 +613,7 @@
 
       ${activeWorkout ? "" : `<a class="coach-card" href="#/treinador">
         <span class="coach-card-icon" aria-hidden="true">${icon("bolt")}</span>
-        <span class="item-main"><strong>Montar um treino agora</strong><span class="meta">Diga o tempo, o que quer treinar e o que tem em casa.</span></span>
+        <span class="item-main"><strong>Montar um treino agora <span class="beta-tag">Beta</span></strong><span class="meta">Diga o tempo, o que quer treinar e o que tem em casa.</span></span>
         <span class="chevron" aria-hidden="true">›</span>
       </a>`}
 
@@ -1030,7 +1030,7 @@
       const choice = await actionSheet({
         title: "Criar",
         actions: [
-          { id: "treinador", icon: "bolt", label: "Montar com o treinador", hint: "Responda algumas perguntas e receba um treino pronto para ajustar" },
+          { id: "treinador", icon: "bolt", label: "Montar com o treinador (beta)", hint: "Responda algumas perguntas e receba um treino pronto para ajustar" },
           { id: "treino", icon: "fitness_center", label: "Criar treino manual", hint: "Escolha os exercícios, séries e repetições um a um" },
           { id: "divisao", icon: "view_week", label: "Nova divisão", hint: "Conjunto de treinos em sequência (A, B, C…)" },
         ],
@@ -3436,6 +3436,71 @@
     return list;
   }
 
+  /* ---------- Beta e feedback do treinador ---------- */
+  const BETA_TAG = `<button class="beta-tag beta-btn" type="button" data-beta aria-label="Treinador em testes (beta): saiba mais">Beta</button>`;
+
+  function showBetaInfo() {
+    return confirmSheet({
+      icon: "info",
+      title: "Treinador em testes",
+      text: "O treinador está em fase beta: as regras de montagem ainda estão sendo ajustadas e podem sugerir algo que não é ideal para você. Revise o treino antes de começar e, se tiver dor ou alguma condição de saúde, siga a orientação de um profissional. Ao montar um treino, conte o que achou: isso ajuda a melhorar o treinador.",
+      confirmLabel: "Entendi",
+      cancelLabel: "Fechar",
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-beta]")) showBetaInfo();
+  });
+
+  const COACH_RATINGS = { bom: "Gostei", medio: "Mais ou menos", ruim: "Não gostei" };
+
+  function coachFeedbackHtml() {
+    const fb = coach.feedback || {};
+    if (fb.sent) return `<p class="coach-hint">${icon("check_circle", "mi-inline")} Obrigado pelo feedback! Ele ajuda a melhorar o treinador.</p>`;
+    return `
+      <section class="coach-feedback" aria-labelledby="coach-fb-title">
+        <h3 id="coach-fb-title">O que achou deste treino? <span class="beta-tag">Beta</span></h3>
+        <div class="chips coach-choices">${Object.entries(COACH_RATINGS)
+          .map(([id, label]) => `<button class="chip" type="button" data-coach-rate="${id}" aria-pressed="${fb.rating === id}">${label}</button>`)
+          .join("")}</div>
+        <label class="visually-hidden" for="coach-fb-text">Comentário</label>
+        <textarea class="textarea coach-fb-text" id="coach-fb-text" maxlength="600" placeholder="Opcional: o que faltou, o que sobrou, algum exercício estranho…">${escapeHtml(fb.text || "")}</textarea>
+        <button class="btn btn-block" type="button" data-coach-feedback ${fb.rating ? "" : "disabled"}>${icon("send", "mi-inline")} Enviar feedback</button>
+        <p class="meta">Abre o seu e-mail com a mensagem pronta, incluindo as escolhas e o treino montado.</p>
+      </section>`;
+  }
+
+  // Monta o e-mail de feedback (avaliação, comentário, escolhas e treino) e guarda uma cópia no aparelho.
+  function coachSendFeedback() {
+    const p = coach.p;
+    const fb = coach.feedback || {};
+    const steps = COACH_STEPS.filter((s) => s !== "nivel" || p.level);
+    const lines = coach.result.map((it) => {
+      const ex = findExercise(it.exerciseId);
+      return `- ${it.warmup ? "(aquecimento) " : ""}${ex ? ex.name : it.exerciseId}: ${it.sets} x ${it.reps}${it.rest ? `, descanso ${it.rest}` : ""}`;
+    });
+    const version = document.querySelector('script[src*="app.js"]')?.src.match(/v=(\d+)/)?.[1] || "";
+    const body = [
+      `Avaliação: ${COACH_RATINGS[fb.rating]}`,
+      `Comentário: ${(fb.text || "").trim() || "(sem comentário)"}`,
+      "",
+      "Escolhas:",
+      ...steps.map((s) => `- ${COACH_QUESTIONS[s]} ${coachAnswer(s)}`),
+      "",
+      "Treino montado:",
+      ...lines,
+      "",
+      `MegGym v${version}`,
+    ].join("\n");
+    const list = [...(user.coachFeedback || []), { rating: fb.rating, text: fb.text || "", date: new Date().toISOString(), choices: steps.map((s) => coachAnswer(s)), exercises: coach.result.map((it) => it.exerciseId) }].slice(-20);
+    user = Store.updateUser(user.id, { coachFeedback: list });
+    const to = window.MEGGYM_CONFIG?.FEEDBACK_EMAIL || "";
+    location.href = `mailto:${to}?subject=${encodeURIComponent(`Feedback do treinador (beta): ${COACH_RATINGS[fb.rating]}`)}&body=${encodeURIComponent(body)}`;
+    coach.feedback = { ...fb, sent: true };
+    renderCoach();
+  }
+
   function coachResultHtml() {
     const p = coach.p;
     const items = coach.result;
@@ -3493,7 +3558,8 @@
         </div>`
         }
         <button class="link-btn" type="button" data-coach-restart>${icon("tune", "mi-inline")} Ajustar escolhas</button>
-      </div>`;
+      </div>
+      ${coachFeedbackHtml()}`;
   }
 
   // Entrada no treinador: pela Início (treinar agora) ou pelo "Novo treino" (montar, salvar e ajustar).
@@ -3507,7 +3573,7 @@
   function renderCoach() {
     if (!coach) coach = { step: "inicio", p: coachDefaults() };
     setTab(coach.fromNew ? "treinos" : "inicio");
-    setHeader(coach.fromNew ? "Novo treino" : "Treinador", { back: coach.fromNew ? "#/treinos" : "#/inicio" });
+    setHeader(coach.fromNew ? "Novo treino" : "Treinador", { back: coach.fromNew ? "#/treinos" : "#/inicio", action: BETA_TAG });
     const firstName = escapeHtml(user.name.split(" ")[0]);
     let html = "";
     if (coach.step === "inicio") {
@@ -3575,6 +3641,16 @@
     const p = coach.p;
     const d = el.dataset;
     const before = coach.step;
+    if (d.coachRate) {
+      coach.feedback = { ...(coach.feedback || {}), rating: d.coachRate, text: $("coach-fb-text")?.value || "" };
+      app.querySelectorAll("[data-coach-rate]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.coachRate === d.coachRate)));
+      app.querySelector("[data-coach-feedback]")?.removeAttribute("disabled");
+      return;
+    }
+    if ("coachFeedback" in d) {
+      coach.feedback = { ...(coach.feedback || {}), text: $("coach-fb-text")?.value || "" };
+      return coachSendFeedback();
+    }
     if (d.coachEx) {
       const it = coach.result[Number(d.coachEx)];
       return openSheet(it.exerciseId, { sets: it.sets, reps: it.reps });
@@ -3638,6 +3714,7 @@
       if (d.coachGoto === "limitacoes") coach.askLimits = true;
     } else if ("coachRegen" in d) {
       coach.result = coachBuild(p);
+      coach.feedback = null;
     } else if (d.coachSwap) {
       return coachSwap(Number(d.coachSwap));
     } else if ("coachSave" in d) {
