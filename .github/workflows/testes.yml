@@ -15,4 +15,13 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npx playwright install --with-deps chromium
-      - run: npm test
+      - name: npm test
+        shell: bash
+        run: npm test 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
+      # Logs só aparecem para quem está logado; as falhas viram anotação pública na página da execução.
+      - name: Resumo das falhas
+        if: failure()
+        shell: bash
+        run: |
+          msg=$(grep -E "✖|Error|expected|actual|violações|erros de|failing|Timeout|waiting for" test-output.txt | head -40 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          echo "::error title=Falhas nos testes::${msg}"
