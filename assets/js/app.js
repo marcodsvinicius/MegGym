@@ -1030,10 +1030,12 @@
       const choice = await actionSheet({
         title: "Criar",
         actions: [
-          { id: "treino", icon: "fitness_center", label: "Novo treino", hint: "Uma sessão com exercícios, séries e repetições" },
+          { id: "treinador", icon: "bolt", label: "Montar com o treinador", hint: "Responda algumas perguntas e receba um treino pronto para ajustar" },
+          { id: "treino", icon: "fitness_center", label: "Criar treino manual", hint: "Escolha os exercícios, séries e repetições um a um" },
           { id: "divisao", icon: "view_week", label: "Nova divisão", hint: "Conjunto de treinos em sequência (A, B, C…)" },
         ],
       });
+      if (choice === "treinador") location.hash = "#/treinador?novo=1";
       if (choice === "treino") location.hash = "#/treinos/novo";
       if (choice === "divisao") location.hash = "#/estruturas/novo";
     });
@@ -1862,7 +1864,7 @@
               </li>${link}`;
           })
           .join("")
-      : `<li class="state state-sm">Nenhum exercício ainda. Toque em Adicionar exercícios.</li>`;
+      : `<li class="state state-sm">Nenhum exercício ainda. Toque em Adicionar exercícios.${draft.id ? "" : `<br><a class="link-btn coach-link" href="#/treinador?novo=1">${icon("bolt", "mi-inline")} Sem ideia? Deixe o treinador montar</a>`}</li>`;
   }
 
   function renderPicker() {
@@ -3139,19 +3141,35 @@
         </details>
       </section>
       <div class="coach-actions">
-        <button class="btn btn-primary btn-lg btn-block" type="button" data-coach-start>${icon("play_arrow", "mi-inline")} Começar agora</button>
+        ${
+          coach.fromNew
+            ? `<button class="btn btn-primary btn-lg btn-block" type="button" data-coach-edit>${icon("edit_note", "mi-inline")} Salvar e ajustar</button>
+        <div class="coach-actions-row">
+          <button class="btn" type="button" data-coach-regen>${icon("replay", "mi-inline")} Gerar outro</button>
+          <button class="btn" type="button" data-coach-start>${icon("play_arrow", "mi-inline")} Começar agora</button>
+        </div>`
+            : `<button class="btn btn-primary btn-lg btn-block" type="button" data-coach-start>${icon("play_arrow", "mi-inline")} Começar agora</button>
         <div class="coach-actions-row">
           <button class="btn" type="button" data-coach-regen>${icon("replay", "mi-inline")} Gerar outro</button>
           <button class="btn" type="button" data-coach-save>${icon("bookmark", "mi-inline")} Salvar treino</button>
-        </div>
+        </div>`
+        }
         <button class="link-btn" type="button" data-coach-restart>${icon("tune", "mi-inline")} Ajustar escolhas</button>
       </div>`;
   }
 
+  // Entrada no treinador: pela Início (treinar agora) ou pelo "Novo treino" (montar, salvar e ajustar).
+  function coachEnter(params) {
+    const fromNew = params.get("novo") === "1";
+    if (coach && Boolean(coach.fromNew) !== fromNew) coach = null;
+    if (!coach && fromNew) coach = { step: "tempo", p: coachDefaults(), fromNew: true, askLevel: !user.level };
+    renderCoach();
+  }
+
   function renderCoach() {
-    setTab("inicio");
-    setHeader("Treinador", { back: "#/inicio" });
     if (!coach) coach = { step: "inicio", p: coachDefaults() };
+    setTab(coach.fromNew ? "treinos" : "inicio");
+    setHeader(coach.fromNew ? "Novo treino" : "Treinador", { back: coach.fromNew ? "#/treinos" : "#/inicio" });
     const firstName = escapeHtml(user.name.split(" ")[0]);
     let html = "";
     if (coach.step === "inicio") {
@@ -3182,6 +3200,7 @@
           <div class="coach-msg coach-user"><button class="coach-answer" type="button" data-coach-goto="${s}" aria-label="Alterar: ${escapeHtml(COACH_QUESTIONS[s])}">${escapeHtml(coachAnswer(s))}${icon("edit_note", "mi-inline")}</button></div>`
         )
         .join("");
+      if (coach.fromNew && current === 0) html = coachBubble(`Vamos montar seu treino, ${firstName}. No fim você revisa e ajusta o que quiser antes de salvar.`);
       html += `<div class="coach-current" tabindex="-1">${coachBubble(escapeHtml(COACH_QUESTIONS[coach.step]))}</div><div class="coach-options">${coachOptionsHtml(coach.step)}</div>`;
     }
     app.innerHTML = `<div class="coach">${html}</div>`;
@@ -3275,6 +3294,21 @@
       return;
     } else if ("coachStart" in d) {
       return coachStart();
+    } else if ("coachEdit" in d) {
+      // Abre o formulário de treino já preenchido (rascunho); o treino só é salvo lá.
+      const w = coachWorkout(p, coach.result);
+      draft = {
+        id: null,
+        name: w.name.replace(/^Treino montado/, "Treino"),
+        description: w.description,
+        notes: "",
+        restSeconds: w.restSeconds,
+        visibility: "private",
+        items: w.items.map((it) => ({ load: "", rir: "", rest: "", ...it })),
+      };
+      coach = null;
+      location.hash = "#/treinos/novo";
+      return;
     } else if ("coachRestart" in d) {
       coach.step = "tempo";
     } else return;
@@ -3355,7 +3389,7 @@
         break;
       case "treinador":
       case "assistente":
-        renderCoach();
+        coachEnter(params);
         break;
       default:
         location.replace("#/inicio");

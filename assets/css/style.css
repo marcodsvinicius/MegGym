@@ -2410,3 +2410,4 @@ body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inse
 .coach-save-card .item-main { display: grid; gap: 2px; flex: 1; min-width: 0; }
 .coach-save-card .meta { margin: 0; color: inherit; opacity: .85; }
 .coach-save-card .coach-card-icon { background: var(--surface); color: var(--accent-ink); }
+.coach-link { margin-top: var(--space-3); }
