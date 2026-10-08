@@ -24,7 +24,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 - `assets/js/pwa.js`: instalação e aviso de nova versão.
 - `assets/js/bodymap.js`: arquivo gerado (MIT).
 - `assets/js/admin-github.js`: admin que salva o `data/exercises.json` via API do GitHub. `admin.js` é o admin do Supabase, ainda desativado.
-- `data/exercises.json`: grupos e exercícios, com os campos `type` (reps/unilateral/tempo), `equipment`, `equipmentAny` e `video`.
+- `data/exercises.json`: grupos e exercícios, com os campos `type` (reps/unilateral/tempo), `equipment`, `equipmentAny`, `video`, `pattern` (empurrar/puxar/agachar/quadril/isolado/core/condicionamento) e `impact` (true para saltos). São 153 exercícios, todos para treino em casa.
 - `sw.js`: service worker. Não ativa sozinho (sem skipWaiting automático): o app mostra a barra "nova versão disponível".
 
 ## A cada publicação (obrigatório)
@@ -66,6 +66,10 @@ Outros cuidados:
 - **Conteúdo e admin:**
   - Admin pelo GitHub: cadastra exercício com tipo e equipamentos e faz upload de imagem.
   - Todos os exercícios têm vídeo (curadoria: vídeos curtos e objetivos).
+- **Assistente de treino** (`#/assistente`, card "Montar um treino agora" na Início): monta um treino na hora por regras, sem IA.
+  - Pergunta tempo, grupos (com atalhos e sugestão pelo histórico das últimas 48h), equipamentos, nível (só na primeira vez, fica em `user.level`) e objetivo (força, ganhar massa, resistência), com opções de evitar impacto e incluir aquecimento.
+  - A quantidade de exercícios sai do tempo (séries × 45s + descanso); 15 min usa 2 séries em bi-set. Grupos grandes ganham 2 vagas; no máximo 2 variações da mesma família (primeira palavra do nome); compostos e com carga primeiro.
+  - Resultado: trocar exercício, gerar outro, salvar como treino ou começar. "Começar" salva um treino com `assistant: true` (escondido das listas; o anterior é apagado) e guarda `user.coachPrefs` para "Igual da última vez".
 - **Perfil:** idade e sexo ficam guardados para uso futuro.
 
 ## Pendências e próximos passos

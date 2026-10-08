@@ -503,7 +503,7 @@
     }
     const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
     if (single) return { workout: single, reason: "Seu treino atual" };
-    const list = Store.visibleWorkouts(user.id).filter((w) => w.items?.length);
+    const list = Store.visibleWorkouts(user.id).filter((w) => w.items?.length && !w.assistant);
     if (!list.length) return null;
     const last = history.find((h) => list.some((w) => w.id === h.workoutId));
     if (!last) return { workout: list[0], reason: "Bom para começar" };
@@ -610,6 +610,12 @@
       }
 
       ${todayCardHtml(history, trainedDays.has(dayKey(today)))}
+
+      ${activeWorkout ? "" : `<a class="coach-card" href="#/assistente">
+        <span class="coach-card-icon" aria-hidden="true">${icon("bolt")}</span>
+        <span class="item-main"><strong>Montar um treino agora</strong><span class="meta">Diga o tempo, o que quer treinar e o que tem em casa.</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </a>`}
 
       ${homeStructureCard()}
 
@@ -1200,7 +1206,7 @@
     const sv = Store.saved(user.id);
     const plan = Store.plan(user.id);
     const divisions = Store.visibleStructures(user.id).filter((st) => isMine(st) || sv.structures.includes(st.id) || plan?.structureId === st.id);
-    const workouts = Store.visibleWorkouts(user.id).filter((w) => isMine(w) || sv.workouts.includes(w.id) || plan?.workoutId === w.id);
+    const workouts = Store.visibleWorkouts(user.id).filter((w) => !w.assistant && (isMine(w) || sv.workouts.includes(w.id) || plan?.workoutId === w.id));
     return `
       <section class="subsection">
         <h2 class="subsection-title">Divisões</h2>
@@ -1508,7 +1514,7 @@
             .join("")
         : `<li class="state state-sm">Adicione os treinos na ordem em que devem ser feitos (A, B, C…).</li>`;
       if (d.workoutIds.length) $("st-items-error").classList.add("hidden");
-      const all = Store.visibleWorkouts(user.id);
+      const all = Store.visibleWorkouts(user.id).filter((w) => !w.assistant);
       $("st-picker").innerHTML = all.length
         ? all
             .map(
@@ -2786,6 +2792,426 @@
     });
   }
 
+  /* ================= Assistente de treino ================= */
+  // Monta um treino na hora a partir de regras (sem IA): tempo, grupos, equipamentos, nível e objetivo.
+
+  const COACH_TIMES = [[15, "15 min"], [30, "30 min"], [45, "45 min"], [60, "1 hora"]];
+  const COACH_FOCUS = {
+    corpo: ["Corpo inteiro", ["peito", "costas", "quadriceps", "posterior", "gluteos", "ombros", "abdomen"]],
+    superiores: ["Superiores", ["peito", "costas", "ombros", "biceps", "triceps"]],
+    inferiores: ["Inferiores", ["quadriceps", "posterior", "gluteos", "panturrilha"]],
+    empurrar: ["Empurrar", ["peito", "ombros", "triceps"]],
+    puxar: ["Puxar", ["costas", "biceps"]],
+    core: ["Abdômen e lombar", ["abdomen", "lombar"]],
+  };
+  // [rótulo, séries, repetições, descanso em segundos]
+  const COACH_GOALS = {
+    hipertrofia: ["Ganhar massa", "3", "8-12", 90],
+    forca: ["Força", "4", "6-8", 120],
+    resistencia: ["Resistência", "3", "15-20", 45],
+  };
+  const COACH_BIG = ["peito", "costas", "quadriceps", "posterior", "gluteos"];
+  const COACH_PATTERN_BY_GROUP = { peito: "empurrar", costas: "puxar", quadriceps: "agachar", posterior: "quadril", gluteos: "quadril", abdomen: "core", lombar: "core" };
+  const COACH_ORDER = { agachar: 0, quadril: 0, empurrar: 0, puxar: 0, isolado: 1, core: 2, condicionamento: 3 };
+  const COACH_STEPS = ["tempo", "grupos", "equipamentos", "nivel", "objetivo"];
+
+  let coach = null; // { step, p, result }
+
+  const coachPattern = (ex) => ex.pattern || COACH_PATTERN_BY_GROUP[ex.group] || "isolado";
+  // "Família" = primeira palavra do nome (Flexão, Barra, Rosca…), para não repetir variações demais.
+  const coachFamily = (ex) => normalizeText(ex.name).split(" ")[0];
+
+  // Exercícios dos 2 últimos treinos feitos (para variar) e grupos treinados nas últimas 48h (para sugerir).
+  function coachRecent() {
+    const history = Store.history(user.id);
+    const ids = new Set(history.slice(0, 2).flatMap((h) => (h.exercises || []).map((e) => e.exerciseId)));
+    const since = Date.now() - 48 * 3600 * 1000;
+    const groupIds = new Set(history.filter((h) => new Date(h.finishedAt) >= since).flatMap((h) => (h.exercises || []).map((e) => e.group)));
+    return { ids, groupIds };
+  }
+
+  function coachSuggestion() {
+    const { groupIds } = coachRecent();
+    if (!groupIds.size) return null;
+    const hit = (focus) => COACH_FOCUS[focus][1].some((g) => groupIds.has(g));
+    if (hit("superiores") && !hit("inferiores")) return ["inferiores", "Você treinou a parte de cima recentemente. Que tal pernas hoje?"];
+    if (hit("inferiores") && !hit("superiores")) return ["superiores", "Você treinou pernas recentemente. Que tal a parte de cima hoje?"];
+    return null;
+  }
+
+  function coachDefaults() {
+    const saved = user.coachPrefs || {};
+    return {
+      time: saved.time || 30,
+      focus: saved.focus || "",
+      groups: saved.groups || [],
+      equipment: saved.equipment || user.equipment || [],
+      level: user.level || saved.level || "",
+      goal: saved.goal || "hipertrofia",
+      noImpact: Boolean(saved.noImpact),
+      warmup: saved.warmup !== false,
+    };
+  }
+
+  function coachPool(p) {
+    return exercises().filter(
+      (ex) =>
+        canDo(ex, p.equipment) &&
+        !(p.noImpact && ex.impact) &&
+        !(p.level === "iniciante" && ex.difficulty === "avancado") &&
+        coachPattern(ex) !== "condicionamento"
+    );
+  }
+
+  function coachScore(ex, p, chosen, recent, first) {
+    let score = Math.random() * 2;
+    const pattern = coachPattern(ex);
+    if (first && COACH_ORDER[pattern] === 0) score += 2;
+    if (chosen.some((c) => coachFamily(c) === coachFamily(ex))) score -= 3;
+    if (recent.has(ex.id)) score -= 1.5;
+    if (p.goal === "forca") score += (usesWeight(ex) ? 1.5 : 0) - (ex.impact ? 1 : 0);
+    const lv = { iniciante: { iniciante: 1 }, intermediario: { intermediario: 0.8, iniciante: 0.3 }, avancado: { avancado: 1, intermediario: 0.6 } }[p.level] || {};
+    return score + (lv[ex.difficulty] || 0);
+  }
+
+  function coachPick(group, p, chosen, recent) {
+    const ids = new Set(chosen.map((c) => c.id));
+    const first = !chosen.some((c) => c.group === group);
+    // No máximo 2 variações do mesmo exercício (ex.: duas flexões) por treino.
+    const options = coachPool(p).filter((ex) => ex.group === group && !ids.has(ex.id) && chosen.filter((c) => coachFamily(c) === coachFamily(ex)).length < 2);
+    if (!options.length) return null;
+    return options.map((ex) => [coachScore(ex, p, chosen, recent, first), ex]).sort((a, b) => b[0] - a[0])[0][1];
+  }
+
+  // Treino de 15 min: 2 séries por exercício, em bi-set.
+  const coachSets = (p) => (p.time <= 15 ? 2 : Number((COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia)[1]));
+
+  // Duração estimada: séries × (45s de execução + descanso); no bi-set o primeiro exercício quase não descansa.
+  function coachMinutes(items, rest) {
+    const seconds = items.reduce((sum, it, i) => sum + (parseInt(it.sets, 10) || 3) * (45 + (it.warmup ? 15 : it.linkNext ? 10 : rest)), 0);
+    return Math.max(10, Math.round(seconds / 60 / 5) * 5);
+  }
+
+  function coachItem(ex, p) {
+    const [, , reps] = COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia;
+    const sets = String(coachSets(p));
+    const pattern = coachPattern(ex);
+    const useDefault = exerciseType(ex) === "tempo" || pattern === "core" || pattern === "condicionamento";
+    const exMax = Math.max(...(String(ex.reps).match(/\d+/g) || [99]).map(Number));
+    // Sem carga para ajustar (peso do corpo), a faixa do objetivo pode não servir: na força ou quando
+    // o exercício não chega nessas repetições, usa as do próprio exercício.
+    const fixedLoad = !usesWeight(ex) && !usesBand(ex);
+    const keep = useDefault || /^\d+$/.test(String(ex.reps).trim()) || (fixedLoad && (p.goal === "forca" || parseInt(reps, 10) > exMax));
+    let r = keep ? ex.reps || "30s" : reps;
+    if (r === reps && exerciseType(ex) === "unilateral") r += " cada lado";
+    return { exerciseId: ex.id, sets: useDefault ? String(Math.min(Number(ex.sets) || 3, coachSets(p))) : sets, reps: r, load: "", rir: "", rest: "" };
+  }
+
+  // Monta a lista: grupos grandes ganham 2 vagas, os pequenos 1; compostos primeiro, abdômen no fim.
+  function coachBuild(p) {
+    // Quantos exercícios cabem no tempo: cada série leva ~45s mais o descanso do objetivo.
+    const [, goalSets, , goalRest] = COACH_GOALS[p.goal] || COACH_GOALS.hipertrofia;
+    const perExercise = coachSets(p) * (45 + goalRest) * (p.time <= 15 ? 0.6 : 1); // bi-set economiza descanso
+    const count = Math.min(10, Math.max(2, Math.round((p.time * 60 - (p.warmup ? 90 : 0)) / perExercise)));
+    const { ids: recent } = coachRecent();
+    const groupsSel = [...p.groups].sort((a, b) => COACH_BIG.includes(b) - COACH_BIG.includes(a));
+    const seq = [...groupsSel, ...groupsSel.filter((g) => COACH_BIG.includes(g))];
+    const chosen = [];
+    let progress = true;
+    while (chosen.length < count && progress) {
+      progress = false;
+      for (const g of seq) {
+        if (chosen.length >= count) break;
+        const ex = coachPick(g, p, chosen, recent);
+        if (ex) {
+          chosen.push(ex);
+          progress = true;
+        }
+      }
+    }
+    // Compostos primeiro (os com carga antes), isolados depois, abdômen no fim.
+    chosen.sort((a, b) => COACH_ORDER[coachPattern(a)] - COACH_ORDER[coachPattern(b)] || usesWeight(b) - usesWeight(a));
+    const items = chosen.map((ex) => coachItem(ex, p));
+    // Treino curto: junta os exercícios em bi-sets de grupos diferentes para ganhar tempo.
+    if (p.time <= 15) {
+      for (let i = 0; i + 1 < items.length; i += 2) {
+        if (chosen[i].group !== chosen[i + 1].group) items[i].linkNext = true;
+      }
+    }
+    if (p.warmup) {
+      const warm = exercises()
+        .filter((ex) => coachPattern(ex) === "condicionamento" && canDo(ex, p.equipment) && !(p.noImpact && ex.impact) && ex.id !== "burpee")
+        .sort((a, b) => (b.id === "pular-corda") - (a.id === "pular-corda"))[0];
+      if (warm) items.unshift({ exerciseId: warm.id, sets: "2", reps: "45s", load: "", rir: "", rest: "", warmup: true });
+    }
+    return items;
+  }
+
+  function coachWorkout(p, items) {
+    const names = p.groups.map(findGroup).filter(Boolean).map((g) => g.name);
+    const focus = COACH_FOCUS[p.focus];
+    const title = focus && focus[1].length === p.groups.length && focus[1].every((g) => p.groups.includes(g)) ? focus[0] : names.slice(0, 3).join(" + ") + (names.length > 3 ? " +" : "");
+    return {
+      name: `Treino montado — ${title}`,
+      description: `Montado pelo assistente: ${COACH_GOALS[p.goal][0].toLowerCase()}, cerca de ${p.time} min.`,
+      notes: "",
+      restSeconds: COACH_GOALS[p.goal][3],
+      visibility: "private",
+      items: items.map(({ warmup, ...it }) => it),
+      groups: workoutGroups(items.filter((it) => !it.warmup)).map((g) => g.id),
+    };
+  }
+
+  function coachReason(ex, p, item) {
+    if (item.warmup) return "Aquecimento";
+    const group = findGroup(ex.group);
+    const has = new Set(p.equipment);
+    const used = equipmentLabels([...(ex.equipment || []), ...(ex.equipmentAny || []).filter((id) => has.has(id))]);
+    return `${group ? group.name : ""} · ${used.length ? `com ${used.join(" e ").toLowerCase()}` : "peso do corpo"}`;
+  }
+
+  function coachSavePrefs() {
+    const { level, ...prefs } = coach.p;
+    user = Store.updateUser(user.id, { coachPrefs: prefs, ...(level ? { level } : {}) });
+  }
+
+  function coachNext() {
+    let i = COACH_STEPS.indexOf(coach.step) + 1;
+    if (COACH_STEPS[i] === "nivel" && user.level && !coach.askLevel) i++;
+    coach.step = COACH_STEPS[i] || "resultado";
+    if (coach.step === "resultado") {
+      coachSavePrefs();
+      coach.result = coachBuild(coach.p);
+    }
+    renderCoach();
+  }
+
+  function coachBubble(text, who = "bot") {
+    return `<div class="coach-msg coach-${who}">${who === "bot" ? `<span class="coach-avatar" aria-hidden="true">${icon("fitness_center")}</span>` : ""}<p>${text}</p></div>`;
+  }
+
+  function coachAnswer(step) {
+    const p = coach.p;
+    switch (step) {
+      case "tempo":
+        return COACH_TIMES.find(([t]) => t === p.time)?.[1] || "";
+      case "grupos":
+        return COACH_FOCUS[p.focus]?.[0] || p.groups.map(findGroup).filter(Boolean).map((g) => g.name).join(", ");
+      case "equipamentos":
+        return p.equipment.length ? equipmentLabels(p.equipment).join(", ") : "Só o peso do corpo";
+      case "nivel":
+        return DIFFICULTIES[p.level] || "";
+      case "objetivo":
+        return [COACH_GOALS[p.goal][0], p.noImpact ? "sem impacto" : "", p.warmup ? "com aquecimento" : ""].filter(Boolean).join(", ");
+    }
+    return "";
+  }
+
+  const COACH_QUESTIONS = {
+    tempo: "Quanto tempo você tem?",
+    grupos: "O que você quer treinar hoje?",
+    equipamentos: "O que você tem aí para usar?",
+    nivel: "Qual é o seu nível?",
+    objetivo: "Qual o objetivo do treino?",
+  };
+
+  function coachOptionsHtml(step) {
+    const p = coach.p;
+    const chip = (attr, value, label, on) => `<button class="chip" type="button" ${attr}="${escapeHtml(String(value))}" aria-pressed="${on}">${escapeHtml(label)}</button>`;
+    const next = (label = "Continuar", disabled = false) => `<button class="btn btn-primary btn-block" type="button" data-coach-next ${disabled ? "disabled" : ""}>${label}</button>`;
+    switch (step) {
+      case "tempo":
+        return `<div class="chips coach-choices">${COACH_TIMES.map(([t, label]) => chip("data-coach-time", t, label, p.time === t)).join("")}</div>`;
+      case "grupos": {
+        const sug = coachSuggestion();
+        return `
+          ${sug ? `<p class="coach-hint">${icon("lightbulb", "mi-inline")} ${escapeHtml(sug[1])} <button class="link-btn" type="button" data-coach-focus="${sug[0]}">Usar sugestão</button></p>` : ""}
+          <p class="meta">Atalhos</p>
+          <div class="chips coach-choices">${Object.entries(COACH_FOCUS).map(([id, [label]]) => chip("data-coach-focus", id, label, p.focus === id)).join("")}</div>
+          <p class="meta">Ou escolha os grupos</p>
+          <div class="chips coach-choices">${groups().map((g) => chip("data-coach-group", g.id, g.name, p.groups.includes(g.id))).join("")}</div>
+          ${next("Continuar", !p.groups.length)}`;
+      }
+      case "equipamentos":
+        return `
+          <div class="chips coach-choices">
+            ${chip("data-coach-bodyweight", 1, "Só o peso do corpo", !p.equipment.length)}
+            ${Object.entries(EQUIPMENT).filter(([id]) => id !== "leg-press").map(([id, label]) => chip("data-coach-equip", id, label, p.equipment.includes(id))).join("")}
+          </div>
+          ${next()}`;
+      case "nivel":
+        return `<div class="chips coach-choices">${Object.entries(DIFFICULTIES).map(([id, label]) => chip("data-coach-level", id, label, p.level === id)).join("")}</div>`;
+      case "objetivo":
+        return `
+          <div class="chips coach-choices">${Object.entries(COACH_GOALS).map(([id, [label]]) => chip("data-coach-goal", id, label, p.goal === id)).join("")}</div>
+          <div class="chips coach-choices">
+            ${chip("data-coach-toggle", "noImpact", "Evitar impacto (sem saltos)", p.noImpact)}
+            ${chip("data-coach-toggle", "warmup", "Incluir aquecimento", p.warmup)}
+          </div>
+          ${next(`${icon("bolt", "mi-inline")} Montar treino`)}`;
+    }
+    return "";
+  }
+
+  function coachResultHtml() {
+    const p = coach.p;
+    const items = coach.result;
+    if (!items.length) {
+      return `${coachBubble("Não encontrei exercícios com essa combinação. Tente marcar mais equipamentos ou outros grupos.")}
+        <div class="coach-actions"><button class="btn btn-primary btn-block" type="button" data-coach-restart>Ajustar escolhas</button></div>`;
+    }
+    const w = coachWorkout(p, items);
+    const minutes = coachMinutes(items, w.restSeconds);
+    const pool = coachPool(p);
+    const missing = p.groups.filter((g) => !pool.some((ex) => ex.group === g)).map(findGroup).filter(Boolean).map((g) => g.name);
+    const rows = items
+      .map((it, i) => {
+        const ex = findExercise(it.exerciseId);
+        if (!ex) return "";
+        const linked = i > 0 && items[i - 1].linkNext;
+        return `
+          <li class="coach-item ${linked ? "coach-linked" : ""}">
+            <button class="coach-item-main" type="button" data-coach-ex="${i}">
+              <strong>${escapeHtml(ex.name)}</strong>
+              <span class="meta">${escapeHtml(setsReps(it.sets, it.reps))}</span>
+              <span class="meta coach-why">${escapeHtml(coachReason(ex, p, it))}${it.linkNext ? " · bi-set com o próximo" : ""}</span>
+            </button>
+            ${it.warmup ? "" : `<button class="icon-btn" type="button" data-coach-swap="${i}" aria-label="Trocar ${escapeHtml(ex.name)}" title="Trocar">${icon("swap_horiz")}</button>`}
+          </li>`;
+      })
+      .join("");
+    return `
+      ${coachBubble(`Pronto! Montei <strong>${items.length} exercícios</strong>, cerca de ${minutes} min, com descanso de ${w.restSeconds}s.`)}
+      ${missing.length ? `<p class="coach-hint">${icon("info", "mi-inline")} Sem exercícios de ${escapeHtml(missing.join(", "))} com os equipamentos escolhidos.</p>` : ""}
+      <section class="coach-result">
+        <h2>${escapeHtml(w.name.replace(/^Treino montado — /, ""))}</h2>
+        <div class="group-chips">${groupChips(w.groups.map(findGroup).filter(Boolean))}</div>
+        <ol class="coach-list">${rows}</ol>
+      </section>
+      <div class="coach-actions">
+        <button class="btn btn-primary btn-lg btn-block" type="button" data-coach-start>${icon("play_arrow", "mi-inline")} Começar agora</button>
+        <div class="coach-actions-row">
+          <button class="btn" type="button" data-coach-regen>${icon("replay", "mi-inline")} Gerar outro</button>
+          <button class="btn" type="button" data-coach-save>${icon("bookmark", "mi-inline")} Salvar treino</button>
+        </div>
+        <button class="link-btn" type="button" data-coach-restart>${icon("tune", "mi-inline")} Ajustar escolhas</button>
+      </div>`;
+  }
+
+  function renderCoach() {
+    setTab("inicio");
+    setHeader("Assistente", { back: "#/inicio" });
+    if (!coach) coach = { step: "inicio", p: coachDefaults() };
+    const firstName = escapeHtml(user.name.split(" ")[0]);
+    let html = "";
+    if (coach.step === "inicio") {
+      const hasPrefs = Boolean(user.coachPrefs?.groups?.length);
+      html = `
+        ${coachBubble(`Olá, ${firstName}! Quer montar um treino personalizado para fazer agora?`)}
+        <div class="coach-actions">
+          <button class="btn btn-primary btn-lg btn-block" type="button" data-coach-begin>Sim, vamos lá</button>
+          ${hasPrefs ? `<button class="btn btn-block" type="button" data-coach-repeat>${icon("replay", "mi-inline")} Igual da última vez (${escapeHtml(coachAnswer("grupos"))}, ${coach.p.time} min)</button>` : ""}
+          <a class="btn btn-block" href="#/inicio">Agora não</a>
+        </div>`;
+    } else {
+      const current = COACH_STEPS.indexOf(coach.step);
+      const done = coach.step === "resultado" ? COACH_STEPS : COACH_STEPS.slice(0, current);
+      html = done
+        .filter((s) => s !== "nivel" || coach.p.level)
+        .map(
+          (s) => `
+          ${coachBubble(escapeHtml(COACH_QUESTIONS[s]))}
+          <div class="coach-msg coach-user"><button class="coach-answer" type="button" data-coach-goto="${s}" aria-label="Alterar: ${escapeHtml(COACH_QUESTIONS[s])}">${escapeHtml(coachAnswer(s))}${icon("edit_note", "mi-inline")}</button></div>`
+        )
+        .join("");
+      html += coach.step === "resultado" ? coachResultHtml() : `${coachBubble(escapeHtml(COACH_QUESTIONS[coach.step]))}<div class="coach-options">${coachOptionsHtml(coach.step)}</div>`;
+    }
+    app.innerHTML = `<div class="coach">${html}</div>`;
+    const last = app.querySelector(".coach-options, .coach-result, .coach-actions");
+    if (last && coach.step !== "inicio" && coach.step !== "tempo") last.scrollIntoView({ block: "nearest" });
+  }
+
+  // Salva o treino do assistente (escondido das listas) e começa. O anterior é apagado se não estiver em andamento.
+  function coachStart() {
+    const w = coachWorkout(coach.p, coach.result);
+    const session = Store.session(user.id);
+    const old = user.coachWorkoutId;
+    if (old && session?.workoutId !== old && Store.getWorkout(old)) Store.deleteWorkout(old);
+    const saved = Store.saveWorkout({ ...w, assistant: true }, user);
+    user = Store.updateUser(user.id, { coachWorkoutId: saved.id });
+    coach = null;
+    startWorkout(saved);
+  }
+
+  function handleCoachClick(e) {
+    const el = e.target.closest("button");
+    if (!el || !coach) return;
+    const p = coach.p;
+    const d = el.dataset;
+    if (d.coachEx) {
+      const it = coach.result[Number(d.coachEx)];
+      return openSheet(it.exerciseId, { sets: it.sets, reps: it.reps });
+    }
+    if ("coachBegin" in d) {
+      coach.step = "tempo";
+      coach.askLevel = !user.level;
+    } else if ("coachRepeat" in d) {
+      coach.step = "resultado";
+      coach.result = coachBuild(p);
+    } else if (d.coachTime) {
+      p.time = Number(d.coachTime);
+      return coachNext();
+    } else if (d.coachFocus) {
+      p.focus = d.coachFocus;
+      p.groups = [...COACH_FOCUS[d.coachFocus][1]];
+      return coachNext();
+    } else if (d.coachGroup) {
+      p.focus = "";
+      p.groups = p.groups.includes(d.coachGroup) ? p.groups.filter((g) => g !== d.coachGroup) : [...p.groups, d.coachGroup];
+    } else if ("coachBodyweight" in d) {
+      p.equipment = [];
+    } else if (d.coachEquip) {
+      p.equipment = p.equipment.includes(d.coachEquip) ? p.equipment.filter((x) => x !== d.coachEquip) : [...p.equipment, d.coachEquip];
+    } else if (d.coachLevel) {
+      p.level = d.coachLevel;
+      return coachNext();
+    } else if (d.coachGoal) {
+      p.goal = d.coachGoal;
+    } else if (d.coachToggle) {
+      p[d.coachToggle] = !p[d.coachToggle];
+    } else if ("coachNext" in d) {
+      return coachNext();
+    } else if (d.coachGoto) {
+      coach.step = d.coachGoto;
+      if (d.coachGoto === "nivel") coach.askLevel = true;
+    } else if ("coachRegen" in d) {
+      coach.result = coachBuild(p);
+    } else if (d.coachSwap) {
+      const i = Number(d.coachSwap);
+      const cur = findExercise(coach.result[i].exerciseId);
+      const chosen = coach.result.map((it) => findExercise(it.exerciseId)).filter(Boolean);
+      const options = coachPool(p).filter((ex) => ex.group === cur.group && !chosen.some((c) => c.id === ex.id));
+      if (!options.length) return toast("Não há outro exercício desse grupo com seus equipamentos.");
+      const ex = options[Math.floor(Math.random() * options.length)];
+      coach.result[i] = { ...coachItem(ex, p), ...(coach.result[i].linkNext ? { linkNext: true } : {}) };
+    } else if ("coachSave" in d) {
+      const saved = Store.saveWorkout(coachWorkout(p, coach.result), user);
+      coach = null;
+      toast("Treino salvo nos seus treinos!", "success");
+      location.hash = `#/treinos/${encodeURIComponent(saved.id)}`;
+      return;
+    } else if ("coachStart" in d) {
+      return coachStart();
+    } else if ("coachRestart" in d) {
+      coach.step = "tempo";
+    } else return;
+    renderCoach();
+  }
+
+  app.addEventListener("click", (e) => {
+    if (location.hash.startsWith("#/assistente")) handleCoachClick(e);
+  });
+
   /* ================= Rotas ================= */
 
   function route() {
@@ -2829,6 +3255,9 @@
         break;
       case "inicio":
         renderHome();
+        break;
+      case "assistente":
+        renderCoach();
         break;
       default:
         location.replace("#/inicio");

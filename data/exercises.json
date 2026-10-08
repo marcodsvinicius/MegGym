@@ -83,6 +83,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -100,6 +102,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -116,6 +120,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -133,6 +139,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -149,6 +157,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -167,6 +177,8 @@
         "roldana",
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -184,6 +196,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -200,6 +214,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -217,6 +233,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -233,6 +251,8 @@
       "equipment": [
         "roldana"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -249,6 +269,8 @@
       "equipment": [
         "roldana"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -265,6 +287,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -281,6 +305,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -297,6 +323,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -313,6 +341,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -329,6 +359,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -346,6 +378,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -367,6 +401,8 @@
       "groups": [
         "costas"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -383,6 +419,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -399,6 +437,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -416,6 +456,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -432,6 +474,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -448,6 +492,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -464,6 +510,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -480,6 +528,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -497,6 +547,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -513,6 +565,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -531,6 +585,8 @@
         "roldana",
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -547,6 +603,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -565,6 +623,8 @@
         "halter",
         "kettlebell"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -584,6 +644,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -603,6 +665,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -622,6 +686,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -641,6 +707,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -660,6 +728,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -677,6 +747,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -691,6 +763,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=ocZRAMlskbU",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -705,6 +779,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=ssqooGaxt2U",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -721,6 +797,8 @@
       "equipment": [
         "leg-press"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -737,6 +815,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -753,6 +833,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -772,6 +854,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -788,6 +872,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -804,6 +890,8 @@
       "equipment": [
         "kettlebell"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -820,6 +908,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -837,6 +927,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -853,6 +945,8 @@
       "equipment": [
         "anilha"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -870,6 +964,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -886,6 +982,8 @@
       "equipment": [
         "kettlebell"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -900,6 +998,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=qYVo2f2ZKRU",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -914,6 +1014,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=WjxmXe-Pmho",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -930,6 +1032,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -946,6 +1050,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -962,6 +1068,8 @@
       "equipment": [
         "roldana"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -978,6 +1086,8 @@
       "equipment": [
         "roda-abdominal"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -995,6 +1105,8 @@
       "groups": [
         "lombar"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -1009,6 +1121,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=pWGhRO5grqs",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -1026,6 +1140,8 @@
       "groups": [
         "lombar"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1042,6 +1158,8 @@
       "equipment": [
         "bola-suica"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1056,6 +1174,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=PnmAX80Vjls",
       "equipment": [],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1070,6 +1190,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=5oNxXM4cfiU",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1084,6 +1206,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=vDXe2eBowUg",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1101,6 +1225,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1120,6 +1246,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1140,6 +1268,8 @@
         "ombros",
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1154,6 +1284,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/QoLEmXs3KNQ",
       "equipment": [],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1171,6 +1303,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": true,
       "type": "reps"
     },
     {
@@ -1190,6 +1324,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1211,6 +1347,8 @@
         "ombros",
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1228,6 +1366,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1247,6 +1387,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1267,6 +1409,8 @@
         "triceps",
         "ombros"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1286,6 +1430,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1305,6 +1451,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1324,6 +1472,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1343,6 +1493,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1363,6 +1515,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1379,6 +1533,8 @@
       "equipment": [
         "barra-fixa"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -1398,6 +1554,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1417,6 +1575,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1433,6 +1593,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1453,6 +1615,8 @@
       "groups": [
         "biceps"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1470,6 +1634,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1489,6 +1655,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1508,6 +1676,8 @@
       "groups": [
         "triceps"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1524,6 +1694,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1540,6 +1712,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1559,6 +1733,8 @@
       "groups": [
         "costas"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1578,6 +1754,8 @@
       "groups": [
         "costas"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1595,6 +1773,8 @@
       "groups": [
         "costas"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1611,6 +1791,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1628,6 +1810,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1644,6 +1828,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1660,6 +1846,8 @@
       "equipment": [
         "halter"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1679,6 +1867,8 @@
       "groups": [
         "costas"
       ],
+      "pattern": "puxar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1695,6 +1885,8 @@
       "equipment": [
         "kettlebell"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1714,6 +1906,8 @@
       "groups": [
         "peito"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1731,6 +1925,8 @@
       "groups": [
         "peito"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1748,6 +1944,8 @@
       "groups": [
         "peito"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1765,6 +1963,8 @@
         "halter",
         "banco"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1781,6 +1981,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1798,6 +2000,8 @@
       "groups": [
         "abdomen"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1817,6 +2021,8 @@
       "groups": [
         "peito"
       ],
+      "pattern": "empurrar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1834,6 +2040,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1852,6 +2060,8 @@
         "gluteos",
         "panturrilha"
       ],
+      "pattern": "agachar",
+      "impact": true,
       "type": "reps"
     },
     {
@@ -1871,6 +2081,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1888,6 +2100,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1905,6 +2119,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": true,
       "type": "reps"
     },
     {
@@ -1924,6 +2140,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1941,6 +2159,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1960,6 +2180,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -1974,6 +2196,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/UcEITFFWnAY",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -1993,6 +2217,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2012,6 +2238,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2028,6 +2256,8 @@
       "equipment": [
         "caneleira"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2045,6 +2275,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2064,6 +2296,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2082,6 +2316,8 @@
         "lombar",
         "gluteos"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2096,6 +2332,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/9HQ6_NFBu8U",
       "equipment": [],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2115,6 +2353,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2132,6 +2372,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2149,6 +2391,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2167,6 +2411,8 @@
         "caneleira",
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2188,6 +2434,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2205,6 +2453,8 @@
       "equipmentAny": [
         "caneleira"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2221,6 +2471,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2237,6 +2489,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2253,6 +2507,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2273,6 +2529,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2292,6 +2550,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2309,6 +2569,8 @@
       "groups": [
         "quadriceps"
       ],
+      "pattern": "agachar",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2328,6 +2590,8 @@
       "groups": [
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2346,6 +2610,8 @@
         "caneleira",
         "elastico"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2362,6 +2628,8 @@
       "equipment": [
         "step"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2378,6 +2646,8 @@
       "equipment": [
         "step"
       ],
+      "pattern": "isolado",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2394,6 +2664,8 @@
       "equipment": [
         "corda"
       ],
+      "pattern": "condicionamento",
+      "impact": true,
       "type": "tempo"
     },
     {
@@ -2408,6 +2680,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/SjHRwhGXBl8",
       "equipment": [],
+      "pattern": "condicionamento",
+      "impact": true,
       "type": "tempo"
     },
     {
@@ -2422,6 +2696,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/MKq4WH-eBAQ",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2436,6 +2712,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=lsfYFbfE45o",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2450,6 +2728,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/6s4cDQw1RwU",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2464,6 +2744,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/ARcKSp-cVCY",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2478,6 +2760,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/2ephPjg2CZs",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2494,6 +2778,8 @@
       "equipment": [
         "barra-fixa"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2511,6 +2797,8 @@
       "groups": [
         "ombros"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2525,6 +2813,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/hfEXhscZUTY",
       "equipment": [],
+      "pattern": "condicionamento",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -2539,6 +2829,8 @@
       "image": "",
       "video": "https://youtube.com/shorts/X67v1Z5wYps",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "tempo"
     },
     {
@@ -2553,6 +2845,8 @@
       "image": "",
       "video": "https://www.youtube.com/watch?v=iP2fjvG0g3w",
       "equipment": [],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2572,6 +2866,8 @@
         "halter",
         "kettlebell"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2588,6 +2884,8 @@
       "equipment": [
         "elastico"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "unilateral"
     },
     {
@@ -2606,6 +2904,8 @@
         "peito",
         "quadriceps"
       ],
+      "pattern": "condicionamento",
+      "impact": true,
       "type": "reps"
     },
     {
@@ -2626,6 +2926,8 @@
         "gluteos",
         "posterior"
       ],
+      "pattern": "quadril",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2644,6 +2946,8 @@
         "abdomen",
         "gluteos"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     },
     {
@@ -2661,6 +2965,8 @@
       "groups": [
         "gluteos"
       ],
+      "pattern": "core",
+      "impact": false,
       "type": "reps"
     }
   ]
