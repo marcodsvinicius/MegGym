@@ -106,7 +106,7 @@
 
   function groupChips(list) {
     return list
-      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}</span>`)
+      .map((g) => `<span class="group-chip" style="--group-color:${safeColor(g.color)}">${escapeHtml(g.name)}</span>`)
       .join("");
   }
 
@@ -1242,7 +1242,7 @@
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-              <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
+              <div class="meta">${g ? `${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(item))}</div>
               ${supersetTag(ssDetail[i])}
               ${ex ? loadPreview(ex) : ""}
               ${ex ? notePreview(ex.id) : ""}
@@ -1841,7 +1841,7 @@
                 <span class="item-index">${i + 1}</span>
                 <div class="item-main">
                   <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
-                  <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}` : ""}</div>
+                  <div class="meta">${g ? `${escapeHtml(g.name)}` : ""}</div>
                   ${supersetTag(ss[i])}
                   <div class="sets-reps">
                     <label><span>Séries</span><input class="input input-sm" data-field="sets" inputmode="numeric" maxlength="10" value="${escapeHtml(item.sets)}"></label>
@@ -1966,7 +1966,7 @@
               skipped
                 ? `<div class="run-tag">Pulado</div>`
                 : `<div class="run-sets">${escapeHtml(setsReps(item.sets, item.reps)) || "—"}${item.load ? `<span class="run-load" title="Carga sugerida pelo treino">${icon("fitness_center", "mi-inline")} meta ${escapeHtml(item.load)}</span>` : ""}</div>
-                  <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
+                  <div class="meta">${g ? `${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
                   ${loadPreview(ex)}
                   ${notePreview(ex.id)}
                   <div class="run-sets-done" data-sets-summary="${i}" data-type="${exerciseType(ex)}">${escapeHtml(setsSummary(session.sets?.[i], exerciseType(ex)))}</div>
@@ -2250,6 +2250,7 @@
     const thisWeek = weeks[7].value;
     const prev = weeks[6].value;
     const fmt = (n) => n.toLocaleString("pt-BR");
+    const units = (n) => (n === 1 && unit === "treinos" ? "treino" : unit);
     const tabs = Object.entries(METRICS)
       .map(([id, [l]]) => `<button type="button" role="tab" data-metric="${id}" aria-selected="${id === metric}">${l}</button>`)
       .join("");
@@ -2258,7 +2259,7 @@
         <h2 class="subsection-title">Evolução</h2>
         <div class="seg" role="tablist" aria-label="Métrica">${tabs}</div>
       </div>
-      <p class="meta">Últimas 8 semanas · ${fmt(total)} ${unit} no total · esta semana ${fmt(thisWeek)} ${unit}${
+      <p class="meta">Últimas 8 semanas · ${fmt(total)} ${units(total)} no total · esta semana ${fmt(thisWeek)} ${units(thisWeek)}${
         prev ? ` (${thisWeek >= prev ? "+" : ""}${Math.round(((thisWeek - prev) / prev) * 100)}% vs. anterior)` : ""
       }</p>
       ${total ? barsHtml(weeks, unit, `${label} por semana`) : `<p class="meta">${metric === "volume" ? "Registre peso e repetições nas séries para ver o volume." : "Termine um treino para começar o gráfico."}</p>`}
@@ -2291,7 +2292,7 @@
           .map(
             ({ g, n }) => `
           <li style="--group-color:${safeColor(g.color)}">
-            <span class="hbar-label">${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)}</span>
+            <span class="hbar-label">${escapeHtml(g.name)}</span>
             <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
             <span class="hbar-value">${n}</span>
           </li>`
@@ -2636,7 +2637,7 @@
                       <span class="item-index done-index">${icon("check")}</span>
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
-                        <div class="meta">${g ? `${groupIcon(g, "mi-inline")} ${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
+                        <div class="meta">${g ? `${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
                         ${e.pr ? `<div class="pr-badge">${icon("emoji_events", "mi-inline")} Recorde: ${escapeHtml(e.pr.text)}</div>` : ""}
                         ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type))}</div>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}

@@ -2387,3 +2387,5 @@ body.resting .update-bar { bottom: calc(var(--nav-h) + 84px + env(safe-area-inse
 .coach-item-main .meta { margin: 0; }
 .coach-why { font-size: var(--fs-xs); }
 @media (max-width: 380px) { .coach-options, .coach-actions { padding-left: 0; } }
+.coach-choices .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+@media (max-width: 400px) { .sheet .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
