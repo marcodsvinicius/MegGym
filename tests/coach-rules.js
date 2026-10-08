@@ -66,7 +66,8 @@ window.checkCoachRules = function (data) {
             const pull = main.filter(({ ex }) => fam[ex.pattern] === "puxar").length;
             if (["corpo", "superiores"].includes(focus) && equipment === ALL && !Object.keys(limits.regions).length && !limits.flags.length && push > pull) fail(`${push} empurrões e ${pull} puxadas`);
             if (equipment === ALL && !limits.flags.length && main.length === 0) fail("treino vazio");
-            if (minutes > time * 1.5 + 10) fail(`estimativa de ${minutes} min`);
+            // Tempo calibrado: a estimativa (arredondada de 5 em 5) não passa do tempo escolhido + 5 min.
+            if (minutes > time + 5 && main.length > 2) fail(`estimativa de ${minutes} min`);
           });
   return { combos: n, errors };
 };

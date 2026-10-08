@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v51**.
+- Versão atual: **v52**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -38,7 +38,7 @@ Outros cuidados:
 - Ícones do mapa corporal: os SVGs usam `<use>`, então o CSS precisa mirar `#bm-sprite ...`.
 
 ## Testes
-- Comando: `npm test` (Playwright e axe-core, via `node --test`). São 24 testes, todos passando.
+- Comando: `npm test` (Playwright e axe-core, via `node --test`). São 25 testes, todos passando.
 - `tests/coach.test.mjs` monta 1.728 combinações no treinador (via `window.MegCoach.build`) e confere as regras de `tests/coach-rules.js` (equipamento, impacto, limitações, gestação, chão, dor, nível, lombar, volume por músculo, puxar >= empurrar, tempo). Ao mudar regras do treinador, atualize os dois.
 - Também rodam no GitHub Actions (`.github/workflows/testes.yml`).
 - Para tirar prints de telas: navegue antes para `#/x`, senão a tela não renderiza de novo quando o hash não muda.
@@ -80,6 +80,9 @@ Outros cuidados:
   - Limitações (salvas em `user.limits`) são editadas no treinador, em Configurações > Dores e limitações (`#/atividade/limitacoes`) e no último passo do tour de primeiro uso; o seletor é compartilhado (`limitsPickerHtml`/`limitsApply`). Regras: regiões com "incomoda" (menos séries e RIR 3) ou "dói" (tira exercícios com exigência alta naquela articulação); condições (pressão alta, 60+, sem deitar no chão); sinais de alerta (dor forte, irradiada, cirurgia, gestação, dor no peito) ativam o modo cuidadoso e orientam procurar um profissional. Gestação tem regras próprias.
   - Dor por exercício: no resumo do treino feito, "Sentiu dor em algum exercício?" (salva em `user.painLog`). De 4 a 6, o exercício sai e entra a versão mais fácil; 7 ou mais, sai e orienta procurar um profissional.
   - Progressão: exercício com todas as séries no topo da faixa nas 2 últimas vezes é "dominado"; o treinador prefere a versão mais difícil da cadeia ou sugere aumentar a carga.
+  - Tempo calibrado: `coachSeconds` estima cada série (por tempo: a duração; por repetições: ~3s por repetição) + descanso + troca; o treinador começa com folga e tira os exercícios de menor prioridade até caber no tempo escolhido.
+  - Aquecimento em duas partes (`coachWarmup`): geral (cardio leve, sem impacto se houver dor em joelho, tornozelo, quadril ou lombar, e variando em relação ao último) e específico (ativação leve do movimento principal; com 45 min ou mais, também do segundo). Fica no treino salvo com `warmup: true` e não conta como grupo trabalhado.
+  - Divisão da semana (`#/treinador?divisao=1`, também no "+ Novo" e no início do treinador): 2 a 6 dias (2: corpo inteiro ×2; 3: empurrar/puxar/pernas, ou corpo inteiro ×3 para iniciante; 4: superiores/inferiores ×2; 5: PPL + superiores/inferiores; 6: PPL ×2). Cada dia usa o mesmo algoritmo, evitando repetir exercícios entre os dias e somando o volume da semana planejada. "Salvar e seguir" cria os treinos A, B, C… e a divisão, e passa a segui-la.
   - Sugestão na etapa de grupos: músculos com menos séries na semana e que não treinaram nas últimas 48h.
   - Está marcado como **Beta** (selo no card da Início, no cabeçalho e no "+ Novo"; tocar no selo explica que está em testes). No resultado há "O que achou deste treino?": avaliação + comentário, enviados por e-mail (`FEEDBACK_EMAIL` em `config.js`, com escolhas e treino no corpo) e com cópia em `user.coachFeedback`.
   - Resultado: trocar exercício, gerar outro, salvar como treino ou começar. "Começar" salva um treino com `assistant: true` (escondido das listas; o anterior é apagado) e guarda `user.coachPrefs` para "Igual da última vez". Treinos do treinador que estão no histórico não são apagados; no resumo do treino feito aparece "Gostou deste treino? Salvar".

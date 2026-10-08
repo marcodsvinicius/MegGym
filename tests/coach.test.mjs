@@ -59,3 +59,25 @@ test("treinador: limitações no perfil e no tour chegam ao treinador", async ()
     await browser.close();
   }
 });
+
+test("treinador: divisão da semana sem exercício repetido entre os dias", async () => {
+  const { browser, page, errors } = await openApp(server.url);
+  try {
+    await seedUser(page, { equipment: ["halter", "banco", "elastico", "barra-fixa", "kettlebell"] });
+    const result = await page.evaluate(() =>
+      [2, 3, 4, 5, 6].map((days) => {
+        const split = window.MegCoach.split({ days, time: 45, goal: "hipertrofia", level: "intermediario", limits: { regions: {}, conditions: [], flags: [] } });
+        const main = split.flatMap((d) => d.items.filter((it) => !it.warmup).map((it) => it.exerciseId));
+        return { days, n: split.length, empty: split.filter((d) => !d.items.some((it) => !it.warmup)).length, repeated: main.length - new Set(main).size };
+      })
+    );
+    for (const r of result) {
+      assert.equal(r.n, r.days, `${r.days} dias: número de treinos`);
+      assert.equal(r.empty, 0, `${r.days} dias: treino vazio`);
+      if (r.days <= 4) assert.equal(r.repeated, 0, `${r.days} dias: exercício repetido`);
+    }
+    assert.deepEqual(errors, [], "erros de JavaScript na página");
+  } finally {
+    await browser.close();
+  }
+});
