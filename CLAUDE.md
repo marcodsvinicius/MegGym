@@ -24,13 +24,13 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 - `assets/js/pwa.js`: instalação e aviso de nova versão.
 - `assets/js/bodymap.js`: arquivo gerado (MIT).
 - `assets/js/admin-github.js`: admin que salva o `data/exercises.json` via API do GitHub. `admin.js` é o admin do Supabase, ainda desativado.
-- `data/exercises.json`: grupos e exercícios, com os campos `type` (reps/unilateral/tempo), `equipment`, `equipmentAny`, `video` e os campos preservados para eventual reativação do treinador: `pattern` (padrão de movimento detalhado: empurrar-h/v, puxar-h/v, joelho, joelho-uni, dobradica, extensao-quadril, abducao, flexao-joelho, peito-iso, ombro-lateral, ombro-posterior, cotovelo-flexao/extensao, panturrilha, core-antiextensao/antirrotacao/lateral/flexao/extensao, cardio), `muscles` (grupo: 1 primário, 0.5 secundário), `joints` (lombar, cervical, ombro, cotovelo, punho, quadril, joelho, tornozelo: 1 moderada, 2 alta), `position`, `complexity` (1 a 3), `impact` e `easier`/`harder` (cadeias de progressão). A classificação foi feita por regras de musculação e deve ser revisada por um profissional de Educação Física. São 157 exercícios em 12 grupos (inclui Cardio), todos para treino em casa (sem máquinas).
+- `data/exercises.json`: grupos e exercícios, com os campos `type` (reps/unilateral/tempo), `equipment`, `equipmentAny`, `video` e os campos preservados para eventual reativação do treinador: `pattern` (padrão de movimento detalhado: empurrar-h/v, puxar-h/v, joelho, joelho-uni, dobradica, extensao-quadril, abducao, flexao-joelho, peito-iso, ombro-lateral, ombro-posterior, cotovelo-flexao/extensao, panturrilha, core-antiextensao/antirrotacao/lateral/flexao/extensao, cardio), `muscles` (grupo: 1 primário, 0.5 secundário), `joints` (lombar, cervical, ombro, cotovelo, punho, quadril, joelho, tornozelo: 1 moderada, 2 alta), `position`, `complexity` (1 a 3), `impact` e `easier`/`harder` (cadeias de progressão). A classificação foi feita por regras de musculação e deve ser revisada por um profissional de Educação Física. São 165 exercícios em 12 grupos (inclui Cardio), todos para treino em casa (sem máquinas).
 - `sw.js`: service worker. Não ativa sozinho (sem skipWaiting automático): o app mostra a barra "nova versão disponível".
 
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v53**.
+- Versão atual: **v54**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -60,6 +60,7 @@ Outros cuidados:
 - **Treinos:**
   - Abas Meu Treino, Explorar e Salvos.
   - Treino e Divisão (A/B/C…), cada um público ou privado; dá para salvar, seguir e copiar.
+- **Treino GPT v1:** divisão ABCD manual, cadastrada em `data/workouts.json` (seed v5, sem apagar dados). Quatro sessões por ciclo, 25 exercícios, com séries, repetições, descanso, RIR e observações. Cargas atuais em branco. As variantes específicas foram adicionadas ao catálogo sem alterar os exercícios antigos.
 - **Formulário de treino:** exercícios primeiro, escolhidos numa folha (sheet); o resto fica em "Mais opções".
 - **Dados e qualidade:**
   - Backup: exporta e importa com data e hora; a restauração é oferecida no cadastro.
@@ -68,7 +69,7 @@ Outros cuidados:
 - **Conteúdo e admin:**
   - Admin pelo GitHub: cadastra exercício com tipo e equipamentos, e faz upload de imagem. Metadados de prescrição automática continuam no JSON para uso futuro, sem campos próprios no admin.
   - Ícones de grupo (mapa corporal) só aparecem em cards; em tags e textos em linha ficam só o nome. O ícone do Cardio é o corpo da cabeça às coxas com os músculos em destaque.
-  - Todos os exercícios têm vídeo (curadoria: vídeos curtos e objetivos).
+  - O catálogo original tem vídeos curados. Algumas variantes adicionadas ao Treino GPT v1 aguardam vídeo específico; não reutilizar demonstrações de outra variante.
 - **Criação de treinos:** manual, pelo botão Novo em Treinos. O Treinador está desativado e arquivado em `archive/treinador/`; não reativar sem pedido do dono. Links antigos abrem o formulário manual. Dados pessoais e metadados antigos foram preservados para compatibilidade.
 - **Perfil:** idade e sexo ficam guardados para uso futuro.
 

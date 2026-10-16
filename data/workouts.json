@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "replaceExisting": false,
   "workouts": [
     {
@@ -198,6 +198,267 @@
           "load": ""
         }
       ]
+    },
+    {
+      "id": "treino-gpt-v1-a",
+      "name": "Treino GPT v1 — A — Quadríceps, panturrilhas e abdômen",
+      "description": "Dia A: Quadríceps, panturrilhas e abdômen. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
+      "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nAgachamento goblet — Kettlebell: Controle a descida.\nAgachamento búlgaro com halteres — Halteres: Apoio firme.\nAfundo reverso com halteres — Halteres: Passo confortável.\nExtensão de joelho com elástico — Elástico: Âncora segura.\nElevação de panturrilha em pé com halteres — Halteres: Pausa no topo.\nDead bug — Tapete: Lombar controlada.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "goblet-squat",
+          "sets": "4",
+          "reps": "8-12",
+          "rest": "120s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "agachamento-bulgaro",
+          "sets": "3",
+          "reps": "8-12 cada lado",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "afundo-reverso",
+          "sets": "3",
+          "reps": "10-12 cada lado",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "extensao-joelho-elastico",
+          "sets": "3",
+          "reps": "12-20",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "panturrilha-em-pe-halteres",
+          "sets": "4",
+          "reps": "12-20",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "dead-bug",
+          "sets": "3",
+          "reps": "10-12 cada lado",
+          "rest": "45s",
+          "rir": "2",
+          "load": ""
+        }
+      ],
+      "groups": [
+        "quadriceps",
+        "panturrilha",
+        "abdomen"
+      ]
+    },
+    {
+      "id": "treino-gpt-v1-b",
+      "name": "Treino GPT v1 — B — Peito, ombros e tríceps",
+      "description": "Dia B: Peito, ombros e tríceps. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
+      "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nSupino no chão — Halteres: Amplitude confortável.\nFlexão de braço — Tapete: Progredir dificuldade.\nDesenvolvimento Arnold — Halteres: Sem compensar lombar.\nElevação lateral — Halteres: Sem balanço.\nTríceps pulley (roldana/elástico) — Polia + elástico: Fixação firme.\nTríceps francês unilateral — Halter: Cotovelo estável.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "supino-chao",
+          "sets": "4",
+          "reps": "8-12",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "flexao",
+          "sets": "3",
+          "reps": "8-15",
+          "rest": "90s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "arnold-press",
+          "sets": "3",
+          "reps": "8-12",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "elevacao-lateral",
+          "sets": "3",
+          "reps": "12-20",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "triceps-pushdown",
+          "sets": "3",
+          "reps": "10-15",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "triceps-frances-unilateral",
+          "sets": "3",
+          "reps": "10-15",
+          "rest": "60s",
+          "rir": "2",
+          "load": ""
+        }
+      ],
+      "groups": [
+        "peito",
+        "ombros",
+        "triceps"
+      ]
+    },
+    {
+      "id": "treino-gpt-v1-c",
+      "name": "Treino GPT v1 — C — Glúteos, posteriores e panturrilhas",
+      "description": "Dia C: Glúteos, posteriores e panturrilhas. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
+      "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nPonte de glúteos com carga — Halter/kettlebell: Pausa no topo.\nAgachamento sumô com kettlebell — Kettlebell: Base confortável.\nFlexora com elástico — Elástico: Fixação segura.\nSubida em plataforma baixa com halteres — Halteres: Plataforma estável.\nAbdução sentado com elástico — Elástico: Controle; realizar sentado, com elástico acima dos joelhos.\nElevação de panturrilha unilateral com halter — Halter: Apoio seguro.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "ponte-gluteo-carga",
+          "sets": "4",
+          "reps": "10-15",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "agachamento-kettlebell-sumo",
+          "sets": "3",
+          "reps": "10-15",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "flexao-joelho-elastico",
+          "sets": "4",
+          "reps": "12-20",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "step-up-baixo-halteres",
+          "sets": "3",
+          "reps": "10-12 cada lado",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "abducao-elastico-sentado",
+          "sets": "3",
+          "reps": "15-25",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "panturrilha-unilateral-halter",
+          "sets": "3",
+          "reps": "12-20 cada lado",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        }
+      ],
+      "groups": [
+        "gluteos",
+        "quadriceps",
+        "posterior",
+        "panturrilha"
+      ]
+    },
+    {
+      "id": "treino-gpt-v1-d",
+      "name": "Treino GPT v1 — D — Costas, bíceps e abdômen",
+      "description": "Dia D: Costas, bíceps e abdômen. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
+      "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nRemada unilateral com apoio firme — Halter: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nRemada curvada com 2 halteres — Halteres: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nPullover no chão com halter — Halter: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nPuxada alta com elástico — Polia + elástico: Fixação superior segura.\nRosca concentrada sentada — Halter: Carga a confirmar.\nRosca martelo unilateral — Halter: Sem balanço.\nPrancha — Tapete: Sem dor lombar.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "remada-unilateral-apoio",
+          "sets": "4",
+          "reps": "8-12 cada lado",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "remada-curvada",
+          "sets": "3",
+          "reps": "10-12",
+          "rest": "90s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "pullover-chao",
+          "sets": "3",
+          "reps": "12-15",
+          "rest": "75s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "puxada-elastico",
+          "sets": "3",
+          "reps": "10-15",
+          "rest": "75s",
+          "rir": "2",
+          "load": ""
+        },
+        {
+          "exerciseId": "rosca-concentrada-cadeira",
+          "sets": "3",
+          "reps": "10-12 cada lado",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "rosca-martelo-unilateral",
+          "sets": "3",
+          "reps": "10-15 cada lado",
+          "rest": "60s",
+          "rir": "1-2",
+          "load": ""
+        },
+        {
+          "exerciseId": "prancha",
+          "sets": "3",
+          "reps": "30-45s",
+          "rest": "45s",
+          "rir": "2",
+          "load": ""
+        }
+      ],
+      "groups": [
+        "costas",
+        "biceps",
+        "abdomen"
+      ]
     }
   ],
   "structures": [
@@ -212,6 +473,19 @@
         "legs"
       ],
       "update": true
+    },
+    {
+      "id": "treino-gpt-v1",
+      "name": "Treino GPT v1",
+      "description": "Divisão ABCD para hipertrofia em casa, com prioridade para pernas e abdômen. Quatro dias por semana, sessões planejadas de 45–60 minutos e cardio separado. Siga A → B → C → D; um ciclo tem quatro sessões e pode ser recomeçado ao concluir.",
+      "duration": 4,
+      "workoutIds": [
+        "treino-gpt-v1-a",
+        "treino-gpt-v1-b",
+        "treino-gpt-v1-c",
+        "treino-gpt-v1-d"
+      ],
+      "visibility": "public"
     }
   ]
 }

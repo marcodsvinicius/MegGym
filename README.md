@@ -51,6 +51,8 @@ O app usa ícones do **Material Symbols** (Google), guardados em `assets/fonts/`
 
 ## Treinos que vêm com o app
 
+**Treino GPT v1** é uma divisão ABCD com quatro sessões por ciclo e 25 exercícios. Está em **Treinos → Explorar → Divisões**. O cadastro preserva séries, repetições, descanso, RIR e observações; as cargas atuais devem ser registradas pelo usuário.
+
 `data/workouts.json` traz treinos prontos. Ao subir a `version`, o app aplica a lista **uma vez** em cada aparelho; com `"replaceExisting": true` ele apaga os treinos salvos no aparelho e deixa só os do arquivo (o histórico é mantido).
 
 ## Como publicar (uma vez só)

@@ -4548,6 +4548,225 @@
       "complexity": 1,
       "impact": false,
       "type": "tempo"
+    },
+    {
+      "id": "extensao-joelho-elastico",
+      "group": "quadriceps",
+      "name": "Extensão de joelho com elástico",
+      "description": "Sentado em uma cadeira firme, fixe o elástico em uma âncora baixa e segura atrás de você e prenda a outra ponta ao tornozelo. Estenda o joelho de forma controlada e retorne sem soltar a tensão. Faça a mesma quantidade de repetições com cada perna.",
+      "sets": "3",
+      "reps": "12-20",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "elastico"
+      ],
+      "pattern": "joelho",
+      "muscles": {
+        "quadriceps": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
+      "impact": false,
+      "type": "unilateral"
+    },
+    {
+      "id": "panturrilha-em-pe-halteres",
+      "group": "panturrilha",
+      "name": "Elevação de panturrilha em pé com halteres",
+      "description": "Em pé, segure os halteres ao lado do corpo. Eleve os calcanhares, faça uma pausa no topo e desça controladamente, mantendo o equilíbrio.",
+      "sets": "4",
+      "reps": "12-20",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=qYVo2f2ZKRU",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
+      "impact": false,
+      "type": "reps"
+    },
+    {
+      "id": "panturrilha-unilateral-halter",
+      "group": "panturrilha",
+      "name": "Elevação de panturrilha unilateral com halter",
+      "description": "Segure um halter em uma mão e use a outra para apoio em uma superfície firme. Eleve o calcanhar da perna de apoio, pause no topo e desça devagar. Repita com a outra perna.",
+      "sets": "3",
+      "reps": "12-20 cada perna",
+      "rest": "60s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=WjxmXe-Pmho",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "panturrilha",
+      "muscles": {
+        "panturrilha": 1
+      },
+      "joints": {
+        "tornozelo": 1
+      },
+      "position": "pe",
+      "complexity": 1,
+      "impact": false,
+      "type": "unilateral"
+    },
+    {
+      "id": "ponte-gluteo-carga",
+      "group": "gluteos",
+      "name": "Ponte de glúteos com carga",
+      "description": "Deitado de costas, joelhos dobrados e pés apoiados no chão, mantenha um halter ou kettlebell apoiado de forma confortável e estável sobre o quadril. Eleve o quadril sem arquear a lombar, faça uma pausa no topo e desça controladamente.",
+      "sets": "4",
+      "reps": "10-15",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "groups": [
+        "posterior"
+      ],
+      "pattern": "extensao-quadril",
+      "muscles": {
+        "gluteos": 1,
+        "posterior": 0.5
+      },
+      "joints": {},
+      "position": "chao-costas",
+      "complexity": 1,
+      "impact": false,
+      "type": "reps",
+      "equipmentAny": [
+        "halter",
+        "kettlebell"
+      ]
+    },
+    {
+      "id": "step-up-baixo-halteres",
+      "group": "quadriceps",
+      "name": "Subida em plataforma baixa com halteres",
+      "description": "Use um degrau, step ou plataforma baixa que não deslize nem tombe. Com halteres nas mãos, apoie o pé inteiro e suba usando a perna da frente. Desça devagar e complete a mesma quantidade de repetições de cada lado.",
+      "sets": "3",
+      "reps": "10-12 cada perna",
+      "rest": "90s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "joelho-uni",
+      "muscles": {
+        "quadriceps": 1,
+        "gluteos": 1
+      },
+      "joints": {
+        "joelho": 1
+      },
+      "position": "pe",
+      "complexity": 2,
+      "impact": false,
+      "type": "unilateral",
+      "equipmentAny": [
+        "step",
+        "banco"
+      ]
+    },
+    {
+      "id": "pullover-chao",
+      "group": "costas",
+      "name": "Pullover no chão com halter",
+      "description": "Deitado de costas no chão, joelhos dobrados, segure um halter com as duas mãos acima do peito. Leve o peso para trás da cabeça dentro de uma amplitude confortável, com cotovelos levemente flexionados, e retorne sem compensar com a lombar.",
+      "sets": "3",
+      "reps": "12-15",
+      "rest": "75s",
+      "difficulty": "intermediario",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "puxar-v",
+      "muscles": {
+        "costas": 1,
+        "peito": 0.5,
+        "triceps": 0.5
+      },
+      "joints": {
+        "ombro": 2
+      },
+      "position": "chao-costas",
+      "complexity": 2,
+      "impact": false,
+      "type": "reps"
+    },
+    {
+      "id": "remada-unilateral-apoio",
+      "group": "costas",
+      "name": "Remada unilateral com apoio firme",
+      "description": "Apoie uma mão em uma cadeira ou superfície firme que não deslize. Incline o tronco mantendo a coluna estável, puxe o halter até a lateral do corpo e desça controladamente. Repita com o outro braço.",
+      "sets": "4",
+      "reps": "8-12 cada lado",
+      "rest": "90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "puxar-h",
+      "muscles": {
+        "costas": 1,
+        "biceps": 0.5,
+        "ombros": 0.5
+      },
+      "joints": {},
+      "position": "pe",
+      "complexity": 1,
+      "impact": false,
+      "type": "unilateral"
+    },
+    {
+      "id": "rosca-concentrada-cadeira",
+      "group": "biceps",
+      "name": "Rosca concentrada sentada",
+      "description": "Sente-se em uma cadeira firme com os pés apoiados. Apoie o cotovelo na parte interna da coxa, flexione o braço segurando o halter e desça controladamente, sem balançar o tronco. Repita com o outro braço.",
+      "sets": "3",
+      "reps": "10-12 cada braço",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "https://www.youtube.com/watch?v=Qm4NdQttdi8",
+      "equipment": [
+        "halter"
+      ],
+      "pattern": "cotovelo-flexao",
+      "muscles": {
+        "biceps": 1
+      },
+      "joints": {
+        "cotovelo": 1
+      },
+      "position": "sentado",
+      "complexity": 1,
+      "impact": false,
+      "type": "unilateral"
     }
   ]
 }
