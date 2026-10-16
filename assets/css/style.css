@@ -1041,7 +1041,7 @@ body.sheet-open { overflow: hidden; }
   color: var(--text-muted);
 }
 .week-day.done .week-day-dot { background: var(--done); border-color: var(--done); color: var(--on-done); font-size: 1rem; }
-.week-day.missed .week-day-dot { border-style: dashed; opacity: .7; }
+.week-day.missed .week-day-dot { border-style: dashed; }
 .week-day.future .week-day-dot { opacity: .45; }
 .week-day.is-today .week-day-label { color: var(--accent-ink); }
 .week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent-ink); }

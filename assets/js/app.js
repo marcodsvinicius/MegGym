@@ -3396,6 +3396,7 @@
 
   const sheet = $("sheet");
   let sheetReturnFocus = null;
+  let sheetCloseTimer = null;
 
   // Conteúdo de detalhes do exercício (usado na tela cheia e no bottom sheet).
   /* ---------- Evolução do peso (gráfico de barras por exercício) ---------- */
@@ -4017,6 +4018,8 @@
   });
 
   function closeSheet(immediate = false) {
+    clearTimeout(sheetCloseTimer);
+    sheetCloseTimer = null;
     if (sheet.classList.contains("hidden")) return;
     if (pendingConfirm) pendingConfirm(false);
     const area = $("ex-note");
@@ -4027,12 +4030,13 @@
     sheet.classList.remove("open");
     document.body.classList.remove("sheet-open");
     const finish = () => {
+      sheetCloseTimer = null;
       sheet.classList.add("hidden");
       $("sheet-content").innerHTML = ""; // para o vídeo
       $("sheet-content").onclick = null; // tira o clique do seletor de exercícios
     };
     if (immediate) finish();
-    else setTimeout(finish, 220);
+    else sheetCloseTimer = setTimeout(finish, 220);
     if (!immediate && sheetReturnFocus) sheetReturnFocus.focus?.({ preventScroll: true });
   }
 

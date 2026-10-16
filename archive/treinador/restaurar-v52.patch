@@ -204,9 +204,18 @@ index 29437da..d699e2d 100644
          document.body.appendChild(el);
        });
 diff --git b/assets/css/style.css a/assets/css/style.css
-index ddc4c44..a0721ec 100644
+index e973b77..a0721ec 100644
 --- b/assets/css/style.css
 +++ a/assets/css/style.css
+@@ -1041,7 +1041,7 @@ body.sheet-open { overflow: hidden; }
+   color: var(--text-muted);
+ }
+ .week-day.done .week-day-dot { background: var(--done); border-color: var(--done); color: var(--on-done); font-size: 1rem; }
+-.week-day.missed .week-day-dot { border-style: dashed; }
++.week-day.missed .week-day-dot { border-style: dashed; opacity: .7; }
+ .week-day.future .week-day-dot { opacity: .45; }
+ .week-day.is-today .week-day-label { color: var(--accent-ink); }
+ .week-day.is-today:not(.done) .week-day-dot { border-color: var(--accent); color: var(--accent-ink); }
 @@ -1143,7 +1143,7 @@ body.sheet-open { overflow: hidden; }
    font-style: normal;
    font-weight: 400 700;
@@ -342,7 +351,7 @@ index e9758a9..9febba7 100644
      if (!validateExercise(values, file)) return;
  
 diff --git b/assets/js/app.js a/assets/js/app.js
-index a967a05..0d40504 100644
+index fe79998..0d40504 100644
 --- b/assets/js/app.js
 +++ a/assets/js/app.js
 @@ -612,6 +612,12 @@
@@ -1815,6 +1824,38 @@ index a967a05..0d40504 100644
          closeSheet();
        });
        $("tour-skip")?.addEventListener("click", () => closeSheet());
+@@ -3396,7 +4657,6 @@
+ 
+   const sheet = $("sheet");
+   let sheetReturnFocus = null;
+-  let sheetCloseTimer = null;
+ 
+   // Conteúdo de detalhes do exercício (usado na tela cheia e no bottom sheet).
+   /* ---------- Evolução do peso (gráfico de barras por exercício) ---------- */
+@@ -4018,8 +5278,6 @@
+   });
+ 
+   function closeSheet(immediate = false) {
+-    clearTimeout(sheetCloseTimer);
+-    sheetCloseTimer = null;
+     if (sheet.classList.contains("hidden")) return;
+     if (pendingConfirm) pendingConfirm(false);
+     const area = $("ex-note");
+@@ -4030,13 +5288,12 @@
+     sheet.classList.remove("open");
+     document.body.classList.remove("sheet-open");
+     const finish = () => {
+-      sheetCloseTimer = null;
+       sheet.classList.add("hidden");
+       $("sheet-content").innerHTML = ""; // para o vídeo
+       $("sheet-content").onclick = null; // tira o clique do seletor de exercícios
+     };
+     if (immediate) finish();
+-    else sheetCloseTimer = setTimeout(finish, 220);
++    else setTimeout(finish, 220);
+     if (!immediate && sheetReturnFocus) sheetReturnFocus.focus?.({ preventScroll: true });
+   }
+ 
 diff --git b/assets/js/config.js a/assets/js/config.js
 index 3a1ec47..11fff47 100644
 --- b/assets/js/config.js
