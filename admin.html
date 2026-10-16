@@ -7,9 +7,9 @@
   <title>MegGym — Cadastro de exercícios</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
-  <script src="assets/js/theme.js?v=52"></script>
-  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=52" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=52">
+  <script src="assets/js/theme.js?v=53"></script>
+  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=53" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=53">
 </head>
 <body>
   <header class="site-header">
@@ -223,80 +223,6 @@
                   <option value="tempo">Tempo (cronômetro)</option>
                 </select>
               </div>
-              <div class="field span-4">
-                <label for="ex-pattern">Padrão de movimento</label>
-                <select class="select" id="ex-pattern">
-                  <option value="">Automático (pelo grupo)</option>
-                  <option value="empurrar-h">Empurrar na horizontal (supino, flexão)</option>
-                  <option value="empurrar-v">Empurrar na vertical (desenvolvimento, pike)</option>
-                  <option value="puxar-h">Puxar na horizontal (remadas)</option>
-                  <option value="puxar-v">Puxar na vertical (barra fixa, puxada)</option>
-                  <option value="joelho">Joelho bilateral (agachamentos)</option>
-                  <option value="joelho-uni">Joelho unilateral (afundo, búlgaro, step)</option>
-                  <option value="dobradica">Dobradiça de quadril (stiff, terra)</option>
-                  <option value="extensao-quadril">Extensão de quadril (ponte, hip thrust)</option>
-                  <option value="abducao">Abdução de quadril</option>
-                  <option value="flexao-joelho">Flexão de joelho (flexoras)</option>
-                  <option value="peito-iso">Peito isolado (crucifixo)</option>
-                  <option value="ombro-lateral">Ombro isolado (elevações)</option>
-                  <option value="ombro-posterior">Ombro posterior e rotadores</option>
-                  <option value="cotovelo-flexao">Flexão de cotovelo (roscas)</option>
-                  <option value="cotovelo-extensao">Extensão de cotovelo (tríceps)</option>
-                  <option value="panturrilha">Panturrilha</option>
-                  <option value="core-antiextensao">Core: antiextensão (prancha)</option>
-                  <option value="core-antirrotacao">Core: antirrotação (pallof)</option>
-                  <option value="core-lateral">Core: lateral (prancha lateral)</option>
-                  <option value="core-flexao">Core: flexão (abdominais)</option>
-                  <option value="core-extensao">Core: extensão (lombar)</option>
-                  <option value="cardio">Cardio</option>
-                </select>
-                <span class="hint">Usado pelo treinador para não repetir o mesmo movimento e equilibrar o treino.</span>
-              </div>
-              <div class="field span-4">
-                <label for="ex-complexity">Complexidade técnica</label>
-                <select class="select" id="ex-complexity">
-                  <option value="">Automática (pela dificuldade)</option>
-                  <option value="1">1 · simples e estável</option>
-                  <option value="2">2 · média</option>
-                  <option value="3">3 · exige técnica</option>
-                </select>
-              </div>
-              <div class="field span-4">
-                <label for="ex-position">Posição</label>
-                <select class="select" id="ex-position">
-                  <option value="">—</option>
-                  <option value="pe">Em pé</option>
-                  <option value="sentado">Sentado</option>
-                  <option value="banco">Deitado no banco</option>
-                  <option value="chao-costas">Deitado de costas no chão</option>
-                  <option value="chao-brucos">Deitado de bruços no chão</option>
-                  <option value="chao-lado">Deitado de lado no chão</option>
-                  <option value="quatro-apoios">Quatro apoios</option>
-                  <option value="prancha">Apoio das mãos (prancha, flexão)</option>
-                  <option value="ajoelhado">Ajoelhado</option>
-                  <option value="pendurado">Pendurado ou nas paralelas</option>
-                </select>
-                <span class="hint">Usada para quem não consegue deitar no chão, por exemplo.</span>
-              </div>
-              <fieldset class="field span-12 fieldset">
-                <legend>Exigência nas articulações</legend>
-                <div class="joint-grid">
-                  <label class="joint-field"><span>Lombar</span><select class="select" data-joint="lombar"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Pescoço</span><select class="select" data-joint="cervical"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Ombro</span><select class="select" data-joint="ombro"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Cotovelo</span><select class="select" data-joint="cotovelo"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Punho</span><select class="select" data-joint="punho"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Quadril</span><select class="select" data-joint="quadril"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Joelho</span><select class="select" data-joint="joelho"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                  <label class="joint-field"><span>Tornozelo</span><select class="select" data-joint="tornozelo"><option value="0">Nenhuma</option><option value="1">Moderada</option><option value="2">Alta</option></select></label>
-                </div>
-                <span class="hint">Com dor marcada como "dói para treinar", o treinador tira os exercícios com exigência alta naquela região.</span>
-              </fieldset>
-              <div class="field span-4">
-                <span class="label">Impacto</span>
-                <label class="check-chip"><input type="checkbox" id="ex-impact"><span>Tem saltos ou impacto</span></label>
-                <span class="hint">Fica de fora quando a pessoa pede treino sem impacto.</span>
-              </div>
               <fieldset class="field span-12 fieldset">
                 <legend>Equipamentos</legend>
                 <div class="check-chips" id="ex-equipment"></div>
@@ -434,7 +360,7 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=52"></script>
+  <script src="assets/js/config.js?v=53"></script>
   <script>
     // Carrega o admin do modo escolhido em config.js (BACKEND: "github" ou "supabase").
     (function () {
@@ -445,7 +371,7 @@
         : ["common.js", "admin-github.js"];
       files.forEach(function (name) {
         var el = document.createElement("script");
-        el.src = "assets/js/" + name + "?v=52";
+        el.src = "assets/js/" + name + "?v=53";
         el.async = false; // mantém a ordem
         document.body.appendChild(el);
       });
@@ -453,3 +379,4 @@
   </script>
 </body>
 </html>
+

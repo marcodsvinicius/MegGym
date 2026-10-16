@@ -6,6 +6,12 @@ App web (mobile first) de treino: lista de exercícios por **grupo muscular**, c
 - **Site:** `https://marcodsvinicius.github.io/MegGym/`
 - **Admin:** `https://marcodsvinicius.github.io/MegGym/admin.html`
 
+## Criação de treinos
+
+Os treinos são montados manualmente: **Treinos → Novo → Criar treino manual**. Adicione exercícios, ajuste séries e repetições e salve. Para organizar a sequência A/B/C, use **Nova divisão**.
+
+O Treinador automático está desativado. Seu código, estilos, integrações e testes foram preservados para uso futuro em [`archive/treinador/`](archive/treinador/README.md). Ele não é carregado pelo app. Treinos e históricos existentes continuam disponíveis.
+
 ## Como funciona o app
 
 - **Onboarding:** boas-vindas → nome, idade e sexo → equipamentos que tem em casa (perfis ficam no aparelho).
@@ -163,3 +169,4 @@ npm install
 npx playwright install chromium
 npm test            # MOTION=1 npm test roda com as animações ligadas
 ```
+
