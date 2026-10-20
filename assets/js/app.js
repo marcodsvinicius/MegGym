@@ -3743,12 +3743,12 @@
   restBar.className = "rest-bar hidden";
   restBar.setAttribute("role", "timer");
   restBar.innerHTML = `
-    <div class="rest-fill" id="rest-fill"></div>
-    <span class="rest-label">${icon("timer", "mi-inline")} Descanso</span>
-    <span class="rest-time" id="rest-time">1:00</span>
+    <div class="rest-main"><div class="rest-info"><span class="rest-label">${icon("timer", "mi-inline")} Descanso</span><span class="rest-time" id="rest-time">1:00</span></div><div class="rest-actions">
+
+
     <button type="button" class="btn btn-sm" data-rest="-15" aria-label="Menos 15 segundos">−15</button>
     <button type="button" class="btn btn-sm" data-rest="15" aria-label="Mais 15 segundos">+15</button>
-    <button type="button" class="btn btn-sm btn-primary" data-rest="skip">Pular</button>`;
+    <button type="button" class="btn btn-sm btn-primary" data-rest="skip">Pular</button></div></div><div class="rest-track" aria-hidden="true"><div class="rest-fill" id="rest-fill"></div></div>`;
   document.body.appendChild(restBar);
   restBar.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-rest]");
