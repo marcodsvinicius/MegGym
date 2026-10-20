@@ -99,6 +99,32 @@
     tempo: ["Tempo", "timer", "Séries medidas em segundos, com cronômetro"],
   };
 
+  // Padrões biomecânicos de movimento (usados na troca inteligente de exercícios).
+  const PATTERNS = {
+    "empurrar-h": "Empurrar horizontal",
+    "empurrar-v": "Empurrar vertical",
+    "puxar-h": "Puxar horizontal",
+    "puxar-v": "Puxar vertical",
+    joelho: "Dominante de joelho",
+    "joelho-uni": "Unilateral de pernas",
+    dobradica: "Dobradiça de quadril",
+    "extensao-quadril": "Extensão de quadril",
+    abducao: "Abdução de quadril",
+    "flexao-joelho": "Flexão de joelho",
+    "peito-iso": "Isolador de peito",
+    "ombro-lateral": "Abdução de ombro",
+    "ombro-posterior": "Posterior de ombro",
+    "cotovelo-flexao": "Flexão de cotovelo",
+    "cotovelo-extensao": "Extensão de cotovelo",
+    panturrilha: "Panturrilhas",
+    "core-antiextensao": "Core antiextensão",
+    "core-antirrotacao": "Core antirrotação",
+    "core-lateral": "Core lateral",
+    "core-flexao": "Flexão de tronco",
+    "core-extensao": "Extensão lombar",
+    cardio: "Cardio",
+  };
+
   function exerciseType(ex) {
     return EXERCISE_TYPES[ex?.type] ? ex.type : "reps";
   }
@@ -231,9 +257,20 @@
         reps: e.reps || "",
         rest: e.rest || "",
         difficulty: e.difficulty || "",
+        type: EXERCISE_TYPES[e.type] ? e.type : "reps",
+        equipment: Array.isArray(e.equipment) ? e.equipment : [],
+        equipmentAny: Array.isArray(e.equipment_any || e.equipmentAny) ? e.equipment_any || e.equipmentAny : [],
+        groups: Array.isArray(e.groups) ? e.groups : [],
+        pattern: e.pattern || "",
+        muscles: e.muscles && typeof e.muscles === "object" ? e.muscles : null,
+        joints: e.joints && typeof e.joints === "object" ? e.joints : {},
+        position: e.position,
+        complexity: e.complexity,
+        impact: e.impact,
+        easier: e.easier || "",
+        harder: e.harder || "",
         image: e.image || "",
         video: e.video || "",
-        position: e.position,
       })),
     };
   }
@@ -282,6 +319,7 @@
     canDo,
     BAND_COLORS,
     EXERCISE_TYPES,
+    PATTERNS,
     exerciseType,
     usesWeight,
     usesBand,

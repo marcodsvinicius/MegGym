@@ -444,6 +444,19 @@
     return read(KEY.history, []).find((h) => h.id === id) || null;
   }
 
+  function updateHistory(id, changes) {
+    const list = read(KEY.history, []);
+    const record = list.find((h) => h.id === id);
+    if (!record) return null;
+    Object.assign(record, changes, { updatedAt: new Date().toISOString() });
+    write(KEY.history, list);
+    return record;
+  }
+
+  function deleteHistory(id) {
+    write(KEY.history, read(KEY.history, []).filter((h) => h.id !== id));
+  }
+
   // snapshot: lista dos exercícios feitos (nome, grupo, séries, repetições) no momento do treino.
   function finishSession(user, workout, exerciseCount, snapshot = []) {
     const current = session(user.id);
@@ -582,6 +595,8 @@
     logWeight,
     saveExerciseLoad,
     getHistory,
+    updateHistory,
+    deleteHistory,
     finishSession,
   };
 })();

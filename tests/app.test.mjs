@@ -336,3 +336,52 @@ test("divisão: seguir pelo Explorar mostra em Meu Treino com o próximo treino"
     await page.waitForURL(/executar/);
   }));
 
+test("busca global de exercícios, avanço no painel, sincronização de carga e editar/excluir histórico", () =>
+  withApp(async ({ page }) => {
+    await seedUser(page);
+    // Busca global na tela de Exercícios
+    await page.goto(server.url + "#/exercicios");
+    await page.fill("#global-ex-search", "arnold");
+    await page.waitForSelector(".exercise-card");
+    assert.match(await page.textContent(".exercise-card"), /Arnold/);
+
+    // Durante o treino: peso nas séries sincroniza com Minha carga + botão de próximo exercício no painel
+    await page.goto(server.url + "#/inicio");
+    await page.click(".today-card [data-start-workout]");
+    await page.waitForSelector(".run-item");
+    await page.locator(".run-item").first().locator(".item-main").click();
+    await page.waitForSelector(".set-row");
+    const firstExId = await page.locator("[data-sets-exercise]").getAttribute("data-sets-exercise");
+    const rows = await page.locator(".set-row").count();
+    for (let i = 0; i < rows; i++) {
+      await page.locator(".set-row").nth(i).locator('[data-set-field="reps"]').fill("10");
+      const w = page.locator(".set-row").nth(i).locator('[data-set-field="weight"]');
+      if (await w.count()) await w.fill("16");
+      await page.locator(".set-row").nth(i).locator("[data-set-check]").click();
+    }
+    const syncedWeight = await page.evaluate((id) => MegStore.exerciseLoad(MegStore.currentUser().id, id).weight, firstExId);
+    if (await page.locator('[data-set-field="weight"]').count()) assert.equal(syncedWeight, "16");
+
+    // Avançar para o próximo exercício direto pelo painel
+    await page.waitForSelector("[data-next-run]");
+    await page.click("[data-next-run]");
+    const secondExId = await page.locator("[data-sets-exercise]").getAttribute("data-sets-exercise");
+    assert.notEqual(secondExId, firstExId);
+    await page.click("#sheet-close");
+
+    // Terminar treino e editar/excluir registro no histórico
+    await page.click("#finish-btn");
+    await page.click('[data-confirm="yes"]');
+    await page.waitForURL(/historico\/.+novo=1/);
+    await page.click('#header-action a[href$="/editar"]');
+    await page.waitForSelector("#history-edit-form");
+    await page.fill("#he-note", "Treino editado com sucesso");
+    await page.click('#history-edit-form [type="submit"]');
+    await page.waitForSelector(".note-box");
+    assert.match(await page.textContent(".note-box"), /Treino editado com sucesso/);
+    await page.click("#delete-history-btn");
+    await page.click('[data-confirm="yes"]');
+    await page.waitForURL(/aba=historico/);
+    assert.equal(await page.evaluate(() => MegStore.history(MegStore.currentUser().id).length), 0);
+  }));
+

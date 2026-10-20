@@ -2,7 +2,7 @@
 (function () {
   "use strict";
 
-  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify, EXERCISE_TYPES, exerciseType, groupIcon } =
+  const { loadData, escapeHtml, safeUrl, safeColor, youtubeId, difficultyBadge, normalizeText, DIFFICULTIES, EQUIPMENT, EQUIPMENT_ICONS, equipmentLabels, canDo, icon, BAND_COLORS, usesWeight, usesBand, loadText, slugify, EXERCISE_TYPES, PATTERNS, exerciseType, groupIcon } =
     window.MegGym;
   const Store = window.MegStore;
 
@@ -203,7 +203,11 @@
     if (weight) {
       weight.addEventListener("input", () => {
         weight.value = weight.value.replace(/[^\d.,]/g, "");
-        Store.saveExerciseLoad(user.id, id, { weight: weight.value.replace(".", ",") });
+        const cleanWeight = weight.value.replace(".", ",");
+        Store.saveExerciseLoad(user.id, id, { weight: cleanWeight });
+        document.querySelectorAll(`[data-sets-exercise="${CSS.escape(id)}"] [data-set-field="weight"]`).forEach((inp) => {
+          inp.placeholder = cleanWeight || "0";
+        });
         saved();
         clearTimeout(weightLogTimer);
         weightLogTimer = setTimeout(() => {
@@ -666,25 +670,53 @@
     setTab("exercicios");
     filters.search = "";
     filters.difficulty = "";
-    const all = exercises();
-    const cards = groups()
-      .map((g) => {
-        const count = all.filter((e) => inGroup(e, g.id) && available(e)).length;
-        return `
-          <a class="group-card" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
-            <span class="group-icon">${groupIcon(g)}</span>
-            <span>
-              <span class="group-name">${escapeHtml(g.name)}</span><br>
-              <span class="group-count">${count} ${count === 1 ? "exercício" : "exercícios"}</span>
-            </span>
-          </a>`;
-      })
-      .join("");
-    const hidden = all.filter((e) => !available(e)).length;
+    const renderContent = () => {
+      const all = exercises();
+      const q = normalizeText(filters.search.trim());
+      if (q) {
+        const hidden = all.filter((e) => !available(e) && (normalizeText(e.name).includes(q) || normalizeText(e.description).includes(q))).length;
+        const items = all.filter((e) => available(e) && (normalizeText(e.name).includes(q) || normalizeText(e.description).includes(q)));
+        $("exercise-groups-view").innerHTML = items.length
+          ? `<p class="meta" style="margin:0 0 12px">${items.length} ${items.length === 1 ? "exercício encontrado" : "exercícios encontrados"}</p><div class="exercise-grid">${items.map((ex) => exerciseCard(ex, { showGroup: true })).join("")}</div>`
+          : empty(
+              "search_off",
+              hidden && equipFilter ? "Nenhum exercício com os seus equipamentos para essa busca." : "Nenhum exercício encontrado.",
+              hidden && equipFilter ? `<button class="btn" type="button" data-equip-filter="off">Mostrar todos (${hidden})</button>` : ""
+            );
+        return;
+      }
+      const cards = groups()
+        .map((g) => {
+          const count = all.filter((e) => inGroup(e, g.id) && available(e)).length;
+          return `
+            <a class="group-card" href="#/exercicios/grupo/${encodeURIComponent(g.id)}" style="--group-color:${safeColor(g.color)}">
+              <span class="group-icon">${groupIcon(g)}</span>
+              <span>
+                <span class="group-name">${escapeHtml(g.name)}</span><br>
+                <span class="group-count">${count} ${count === 1 ? "exercício" : "exercícios"}</span>
+              </span>
+            </a>`;
+        })
+        .join("");
+      $("exercise-groups-view").innerHTML = `
+        <p class="page-subtitle section-intro">Escolha um grupo muscular.</p>
+        <nav class="group-grid" aria-label="Grupos musculares">${cards}</nav>`;
+    };
+    const hidden = exercises().filter((e) => !available(e)).length;
     app.innerHTML = `
       ${equipFilterHtml(hidden)}
-      <p class="page-subtitle section-intro">Escolha um grupo muscular.</p>
-      <nav class="group-grid" aria-label="Grupos musculares">${cards}</nav>`;
+      <div class="toolbar">
+        <label class="search">
+          <span class="visually-hidden">Buscar exercício em todos os grupos</span>
+          <input class="input" id="global-ex-search" type="search" placeholder="Buscar exercício em todos os grupos…" value="">
+        </label>
+      </div>
+      <div id="exercise-groups-view"></div>`;
+    $("global-ex-search").addEventListener("input", (e) => {
+      filters.search = e.target.value;
+      renderContent();
+    });
+    renderContent();
   }
 
   // Etiqueta do tipo (só quando não é o padrão "repetições").
@@ -701,8 +733,9 @@
     return exerciseType(ex) === "unilateral" ? t.replace(/\s*(cada|por)\s+(lado|braço|perna)s?$/i, "") : t;
   }
 
-  function exerciseCard(ex) {
+  function exerciseCard(ex, { showGroup = false } = {}) {
     const img = safeUrl(ex.image);
+    const g = showGroup ? findGroup(ex.group) : null;
     const stats = [
       ["Séries", ex.sets],
       [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, ex.reps)],
@@ -721,6 +754,7 @@
             <h2 class="exercise-name">${escapeHtml(ex.name)}</h2>
             ${difficultyBadge(ex.difficulty)}
           </div>
+          ${g ? `<div class="group-chips">${groupChips([g])}</div>` : ""}
           ${typeTag(ex)}
           ${stats ? `<div class="stats">${stats}</div>` : ""}
           ${equip ? `<div class="equip-chips">${equip}</div>` : ""}
@@ -2129,7 +2163,12 @@
         const pr = ex && recordOf(ex, e.setLog, bestOf(e.exerciseId, before));
         if (pr) e.pr = pr;
         const max = Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
-        if (max) Store.logWeight(user.id, e.exerciseId, max);
+        if (max) {
+          const weightStr = String(Math.round(max * 10) / 10).replace(".", ",");
+          Store.saveExerciseLoad(user.id, e.exerciseId, { weight: weightStr });
+          e.myLoad = loadText(Store.exerciseLoad(user.id, e.exerciseId), ex);
+          Store.logWeight(user.id, e.exerciseId, max);
+        }
       });
       const prCount = snapshot.filter((e) => e.pr).length;
       const record = Store.finishSession(user, w, list.length, snapshot);
@@ -2170,11 +2209,43 @@
     renderList();
   }
 
-  // Alternativas para trocar: mesmo grupo muscular, que dá para fazer com os equipamentos do usuário.
+  // Alternativas para trocar: prioriza variações diretas (mais fácil/difícil), mesmo padrão biomecânico e mesmo grupo muscular.
   async function pickAlternative(current, originalId) {
+    const orig = originalId && originalId !== current.id ? findExercise(originalId) : null;
+    const baseEx = orig || current;
+    const pat = baseEx.pattern || current.pattern || "";
+    const patLabel = PATTERNS[pat] || "";
+    const easierId = current.easier || baseEx.easier || "";
+    const harderId = current.harder || baseEx.harder || "";
+
     const options = exercises()
-      .filter((e) => e.id !== current.id && inGroup(e, current.group) && available(e))
-      .sort((a, b) => (a.id === originalId ? -1 : b.id === originalId ? 1 : a.name.localeCompare(b.name)));
+      .filter((e) => e.id !== current.id && available(e) && (inGroup(e, current.group) || (pat && e.pattern === pat) || e.id === easierId || e.id === harderId || e.id === originalId))
+      .map((e) => {
+        let rank = 4;
+        let reason = setsReps(e.sets, e.reps);
+        if (e.id === originalId) {
+          rank = 0;
+          reason = "Original do treino";
+        } else if (e.id === easierId) {
+          rank = 1;
+          reason = `Mais fácil${patLabel && e.pattern === pat ? ` · ${patLabel}` : ""}`;
+        } else if (e.id === harderId) {
+          rank = 1;
+          reason = `Mais difícil${patLabel && e.pattern === pat ? ` · ${patLabel}` : ""}`;
+        } else if (pat && e.pattern === pat && inGroup(e, current.group)) {
+          rank = 2;
+          reason = `Mesmo padrão (${patLabel})${reason ? ` · ${reason}` : ""}`;
+        } else if (pat && e.pattern === pat) {
+          rank = 3;
+          const g = findGroup(e.group);
+          reason = `Mesmo padrão (${patLabel})${g ? ` · ${g.name}` : ""}`;
+        } else if (e.pattern && PATTERNS[e.pattern]) {
+          reason = `${PATTERNS[e.pattern]}${reason ? ` · ${reason}` : ""}`;
+        }
+        return { e, rank, reason };
+      })
+      .sort((a, b) => a.rank - b.rank || a.e.name.localeCompare(b.e.name));
+
     if (!options.length) {
       toast("Nenhuma alternativa do mesmo grupo com seus equipamentos.");
       return null;
@@ -2182,8 +2253,13 @@
     const g = findGroup(current.group);
     return actionSheet({
       title: "Trocar por…",
-      text: `Exercícios de ${g ? g.name : "mesmo grupo"} que você consegue fazer.`,
-      actions: options.map((e) => ({ id: e.id, icon: e.id === originalId ? "undo" : "fitness_center", label: e.name, hint: e.id === originalId ? "Original do treino" : setsReps(e.sets, e.reps) })),
+      text: patLabel ? `Priorizando ${patLabel.toLowerCase()} e exercícios de ${g ? g.name : "mesmo grupo"} que você consegue fazer.` : `Exercícios de ${g ? g.name : "mesmo grupo"} que você consegue fazer.`,
+      actions: options.map(({ e, rank, reason }) => ({
+        id: e.id,
+        icon: e.id === originalId ? "undo" : rank <= 2 ? "swap_horiz" : "fitness_center",
+        label: e.name,
+        hint: reason,
+      })),
     });
   }
 
@@ -2262,20 +2338,32 @@
       <p class="meta chart-note">Cada barra é uma semana (data = segunda-feira).</p>`;
   }
 
-  // Séries por grupo muscular nos últimos 30 dias.
-  function muscleBalanceHtml(history) {
-    const since = Date.now() - 30 * 86400000;
+  // Soma as séries realizadas por grupo muscular (a partir de sinceMs), incluindo contribuição proporcional de músculos secundários e ignorando aquecimento.
+  function countMuscleSets(history, sinceMs) {
     const count = {};
     history
-      .filter((h) => new Date(h.finishedAt).getTime() >= since)
-      .forEach((h) =>
-        (h.exercises || []).forEach((e) => {
-          count[e.group] = (count[e.group] || 0) + (e.setLog?.length || parseInt(e.sets, 10) || 1);
-        })
-      );
+      .filter((h) => new Date(h.finishedAt).getTime() >= sinceMs)
+      .forEach((h) => {
+        (h.exercises || [])
+          .filter((e) => !e.warmup)
+          .forEach((e) => {
+            const ex = findExercise(e.exerciseId);
+            const muscles = ex?.muscles || { [e.group]: 1 };
+            const sets = e.setLog?.length || parseInt(e.sets, 10) || 1;
+            Object.entries(muscles).forEach(([g, weight]) => {
+              if (sets * weight > 0) count[g] = (count[g] || 0) + sets * weight;
+            });
+          });
+      });
+    return count;
+  }
+
+  // Séries por grupo muscular nos últimos 30 dias.
+  function muscleBalanceHtml(history) {
+    const count = countMuscleSets(history, Date.now() - 30 * 86400000);
     const rows = Object.entries(count)
       .map(([id, n]) => ({ g: findGroup(id), n }))
-      .filter((x) => x.g)
+      .filter((x) => x.g && x.g.id !== "cardio" && x.n > 0)
       .sort((a, b) => b.n - a.n);
     if (!rows.length) return "";
     const max = rows[0].n;
@@ -2283,14 +2371,14 @@
     return `
       <section class="subsection">
         <h2 class="subsection-title">Músculos trabalhados</h2>
-        <p class="meta">Séries nos últimos 30 dias</p>
+        <p class="meta">Séries nos últimos 30 dias (músculos secundários contam proporcionalmente)</p>
         <ul class="hbars">${rows
           .map(
             ({ g, n }) => `
           <li style="--group-color:${safeColor(g.color)}">
             <span class="hbar-label">${escapeHtml(g.name)}</span>
             <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
-            <span class="hbar-value">${n}</span>
+            <span class="hbar-value">${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}</span>
           </li>`
           )
           .join("")}</ul>
@@ -2370,16 +2458,7 @@
 
   // Séries realizadas na semana, incluindo a contribuição dos músculos secundários.
   function weeklyMusclesHtml(history) {
-    const weekly = {};
-    const weekStart = startOfWeek();
-    history.filter((h) => new Date(h.finishedAt) >= weekStart).forEach((h) => {
-      (h.exercises || []).filter((e) => !e.warmup).forEach((e) => {
-        const ex = findExercise(e.exerciseId);
-        const muscles = ex?.muscles || { [e.group]: 1 };
-        const sets = e.setLog?.length || parseInt(e.sets, 10) || 0;
-        Object.entries(muscles).forEach(([g, weight]) => (weekly[g] = (weekly[g] || 0) + sets * weight));
-      });
-    });
+    const weekly = countMuscleSets(history, startOfWeek().getTime());
     const list = groups().filter((g) => g.id !== "cardio");
     const max = Math.max(1, ...list.map((g) => weekly[g.id] || 0));
     return `
@@ -2609,7 +2688,10 @@
       app.innerHTML = empty("help", "Registro não encontrado.");
       return;
     }
-    setHeader("Treino feito", { back: "#/atividade" });
+    setHeader("Treino feito", {
+      back: "#/atividade",
+      action: `<a class="btn btn-sm" href="#/atividade/historico/${encodeURIComponent(h.id)}/editar">Editar</a>`,
+    });
     const start = new Date(h.startedAt);
     const end = new Date(h.finishedAt);
     const time = (d) => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -2681,6 +2763,7 @@
       ${h.note ? `<section class="subsection"><h2 class="subsection-title">${icon("edit_note", "mi-inline")} Observações do treino</h2><p class="note-box">${escapeHtml(h.note)}</p></section>` : ""}
 
       <p class="meta">Você já fez este treino ${sameWorkoutCount} ${sameWorkoutCount === 1 ? "vez" : "vezes"}.</p>
+      <button class="btn btn-danger btn-block" type="button" id="delete-history-btn">${icon("delete", "mi-inline")} Excluir este registro</button>
       ${
         workout?.assistant
           ? `<section class="save-workout-card">
@@ -2696,11 +2779,166 @@
           : `<p class="meta">Este treino foi excluído.</p>`
       }`;
     $("share-btn").addEventListener("click", () => shareSummary(h));
+    $("delete-history-btn").addEventListener("click", async () => {
+      const ok = await confirmSheet({
+        icon: "delete",
+        title: "Excluir este registro?",
+        text: `O treino "${h.workoutName}" de ${formatDateTime(h.finishedAt)} será removido do seu histórico e dos gráficos.`,
+        confirmLabel: "Excluir registro",
+        cancelLabel: "Voltar",
+        danger: true,
+      });
+      if (!ok) return;
+      Store.deleteHistory(h.id);
+      toast("Registro excluído do histórico.");
+      location.hash = "#/atividade?aba=historico";
+    });
     $("save-history-workout")?.addEventListener("click", () => {
       const { id: _id, assistant, ownerId, createdBy, createdAt, updatedAt, ...data } = workout;
       const saved = Store.saveWorkout({ ...data, name: workout.name.replace(/^Treino montado/, "Treino") }, user);
       toast("Treino salvo nos seus treinos!", "success");
       location.hash = `#/treinos/${encodeURIComponent(saved.id)}`;
+    });
+  }
+
+  function renderHistoryEdit(id) {
+    setTab("atividade");
+    const h = Store.getHistory(id);
+    if (!h || h.userId !== user.id) {
+      setHeader("Editar registro", { back: "#/atividade" });
+      app.innerHTML = empty("help", "Registro não encontrado.");
+      return;
+    }
+    const back = `#/atividade/historico/${encodeURIComponent(h.id)}`;
+    setHeader("Editar registro", { back });
+    const workout = Store.getWorkout(h.workoutId);
+    const list = (Array.isArray(h.exercises) && h.exercises.length
+      ? h.exercises
+      : (workout?.items || []).map((item) => {
+          const ex = findExercise(item.exerciseId);
+          return ex ? { exerciseId: ex.id, name: ex.name, group: ex.group, sets: item.sets, reps: item.reps, load: item.load || "", rir: item.rir || "", setLog: [] } : null;
+        }).filter(Boolean)
+    ).map((e) => ({
+      ...e,
+      setLog: Array.isArray(e.setLog) && e.setLog.length
+        ? e.setLog.map((s) => ({ ...s }))
+        : Array.from({ length: Math.min(Math.max(parseInt(e.sets, 10) || 1, 1), 12) }, () => ({ reps: e.reps || "", weight: "", done: true })),
+    }));
+    const durationMin = Math.max(1, Math.round((new Date(h.finishedAt) - new Date(h.startedAt)) / 60000));
+
+    app.innerHTML = `
+      <form class="form-stack" id="history-edit-form" novalidate>
+        <div class="field-row">
+          <div class="field">
+            <label for="he-name">Nome do treino</label>
+            <input class="input" id="he-name" maxlength="60" value="${escapeHtml(h.workoutName)}">
+          </div>
+          <div class="field">
+            <label for="he-duration">Duração (min)</label>
+            <input class="input" id="he-duration" type="number" inputmode="numeric" min="1" max="600" value="${durationMin}">
+          </div>
+        </div>
+        <div class="field">
+          <label for="he-note">Observações deste treino</label>
+          <textarea class="textarea textarea-sm" id="he-note" maxlength="1000" placeholder="Como foi o treino, ajustes feitos…">${escapeHtml(h.note || "")}</textarea>
+        </div>
+        <section class="subsection">
+          <h2 class="subsection-title">Séries realizadas</h2>
+          <ol class="item-list" id="he-exercises">
+            ${list
+              .map((e, ei) => {
+                const ex = findExercise(e.exerciseId);
+                const weight = ex ? usesWeight(ex) : true;
+                const unit = unitOf(e.type || (ex ? exerciseType(ex) : "reps"));
+                const rows = e.setLog
+                  .map(
+                    (s, si) => `
+                    <li class="set-row done ${weight ? "weighted" : ""}" data-he-set="${si}">
+                      <span class="set-num" aria-hidden="true">${si + 1}</span>
+                      <label class="set-field"><span class="visually-hidden">Repetições da série ${si + 1} de ${escapeHtml(e.name)}</span>
+                        <input class="input input-sm" data-he-field="reps" inputmode="numeric" maxlength="4" placeholder="0" value="${escapeHtml(s.reps || "")}"><span class="set-unit">${unit === "reps/lado" ? "/lado" : unit}</span></label>
+                      ${
+                        weight
+                          ? `<label class="set-field"><span class="visually-hidden">Peso da série ${si + 1} de ${escapeHtml(e.name)}</span>
+                              <input class="input input-sm" data-he-field="weight" inputmode="decimal" maxlength="7" placeholder="0" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
+                          : ""
+                      }
+                    </li>`
+                  )
+                  .join("");
+                return `
+                  <li class="item-row item-row-edit" data-he-ex="${ei}">
+                    <span class="item-index">${ei + 1}</span>
+                    <div class="item-main">
+                      <div class="item-title">${escapeHtml(e.name)}</div>
+                      <ol class="set-list" style="margin-top:8px">${rows}</ol>
+                    </div>
+                  </li>`;
+              })
+              .join("")}
+          </ol>
+        </section>
+        <div class="sticky-cta">
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Salvar alterações</button>
+          <button class="btn btn-danger btn-block" type="button" id="he-delete">${icon("delete", "mi-inline")} Excluir registro</button>
+        </div>
+      </form>`;
+
+    $("history-edit-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = $("he-name").value.trim() || h.workoutName;
+      const mins = Math.min(Math.max(parseInt($("he-duration").value, 10) || durationMin, 1), 600);
+      const startedAt = new Date(new Date(h.finishedAt).getTime() - mins * 60000).toISOString();
+      const note = $("he-note").value.trim();
+      const otherHistory = Store.history(user.id).filter((x) => x.id !== h.id);
+
+      const updatedExercises = list.map((item, ei) => {
+        const box = app.querySelector(`[data-he-ex="${ei}"]`);
+        const setLog = box
+          ? [...box.querySelectorAll("[data-he-set]")].map((row) => ({
+              reps: row.querySelector('[data-he-field="reps"]')?.value.trim() || "",
+              weight: (row.querySelector('[data-he-field="weight"]')?.value.trim() || "").replace(".", ","),
+              done: true,
+            }))
+          : item.setLog;
+        const ex = findExercise(item.exerciseId);
+        const pr = ex ? recordOf(ex, setLog, bestOf(item.exerciseId, otherHistory)) : null;
+        const max = Math.max(0, ...setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
+        if (max) {
+          Store.logWeight(user.id, item.exerciseId, max, { replace: true, date: h.finishedAt });
+          const weightStr = String(Math.round(max * 10) / 10).replace(".", ",");
+          Store.saveExerciseLoad(user.id, item.exerciseId, { weight: weightStr });
+        }
+        const next = { ...item, setLog, myLoad: ex ? loadText(Store.exerciseLoad(user.id, item.exerciseId), ex) : item.myLoad };
+        if (pr) next.pr = pr;
+        else delete next.pr;
+        return next;
+      });
+
+      Store.updateHistory(h.id, {
+        workoutName: name,
+        startedAt,
+        note,
+        exercises: updatedExercises,
+        exerciseCount: updatedExercises.length || h.exerciseCount,
+      });
+      toast("Registro atualizado!", "success");
+      location.hash = back;
+    });
+
+    $("he-delete").addEventListener("click", async () => {
+      const ok = await confirmSheet({
+        icon: "delete",
+        title: "Excluir este registro?",
+        text: `O treino "${h.workoutName}" será removido do seu histórico.`,
+        confirmLabel: "Excluir registro",
+        cancelLabel: "Voltar",
+        danger: true,
+      });
+      if (!ok) return;
+      Store.deleteHistory(h.id);
+      toast("Registro excluído do histórico.");
+      location.hash = "#/atividade?aba=historico";
     });
   }
 
@@ -2872,6 +3110,7 @@
       case "atividade":
         if (parts[1] === "configuracoes") renderSettings();
         else if (parts[1] === "perfil") renderEditProfile();
+        else if (parts[1] === "historico" && parts[2] && parts[3] === "editar") renderHistoryEdit(parts[2]);
         else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2], params);
         else if (parts[1] === "equipamentos") renderEditEquipment();
         else renderActivity(params);
@@ -3562,6 +3801,43 @@
     return null;
   }
 
+  // Próximo exercício pendente na tela de execução (ou o próximo do bi-set).
+  function nextRunTarget(w, session, currentIndex) {
+    const list = runItems(w, session).filter((x) => !x.skipped);
+    const pos = list.findIndex((x) => x.i === currentIndex);
+    if (pos < 0) return null;
+    const ss = supersets(w.items)[currentIndex];
+    if (ss && !ss.last) {
+      const nextInSs = list.find((x) => x.i === currentIndex + 1 && !x.done);
+      if (nextInSs) return { ...nextInSs, ssLabel: `${ss.name} ${ss.letter}${ss.pos + 1}` };
+    }
+    for (let k = 1; k < list.length; k++) {
+      const candidate = list[(pos + k) % list.length];
+      if (!candidate.done && candidate.i !== currentIndex) return candidate;
+    }
+    return null;
+  }
+
+  function nextRunButtonHtml(run) {
+    const session = Store.session(user.id);
+    if (!session) return "";
+    const next = nextRunTarget(run.workout, session, run.index);
+    const allDone = run.sets.length > 0 && run.sets.every((s) => s.done);
+    if (!next) {
+      return allDone
+        ? `<div class="next-ex-bar"><button class="btn btn-primary btn-block" type="button" data-close-sheet>${icon("check_circle", "mi-inline")} Exercício concluído · voltar à lista</button></div>`
+        : "";
+    }
+    const prefix = next.ssLabel ? `Ir para ${next.ssLabel}: ` : allDone ? "Próximo: " : "Ir para próximo: ";
+    return `
+      <div class="next-ex-bar">
+        <button class="btn ${allDone || next.ssLabel ? "btn-primary" : ""} btn-block" type="button" data-next-run="${next.i}">
+          <span>${escapeHtml(prefix)}<strong>${escapeHtml(next.ex.name)}</strong></span>
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>`;
+  }
+
   function setsTableHtml(ex, run, setsText, repsText) {
     const count = Math.min(Math.max(parseInt(setsText, 10) || 3, 1), 12);
     const weight = usesWeight(ex);
@@ -3605,6 +3881,7 @@
         ${last ? `<p class="meta">${icon("history", "mi-inline")} Comparando com ${escapeHtml(formatDateTime(last.date))}. Campos vazios usam o valor sugerido ao marcar.</p>` : ""}
         <ol class="set-list">${rows}</ol>
         <p class="meta">${timed ? `Toque em ${icon("play_arrow", "mi-inline")} para cronometrar a série; ao terminar ela é marcada e o descanso de ${run.restSeconds}s começa.` : `Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.`}</p>
+        <div id="sets-next-slot">${nextRunButtonHtml(run)}</div>
       </section>`;
   }
 
@@ -3635,8 +3912,25 @@
     const save = () => {
       const sets = read();
       Store.saveSets(user.id, index, sets);
+      // Sincroniza o peso preenchido na série com "Minha carga" do exercício.
+      const ex = findExercise(exId);
+      if (ex && usesWeight(ex)) {
+        const doneWeights = sets.filter((s) => s.done && num(s.weight) > 0).map((s) => num(s.weight));
+        const anyWeights = sets.filter((s) => num(s.weight) > 0).map((s) => num(s.weight));
+        const bestW = Math.max(0, ...(doneWeights.length ? doneWeights : anyWeights));
+        if (bestW > 0) {
+          const weightStr = fmtNum(bestW);
+          Store.saveExerciseLoad(user.id, exId, { weight: weightStr });
+          const exWeightInput = $("ex-weight");
+          if (exWeightInput && document.activeElement !== exWeightInput) exWeightInput.value = weightStr;
+          refreshLoadPreviews(exId);
+        }
+      }
       // Todas as séries feitas → exercício concluído na lista.
       const session = Store.setDone(user.id, index, sets.every((s) => s.done));
+      const w = session && Store.getWorkout(session.workoutId);
+      const slot = $("sets-next-slot");
+      if (slot && w) slot.innerHTML = nextRunButtonHtml({ index, workout: w, restSeconds: itemRestSeconds(w, index), sets });
       document.dispatchEvent(new CustomEvent("meggym:run-changed", { detail: { session, exerciseId: exId } }));
     };
     box.addEventListener("input", (e) => {
@@ -3645,6 +3939,28 @@
       save();
     });
     box.addEventListener("click", (e) => {
+      if (e.target.closest("[data-close-sheet]")) return closeSheet();
+      const nextBtn = e.target.closest("[data-next-run]");
+      if (nextBtn) {
+        const nextIdx = Number(nextBtn.dataset.nextRun);
+        const session = Store.session(user.id);
+        const w = session && Store.getWorkout(session.workoutId);
+        if (!w) return;
+        const item = w.items[nextIdx];
+        const nextExId = session.swaps?.[nextIdx] || item?.exerciseId;
+        if (item && nextExId) {
+          stopSetTimer();
+          openSheet(nextExId, {
+            sets: item.sets,
+            reps: item.reps,
+            load: item.load || "",
+            rir: item.rir || "",
+            rest: item.rest || "",
+            runIndex: String(nextIdx),
+          });
+        }
+        return;
+      }
       const timerBtn = e.target.closest("[data-set-timer]");
       if (timerBtn) return toggleSetTimer(timerBtn);
       const btn = e.target.closest("[data-set-check]");
@@ -4047,13 +4363,20 @@
       if (w) startWorkout(w);
       return;
     }
-    const toggle = e.target.closest("[data-equip-filter]");
-    if (toggle) {
-      equipFilter = toggle.dataset.equipFilter === "on";
-      if ($("picker-list")) renderPicker();
-      else route();
-      return;
-    }
+      const toggle = e.target.closest("[data-equip-filter]");
+      if (toggle) {
+        equipFilter = toggle.dataset.equipFilter === "on";
+        if ($("picker-list")) renderPicker();
+        else {
+          const savedSearch = $("global-ex-search")?.value || "";
+          route();
+          if (savedSearch && $("global-ex-search")) {
+            $("global-ex-search").value = savedSearch;
+            $("global-ex-search").dispatchEvent(new Event("input"));
+          }
+        }
+        return;
+      }
   });
 
   app.addEventListener("click", (e) => {
