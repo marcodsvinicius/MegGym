@@ -4186,6 +4186,51 @@
     if (user) Store.saveRest(user.id, null);
   }
 
+  let expandedVideo = null;
+  let nativeVideoFullscreen = false;
+
+  function resetVideoFullscreen() {
+    if (!expandedVideo) return;
+    expandedVideo.classList.remove("video-expanded");
+    const button = expandedVideo.querySelector("[data-video-fullscreen]");
+    if (button) {
+      button.textContent = "Tela cheia";
+      button.setAttribute("aria-expanded", "false");
+    }
+    expandedVideo = null;
+    nativeVideoFullscreen = false;
+    document.body.classList.remove("video-fullscreen");
+  }
+
+  function closeVideoFullscreen() {
+    const video = expandedVideo;
+    resetVideoFullscreen();
+    if (video && document.fullscreenElement === video) document.exitFullscreen?.().catch(() => {});
+  }
+
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-video-fullscreen]");
+    if (!button) return;
+    const video = button.closest(".exercise-video");
+    if (expandedVideo === video) return closeVideoFullscreen();
+    closeVideoFullscreen();
+    expandedVideo = video;
+    video.classList.add("video-expanded");
+    document.body.classList.add("video-fullscreen");
+    button.textContent = "Sair da tela cheia";
+    button.setAttribute("aria-expanded", "true");
+    // O modo expandido também funciona quando o navegador não oferece Fullscreen API.
+    if (video.requestFullscreen) {
+      nativeVideoFullscreen = true;
+      try { await video.requestFullscreen(); }
+      catch { nativeVideoFullscreen = false; }
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    if (nativeVideoFullscreen && document.fullscreenElement !== expandedVideo) resetVideoFullscreen();
+  });
+
   function exerciseDetailHtml(ex, prescription = {}, { titleId = "sheet-title" } = {}) {
     const g = findGroup(ex.group);
     const img = safeUrl(ex.image);
@@ -4198,7 +4243,6 @@
     const stats = [
       ["Séries", sets],
       [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, reps)],
-      ["Carga", prescription.load],
     ]
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
@@ -4220,7 +4264,14 @@
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
     return `
-      ${img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
+      ${ytId
+        ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
+            <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+            <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
+          </div>`
+        : videoUrl
+          ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
+          : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
       <div class="sheet-head">
         <h2 id="${titleId}">${escapeHtml(ex.name)}</h2>
         ${difficultyBadge(ex.difficulty)}
@@ -4229,25 +4280,19 @@
       ${stats ? `<div class="stats">${stats}</div>` : ""}
       ${rirTip}
 
-      ${loadFieldsHtml(ex)}
-
       ${run ? setsTableHtml(ex, run, sets, reps) : ""}
 
-      <section class="sheet-section" data-weight-chart="${escapeHtml(ex.id)}">${weightChartHtml(ex.id)}</section>
+      ${loadFieldsHtml(ex)}
+      ${prescription.load ? `<p class="meta">Carga sugerida pelo treino: ${escapeHtml(prescription.load)}</p>` : ""}
+
+      ${personalNoteHtml(ex.id)}
 
       <section class="sheet-section">
         <h3>Execução</h3>
-        ${
-          ytId
-            ? `<div class="video-wrap"><iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
-            : videoUrl
-              ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
-              : ""
-        }
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
 
-      ${personalNoteHtml(ex.id)}
+      <section class="sheet-section" data-weight-chart="${escapeHtml(ex.id)}">${weightChartHtml(ex.id)}</section>
 
       <section class="sheet-section">
         <h3>Equipamentos</h3>
@@ -4273,6 +4318,7 @@
   }
 
   function openSheet(exerciseId, prescription = {}) {
+    closeVideoFullscreen();
     const ex = findExercise(exerciseId);
     if (!ex) return;
     $("sheet-content").innerHTML = exerciseDetailHtml(ex, prescription);
@@ -4356,6 +4402,7 @@
   });
 
   function closeSheet(immediate = false) {
+    closeVideoFullscreen();
     clearTimeout(sheetCloseTimer);
     sheetCloseTimer = null;
     if (sheet.classList.contains("hidden")) return;
@@ -4430,7 +4477,10 @@
     if (e.target === sheet || e.target.closest("#sheet-close")) closeSheet();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeSheet();
+    if (e.key === "Escape") {
+      if (expandedVideo) { e.preventDefault(); closeVideoFullscreen(); }
+      else closeSheet();
+    }
   });
 
   // Arrastar para baixo fecha o painel.

@@ -1,5 +1,7 @@
 # MegGym
 
+Na versão 58, o exercício abre com vídeo vertical (9:16) e botão próprio de tela cheia, seguido dos cards de prescrição, séries, Minha carga e Minhas observações. O modo expandido funciona também quando o navegador não oferece tela cheia nativa. Os vídeos já cadastrados continuam com os mesmos links; o player aceita Shorts e os demais links do YouTube.
+
 Na versão 57, séries parciais são registradas ao terminar antes; sessões preservam a ficha de quando começaram; falhas ao salvar mantêm o treino recuperável. Edições e exclusões atualizam o gráfico de cargas, e backups são validados antes de restaurar. Cargas manuais novas têm origem identificada. Nas cargas antigas sem essa identificação, uma entrada igual ao máximo da sessão naquele dia é tratada como resultado do treino durante a correção/exclusão.
 academia em casa
 

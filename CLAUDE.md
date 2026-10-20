@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v57**.
+- Versão atual: **v58**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -46,7 +46,7 @@ Outros cuidados:
 ## Funcionalidades prontas
 - **Integridade v57:** finalização só limpa a sessão após persistir o histórico e a carga; gravações em lote desfazem mudanças anteriores em caso de erro. Séries parciais entram no histórico. Sessões guardam a ficha original e migram sessões antigas antes de editar. Gráficos combinam resultados do histórico com cargas manuais identificadas; editar registros antigos não troca a carga atual. Backup validado integralmente antes de gravar, com reversão em caso de falha.
 - **Exercício:**
-  - Carga no topo; tabela por série com repetições, peso e check.
+  - Vídeo vertical 9:16 no topo, com botão próprio de tela cheia e modo expandido quando a API nativa não está disponível. Cards de prescrição, séries registráveis, Minha carga e Minhas observações vêm nessa ordem. Evolução e instruções ficam abaixo.
   - O check inicia o descanso com timer. O timer sobrevive a recarregar a página, emite bipe e mantém a tela ligada.
   - Descanso configurável por treino; RIR com tooltip; "Última vez" em cada série.
 - **Execução do treino:**
