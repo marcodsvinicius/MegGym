@@ -935,7 +935,7 @@ body.backend-supabase .github-only { display: none !important; }
 .video-fullscreen-button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 body.video-fullscreen { overflow: hidden; }
 body.video-fullscreen .sheet-backdrop { z-index: 200; }
-body.video-fullscreen .sheet { transform: none; }
+body.video-fullscreen .sheet-backdrop.open .sheet { transform: none; }
 body.video-fullscreen .sheet-content { overflow: visible; }
 body.video-fullscreen .app-main { transform: none; animation: none; }
 .exercise-video.video-expanded, .exercise-video:fullscreen {
