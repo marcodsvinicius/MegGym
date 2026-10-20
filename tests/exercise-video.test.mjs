@@ -24,15 +24,15 @@ async function withApp(fn) {
   } finally { await browser.close(); }
 }
 
-test("player vertical vem antes dos cards, séries, carga e observações nas telas mobile", () => withApp(async (page) => {
+test("cards vêm antes do vídeo vertical, séries, carga e observações nas telas mobile", () => withApp(async (page) => {
   const sequence = await page.evaluate(() => {
     const content = document.querySelector("#sheet-content");
-    const selectors = [".exercise-video", ".stats", ".sets-log", ".my-load", ".my-note"];
+    const selectors = [".stats", ".exercise-video", ".sets-log", ".my-load", ".my-note"];
     return selectors.map((selector) => [...content.children].indexOf(content.querySelector(selector)));
   });
   assert.ok(sequence.every((n) => n >= 0));
   assert.deepEqual(sequence, [...sequence].sort((a, b) => a - b));
-  assert.equal(sequence[0], 0);
+  assert.ok(sequence[0] < sequence[1]);
   assert.match(await page.textContent(".stats"), /Séries[\s\S]*Reps[\s\S]*Descanso[\s\S]*RIR/);
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 430, height: 932 }]) {
     await page.setViewportSize(viewport);

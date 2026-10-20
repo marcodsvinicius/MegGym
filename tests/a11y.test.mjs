@@ -1,4 +1,4 @@
-// Acessibilidade automática (axe-core, WCAG A/AA) nas telas principais, nos 3 estilos e nos 2 modos.
+// Acessibilidade automática (axe-core, WCAG A/AA) nas telas principais e em cada estilo/modo.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -10,14 +10,14 @@ let server;
 before(async () => (server = await startServer()));
 after(() => server.close());
 
-test("sem violações de acessibilidade (axe) nos 3 estilos, claro e escuro", async () => {
+for (const style of ["energia", "esportivo", "pink-money", "arcade"]) {
+test(`sem violações de acessibilidade (axe) em ${style}, claro e escuro`, async () => {
   const { browser, page } = await openApp(server.url);
   try {
     await seedUser(page);
     const id = await page.evaluate(() => MegStore.workouts()[0].id);
     const screens = ["#/inicio", "#/treinos", "#/treinos?aba=explorar", `#/treinos/${id}`, "#/treinos/novo", "#/exercicios/grupo/peito", "#/exercicios/ver/prancha", "#/atividade", "#/atividade?aba=evolucao", "#/atividade?aba=historico", "#/atividade/configuracoes"];
     const problems = [];
-    for (const style of ["suave", "energia", "esportivo"])
       for (const theme of ["light", "dark"]) {
         await page.evaluate(([st, th]) => (MegTheme.setStyle(st), MegTheme.set(th)), [style, theme]);
         for (const hash of screens) {
@@ -33,3 +33,5 @@ test("sem violações de acessibilidade (axe) nos 3 estilos, claro e escuro", as
     await browser.close();
   }
 });
+}
+

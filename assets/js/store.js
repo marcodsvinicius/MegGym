@@ -96,7 +96,7 @@
       age: profile.age ?? null,
       sex: profile.sex || "",
       equipment: profile.equipment || [],
-      style: profile.style || "suave",
+      style: ["energia", "esportivo", "pink-money", "arcade"].includes(profile.style) ? profile.style : "energia",
       onboarded: true,
       createdAt: new Date().toISOString(),
     };
@@ -557,7 +557,7 @@
     list.push(record);
     const loads = read(KEY.exerciseLoads + user.id, {});
     snapshot.forEach((e) => {
-      const max = Math.max(0, ...(e.setLog || []).map((s) => Number(String(s.weight || "").replace(",", ".")) || 0));
+      const max = Number(String(e.setLog?.[0]?.weight || "").replace(",", ".")) || Math.max(0, ...(e.setLog || []).map((s) => Number(String(s.weight || "").replace(",", ".")) || 0));
       if (max) loads[e.exerciseId] = { ...(loads[e.exerciseId] || {}), weight: String(Math.round(max * 10) / 10).replace(".", ","), updatedAt: record.finishedAt };
     });
     return writeBatch([[KEY.history, list], [KEY.exerciseLoads + user.id, loads], [KEY.session + user.id, null]]) ? record : null;

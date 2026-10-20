@@ -1,5 +1,7 @@
 # MegGym
 
+Na versão 59, Energia é o estilo padrão, ao lado de Esportivo, Pink Money e Arcade. Perfis antigos em Suave migram para Energia. A retomada do treino é fixa acima da navegação e dá espaço ao descanso. O peso da primeira série preenche as seguintes, preservando alterações individuais e séries feitas. A ordem do exercício agora é: cards de prescrição, vídeo vertical, séries, Minha carga e Minhas observações.
+
 Na versão 58, o exercício abre com vídeo vertical (9:16) e botão próprio de tela cheia, seguido dos cards de prescrição, séries, Minha carga e Minhas observações. O modo expandido funciona também quando o navegador não oferece tela cheia nativa. Os vídeos já cadastrados continuam com os mesmos links; o player aceita Shorts e os demais links do YouTube.
 
 Na versão 57, séries parciais são registradas ao terminar antes; sessões preservam a ficha de quando começaram; falhas ao salvar mantêm o treino recuperável. Edições e exclusões atualizam o gráfico de cargas, e backups são validados antes de restaurar. Cargas manuais novas têm origem identificada. Nas cargas antigas sem essa identificação, uma entrada igual ao máximo da sessão naquele dia é tratada como resultado do treino durante a correção/exclusão.
@@ -20,7 +22,7 @@ O Treinador automático está desativado. Seu código, estilos, integrações e 
 
 - **Onboarding:** boas-vindas → nome, idade e sexo → equipamentos que tem em casa (perfis ficam no aparelho).
 - **Filtro de equipamentos:** a lista de exercícios e a montagem de treino mostram só o que dá para fazer com os equipamentos do perfil (dá para ver todos).
-- **Personalização:** 3 estilos (Suave — padrão, Energia, Esportivo), cada um com modo claro/escuro/automático. Escolhido no onboarding (passo "Deixe a sua cara") e em Configurações; fica salvo no perfil.
+- **Personalização:** 4 estilos (Energia — padrão, Esportivo, Pink Money e Arcade), cada um com modo claro/escuro/automático. Escolhido no onboarding (passo "Deixe a sua cara") e em Configurações; fica salvo no perfil.
 - **Configurações** (Atividade → ⚙): estilo e modo, editar perfil, equipamentos e sair.
 - **Menu inferior:** Início · Treinos · Exercícios · Atividade.
 - **Exercícios:** lista por grupo muscular. Qualquer pessoa pode cadastrar exercícios novos (botão ＋ Novo).
@@ -119,7 +121,7 @@ insert into public.admins (email) values ('email@dela.com');
 index.html            app (login, treinos, exercícios, atividade)
 assets/js/store.js    dados salvos no aparelho (perfis, treinos, histórico)
 assets/js/pwa.js      instalação do app e registro do service worker
-assets/js/theme.js    estilo (suave/energia/esportivo) e modo claro/escuro, aplicados antes de desenhar
+assets/js/theme.js    estilo (energia/esportivo/pink-money/arcade) e modo claro/escuro, aplicados antes de desenhar
 sw.js                 service worker (cache/offline)
 manifest.webmanifest  nome, ícones e cores do app instalado
 assets/icons/         ícones do app (instalação)

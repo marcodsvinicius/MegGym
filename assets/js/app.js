@@ -377,6 +377,21 @@
   });
   if (PWA) PWA.onUpdate(() => ((updateDismissed = false), refreshUpdateBar()));
 
+  const resumeDock = document.createElement("a");
+  resumeDock.className = "resume-banner resume-dock hidden";
+  document.body.appendChild(resumeDock);
+  function refreshResumeDock() {
+    const session = user && Store.session(user.id);
+    const workout = session && Store.sessionWorkout(user.id);
+    const executing = /^#\/treinos\/[^/]+\/executar(?:\?|$)/.test(location.hash);
+    const show = Boolean(workout && !executing);
+    resumeDock.classList.toggle("hidden", !show);
+    document.body.classList.toggle("has-resume", show);
+    if (!show) return;
+    resumeDock.href = `#/treinos/${encodeURIComponent(workout.id)}/executar`;
+    resumeDock.innerHTML = `${icon("play_arrow")}<span class="resume-dock-label"><span>Continuar treino</span><strong>${escapeHtml(workout.name)}</strong></span><span aria-hidden="true">›</span>`;
+  }
+
   app.addEventListener("click", async (e) => {
     const close = e.target.closest("[data-install-dismiss]");
     if (close) {
@@ -605,14 +620,6 @@
           <h2 class="page-title">${escapeHtml(user.name)} 👋</h2>
         </div>
       </div>
-
-      ${
-        activeWorkout
-          ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
-              <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
-            </a>`
-          : ""
-      }
 
       ${todayCardHtml(history, trainedDays.has(dayKey(today)))}
 
@@ -1083,11 +1090,7 @@
   function myTrainingHtml() {
     const session = Store.session(user.id);
     const activeWorkout = session && Store.sessionWorkout(user.id);
-    const resume = activeWorkout
-      ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
-          <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
-        </a>`
-      : "";
+    const resume = ""; // a retomada agora fica na barra fixa global
     const plan = Store.plan(user.id);
     const st = plan?.structureId && Store.getStructure(plan.structureId);
     const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
@@ -2162,7 +2165,7 @@
         swappedFrom: swapped ? item.exerciseId : "",
         note: Store.exerciseNote(user.id, ex.id),
         myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex),
-        setLog: (session.sets?.[i] || []).filter((s) => s.done),
+        setLog: (session.sets?.[i] || []).filter((s) => s.done).map(({ weightSource, ...s }) => s),
         type: exerciseType(ex),
       }));
       const before = Store.history(user.id);
@@ -2170,7 +2173,7 @@
         const ex = findExercise(e.exerciseId);
         const pr = ex && recordOf(ex, e.setLog, bestOf(e.exerciseId, before));
         if (pr) e.pr = pr;
-        const max = Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
+        const max = num(e.setLog[0]?.weight) || Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
         if (max) {
           const weightStr = String(Math.round(max * 10) / 10).replace(".", ",");
           e.myLoad = loadText({ ...Store.exerciseLoad(user.id, e.exerciseId), weight: weightStr }, ex);
@@ -2966,7 +2969,7 @@
       <section class="settings-group">
         <h2 class="settings-title">Personalização</h2>
         <p class="meta" style="margin:0 0 10px">Estilo do app</p>
-        <form id="style-form">${stylePickerHtml(user.style || "suave", "set")}</form>
+        <form id="style-form">${stylePickerHtml(window.MegTheme.normalizeStyle(user.style), "set")}</form>
         <p class="meta" style="margin:16px 0 10px">Modo</p>
         ${modePickerHtml(theme, "theme-picker")}
         <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
@@ -3143,6 +3146,7 @@
         return;
     }
     window.scrollTo(0, 0);
+    refreshResumeDock();
     animatePage(parts);
   }
 
@@ -3373,6 +3377,8 @@
   let onboarding = null;
 
   function showLogin() {
+    resumeDock.classList.add("hidden");
+    document.body.classList.remove("has-resume");
     clearInterval(timer);
     $("app-shell").classList.add("hidden");
     $("login-screen").classList.remove("hidden");
@@ -3483,7 +3489,7 @@
     }
 
     // step 4: personalização
-    if (!values.style) values.style = window.MegTheme ? window.MegTheme.getStyle() : "suave";
+    if (!values.style) values.style = window.MegTheme ? window.MegTheme.getStyle() : "energia";
     if (!values.mode) values.mode = window.MegTheme ? window.MegTheme.get() : "auto";
     box.innerHTML = `
       <form class="onboarding-step form-stack" id="ob-style" novalidate>
@@ -3529,9 +3535,10 @@
   }
 
   const STYLE_INFO = [
-    ["suave", "Suave", "Claro, tons pastel, formas arredondadas"],
     ["energia", "Energia", "Escuro, números grandes, foco em performance"],
     ["esportivo", "Esportivo", "Pôster esportivo, linhas fortes"],
+    ["pink-money", "Pink Money", "Rosa, detalhes esmeralda e formas delicadas"],
+    ["arcade", "Arcade", "Retrô, neon e visual de fliperama"],
   ];
 
   function stylePickerHtml(selected, prefix) {
@@ -3543,7 +3550,7 @@
             <input type="radio" name="${prefix}-style-choice" value="${id}" ${selected === id ? "checked" : ""}>
             <span class="style-card">
               <span class="mini mini-${id}" aria-hidden="true"><i class="t"></i><i class="h"></i><span class="r"><i></i><i></i></span><span class="n"><i></i><i></i><i></i><i></i></span></span>
-              <span class="style-name">${name}${id === "suave" ? " (padrão)" : ""}</span>
+              <span class="style-name">${name}${id === "energia" ? " (padrão)" : ""}</span>
               <span class="style-desc">${desc}</span>
             </span>
           </label>`
@@ -3639,7 +3646,9 @@
       startProfileCompletion(user);
       return;
     }
-    window.MegTheme?.setStyle(user.style || window.MegTheme.DEFAULT_STYLE);
+    const style = window.MegTheme.normalizeStyle(user.style);
+    if (user.style !== style) user = Store.updateUser(user.id, { style });
+    window.MegTheme.setStyle(style);
     $("login-screen").classList.add("hidden");
     $("onboarding").innerHTML = ""; // evita campos com o mesmo id escondidos na página
     $("app-shell").classList.remove("hidden");
@@ -3883,7 +3892,7 @@
           ${
             weight
               ? `<label class="set-field"><span class="visually-hidden">Peso da série ${i + 1}</span>
-                  <input class="input input-sm" data-set-field="weight" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || prev?.weight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
+                  <input class="input input-sm" data-set-field="weight" data-weight-source="${s.weightSource === "first" ? "first" : s.weight ? "manual" : ""}" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || prev?.weight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
               : ""
           }
           ${
@@ -3928,6 +3937,7 @@
         return {
           reps: row.querySelector('[data-set-field="reps"]').value.trim(),
           weight: w ? w.value.trim().replace(".", ",") : "",
+          ...(w?.dataset.weightSource ? { weightSource: w.dataset.weightSource } : {}),
           done: row.classList.contains("done"),
         };
       });
@@ -3939,7 +3949,7 @@
       if (ex && usesWeight(ex)) {
         const doneWeights = sets.filter((s) => s.done && num(s.weight) > 0).map((s) => num(s.weight));
         const anyWeights = sets.filter((s) => num(s.weight) > 0).map((s) => num(s.weight));
-        const bestW = Math.max(0, ...(doneWeights.length ? doneWeights : anyWeights));
+        const bestW = num(sets[0]?.weight) || Math.max(0, ...(doneWeights.length ? doneWeights : anyWeights));
         if (bestW > 0) {
           const weightStr = fmtNum(bestW);
           Store.saveExerciseLoad(user.id, exId, { weight: weightStr });
@@ -3958,6 +3968,20 @@
     box.addEventListener("input", (e) => {
       if (e.target.dataset.setField === "reps") e.target.value = e.target.value.replace(/\D/g, "");
       if (e.target.dataset.setField === "weight") e.target.value = e.target.value.replace(/[^\d.,]/g, "");
+      if (e.target.dataset.setField === "weight") {
+        const row = e.target.closest("[data-set]");
+        e.target.dataset.weightSource = "manual";
+        if (row.dataset.set === "0") {
+          box.querySelectorAll('[data-set]:not([data-set="0"])').forEach((next) => {
+            const input = next.querySelector('[data-set-field="weight"]');
+            if (!input) return;
+            input.placeholder = e.target.value || "0";
+            if (next.classList.contains("done") || (input.value && input.dataset.weightSource !== "first")) return;
+            input.value = e.target.value;
+            input.dataset.weightSource = "first";
+          });
+        }
+      }
       save();
     });
     box.addEventListener("click", (e) => {
@@ -4263,15 +4287,15 @@
     const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
-    return `
-      ${ytId
+    const mediaHtml = `${ytId
         ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
             <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
             <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
           </div>`
         : videoUrl
           ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
-          : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
+          : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}`;
+    return `
       <div class="sheet-head">
         <h2 id="${titleId}">${escapeHtml(ex.name)}</h2>
         ${difficultyBadge(ex.difficulty)}
@@ -4279,6 +4303,8 @@
       ${typeTag(ex)}
       ${stats ? `<div class="stats">${stats}</div>` : ""}
       ${rirTip}
+
+      ${mediaHtml}
 
       ${run ? setsTableHtml(ex, run, sets, reps) : ""}
 
