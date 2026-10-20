@@ -1322,6 +1322,7 @@
     });
     $("copy-btn")?.addEventListener("click", () => {
       const copy = Store.copyWorkout(w.id, user);
+      if (!copy) return;
       toast("Cópia criada em Salvos. Agora você pode editar.", "success");
       location.hash = `#/treinos/${encodeURIComponent(copy.id)}`;
     });
@@ -1897,6 +1898,7 @@
   }
 
   function renderPicker() {
+    if (!$("picker-search") || !draft) return;
     const q = normalizeText($("picker-search").value.trim());
     const groupFilter = $("picker-group").value;
     const chosen = new Set(draft.items.map((i) => i.exerciseId));
@@ -2813,6 +2815,7 @@
     $("save-history-workout")?.addEventListener("click", () => {
       const { id: _id, assistant, ownerId, createdBy, createdAt, updatedAt, ...data } = workout;
       const saved = Store.saveWorkout({ ...data, name: workout.name.replace(/^Treino montado/, "Treino") }, user);
+      if (!saved) return;
       toast("Treino salvo nos seus treinos!", "success");
       location.hash = `#/treinos/${encodeURIComponent(saved.id)}`;
     });

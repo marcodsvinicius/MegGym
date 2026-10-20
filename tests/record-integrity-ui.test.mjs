@@ -46,6 +46,7 @@ test("uma série parcial permite finalizar e mantém só o trabalho realizado", 
   await page.click("#finish-btn");
   await page.click('[data-confirm="yes"]');
   await page.waitForURL(/historico\/.+novo=1/);
+  await page.waitForSelector(".history-hero");
   const h = await page.evaluate(() => MegStore.history(MegStore.currentUser().id)[0]);
   assert.equal(h.exerciseCount, 1);
   assert.equal(h.exercises[0].sets, "1");
