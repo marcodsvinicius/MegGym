@@ -62,8 +62,12 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
   });
   const box = await page.locator(".exercise-video").boundingBox();
   const size = page.viewportSize();
+  const metrics = await page.locator(".exercise-video").evaluate((el) => {
+    const css = getComputedStyle(el);
+    return { width: css.width, height: css.height, boxSizing: css.boxSizing, transform: getComputedStyle(el.closest(".sheet")).transform, innerWidth, innerHeight };
+  });
   assert.ok(Math.abs(box.x) < 1 && Math.abs(box.y) < 1, JSON.stringify(box));
-  assert.ok(Math.abs(box.width - size.width) < 1 && Math.abs(box.height - size.height) < 1);
+  assert.ok(Math.abs(box.width - size.width) < 1 && Math.abs(box.height - size.height) < 1, JSON.stringify({ box, size, metrics }));
   const frame = await page.locator(".exercise-video iframe").boundingBox();
   assert.ok(Math.abs(frame.width / frame.height - 9 / 16) < 0.01);
   await page.keyboard.press("Escape");
