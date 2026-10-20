@@ -594,7 +594,7 @@
     const last = history[0];
     const lastWorkout = last && Store.getWorkout(last.workoutId);
     const session = Store.session(user.id);
-    const activeWorkout = session && Store.getWorkout(session.workoutId);
+    const activeWorkout = session && Store.sessionWorkout(user.id);
 
     const bgSrc = window.MEGGYM_CONFIG?.HOME_BACKGROUND;
     const bg = bgSrc && /^(https:\/\/|assets\/)/.test(bgSrc) ? bgSrc : "";
@@ -1082,7 +1082,7 @@
   // Meu Treino: a divisão (ou treino) que o usuário está seguindo.
   function myTrainingHtml() {
     const session = Store.session(user.id);
-    const activeWorkout = session && Store.getWorkout(session.workoutId);
+    const activeWorkout = session && Store.sessionWorkout(user.id);
     const resume = activeWorkout
       ? `<a class="resume-banner" href="#/treinos/${encodeURIComponent(activeWorkout.id)}/executar">
           <span>${icon("play_arrow", "mi-inline")} Continuar <strong>${escapeHtml(activeWorkout.name)}</strong></span><span aria-hidden="true">›</span>
@@ -1331,11 +1331,11 @@
   function startWorkout(w) {
     const current = Store.session(user.id);
     if (current && current.workoutId !== w.id) {
-      const other = Store.getWorkout(current.workoutId);
+      const other = Store.sessionWorkout(user.id);
       if (!confirm(`Você tem o treino "${other?.name || "anterior"}" em andamento. Descartar e iniciar este?`)) return;
       Store.cancelSession(user.id);
     }
-    if (!Store.session(user.id)) Store.startSession(user.id, w.id);
+    if (!Store.session(user.id) && !Store.startSession(user.id, w.id)) return;
     location.hash = `#/treinos/${encodeURIComponent(w.id)}/executar`;
   }
 
@@ -1761,6 +1761,7 @@
         },
         user
       );
+      if (!saved) return;
       draft = null;
       toast(editing ? "Treino salvo!" : "Treino criado!", "success");
       location.hash = `#/treinos/${encodeURIComponent(saved.id)}`;
@@ -1935,14 +1936,15 @@
     return order.map((i) => {
       const item = w.items[i];
       const swappedTo = session.swaps?.[i];
-      return { i, item, ex: findExercise(swappedTo || item.exerciseId), swapped: Boolean(swappedTo), skipped: Boolean(session.skipped?.[i]), done: Boolean(session.done[i]) };
+      return { i, item, ex: findExercise(swappedTo || item.exerciseId), swapped: Boolean(swappedTo), skipped: Boolean(session.skipped?.[i]), done: Boolean(session.done[i]), performed: Boolean(session.done[i]) || (session.sets?.[i] || []).some((s) => s.done) };
     });
   }
 
   function renderWorkoutRun(id) {
     setTab("treinos");
-    const w = Store.getWorkout(id);
+    const w = Store.sessionWorkout(user.id, id);
     let session = Store.session(user.id);
+    let finishing = false;
     if (!w) {
       setHeader("Treino", { back: "#/treinos" });
       app.innerHTML = empty("help", "Treino não encontrado.");
@@ -2025,14 +2027,15 @@
       $("run-bar").style.width = `${total ? (done / total) * 100 : 0}%`;
       // Cartão no fim da lista (não fica fixo): terminar quando quiser ou descartar.
       const complete = total > 0 && done === total;
+      const recorded = runItems(w, session).filter((x) => x.performed).length;
       $("finish-card").classList.toggle("complete", complete);
-      $("finish-title").textContent = complete ? "Tudo feito!" : done ? "Quer terminar agora?" : "Fim da lista";
+      $("finish-title").textContent = complete ? "Tudo feito!" : recorded ? "Quer terminar agora?" : "Fim da lista";
       $("finish-text").textContent = complete
         ? "Todos os exercícios concluídos. Registre o treino no seu histórico."
-        : `Você fez ${done} de ${total} exercícios. Pode terminar antes e registrar só o que fez.`;
+        : `Você concluiu ${done} de ${total} exercícios. As séries feitas parcialmente também serão registradas.`;
       const btn = $("finish-btn");
-      btn.disabled = done === 0;
-      btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `${icon("flag", "mi-inline")} Terminar com ${done} de ${total}`;
+      btn.disabled = recorded === 0;
+      btn.innerHTML = complete ? `${icon("flag", "mi-inline")} Terminar treino` : `${icon("flag", "mi-inline")} Terminar e registrar ${recorded} ${recorded === 1 ? "exercício" : "exercícios"}`;
     }
 
     const save = (changes) => (session = Store.updateSession(user.id, changes));
@@ -2128,25 +2131,28 @@
     });
 
     $("finish-btn").addEventListener("click", async () => {
-      const all = runItems(w, session).filter((x) => !x.skipped);
-      // Terminar antes: registra só os exercícios marcados como feitos.
-      const list = all.filter((x) => x.done);
-      if (!list.length) return;
-      if (list.length < all.length) {
+      if (finishing) return;
+      finishing = true;
+      const all = runItems(w, session);
+      const list = all.filter((x) => x.performed);
+      if (!list.length) { finishing = false; return; }
+      if (all.some((x) => !x.skipped && !x.done) || list.some((x) => !x.done)) {
         const ok = await confirmSheet({
           icon: "flag",
           title: "Terminar antes?",
-          text: `Você fez ${list.length} de ${all.length} exercícios. Só os feitos vão para o histórico.`,
+          text: `Serão registrados ${list.length} exercícios, incluindo as séries feitas parcialmente. Séries não realizadas ficam de fora.`,
           confirmLabel: "Terminar e registrar",
           cancelLabel: "Continuar treinando",
         });
-        if (!ok) return;
+        if (!ok) { finishing = false; return; }
       }
       const snapshot = list.map(({ i, item, ex, swapped }) => ({
         exerciseId: ex.id,
         name: ex.name,
         group: ex.group,
-        sets: item.sets,
+        sets: String((session.sets?.[i] || []).filter((s) => s.done).length || item.sets),
+        plannedSets: item.sets,
+        partial: !session.done[i],
         reps: item.reps,
         load: item.load || "",
         rir: item.rir || "",
@@ -2165,14 +2171,16 @@
         const max = Math.max(0, ...e.setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
         if (max) {
           const weightStr = String(Math.round(max * 10) / 10).replace(".", ",");
-          Store.saveExerciseLoad(user.id, e.exerciseId, { weight: weightStr });
-          e.myLoad = loadText(Store.exerciseLoad(user.id, e.exerciseId), ex);
-          Store.logWeight(user.id, e.exerciseId, max);
+          e.myLoad = loadText({ ...Store.exerciseLoad(user.id, e.exerciseId), weight: weightStr }, ex);
         }
       });
       const prCount = snapshot.filter((e) => e.pr).length;
       const record = Store.finishSession(user, w, list.length, snapshot);
-      if (!record) return;
+      if (!record) {
+        finishing = false;
+        toast("Não foi possível salvar. Seu treino continua em andamento; libere espaço e tente novamente.", "error");
+        return;
+      }
       stopRest();
       toast(prCount ? `Treino concluído com ${prCount} ${prCount === 1 ? "novo recorde" : "novos recordes"}!` : "Treino concluído!", "success");
       celebrate();
@@ -2682,12 +2690,20 @@
 
   function renderHistoryDetail(id, params = new URLSearchParams()) {
     setTab("atividade");
-    const h = Store.getHistory(id);
+    let h = Store.getHistory(id);
     if (!h || h.userId !== user.id) {
       setHeader("Treino feito", { back: "#/atividade" });
       app.innerHTML = empty("help", "Registro não encontrado.");
       return;
     }
+    // Recordes dependem dos registros anteriores que ainda existem, inclusive após correções.
+    const previous = Store.history(user.id).filter((x) => x.id !== h.id && x.finishedAt < h.finishedAt);
+    h = { ...h, exercises: h.exercises?.map((e) => {
+      const ex = findExercise(e.exerciseId);
+      const { pr: oldPr, ...entry } = e;
+      const pr = ex && recordOf(ex, e.setLog || [], bestOf(e.exerciseId, previous));
+      return pr ? { ...entry, pr } : entry;
+    }) };
     setHeader("Treino feito", {
       back: "#/atividade",
       action: `<a class="btn btn-sm" href="#/atividade/historico/${encodeURIComponent(h.id)}/editar">Editar</a>`,
@@ -2748,6 +2764,7 @@
                         <div class="meta">${g ? `${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
                         ${e.pr ? `<div class="pr-badge">${icon("emoji_events", "mi-inline")} Recorde: ${escapeHtml(e.pr.text)}</div>` : ""}
                         ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type))}</div>` : ""}
+                        ${e.partial ? `<p class="meta">Parcial: ${escapeHtml(e.sets)} de ${escapeHtml(e.plannedSets || e.sets)} séries realizadas.</p>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
                         ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
                       </div>
@@ -2789,7 +2806,7 @@
         danger: true,
       });
       if (!ok) return;
-      Store.deleteHistory(h.id);
+      if (!Store.deleteHistory(h.id)) return;
       toast("Registro excluído do histórico.");
       location.hash = "#/atividade?aba=historico";
     });
@@ -2888,9 +2905,9 @@
       e.preventDefault();
       const name = $("he-name").value.trim() || h.workoutName;
       const mins = Math.min(Math.max(parseInt($("he-duration").value, 10) || durationMin, 1), 600);
-      const startedAt = new Date(new Date(h.finishedAt).getTime() - mins * 60000).toISOString();
+      const startedAt = mins === durationMin ? h.startedAt : new Date(new Date(h.finishedAt).getTime() - mins * 60000).toISOString();
       const note = $("he-note").value.trim();
-      const otherHistory = Store.history(user.id).filter((x) => x.id !== h.id);
+      const otherHistory = Store.history(user.id).filter((x) => x.id !== h.id && x.finishedAt < h.finishedAt);
 
       const updatedExercises = list.map((item, ei) => {
         const box = app.querySelector(`[data-he-ex="${ei}"]`);
@@ -2904,24 +2921,20 @@
         const ex = findExercise(item.exerciseId);
         const pr = ex ? recordOf(ex, setLog, bestOf(item.exerciseId, otherHistory)) : null;
         const max = Math.max(0, ...setLog.map((s) => parseFloat(String(s.weight || "").replace(",", ".")) || 0));
-        if (max) {
-          Store.logWeight(user.id, item.exerciseId, max, { replace: true, date: h.finishedAt });
-          const weightStr = String(Math.round(max * 10) / 10).replace(".", ",");
-          Store.saveExerciseLoad(user.id, item.exerciseId, { weight: weightStr });
-        }
-        const next = { ...item, setLog, myLoad: ex ? loadText(Store.exerciseLoad(user.id, item.exerciseId), ex) : item.myLoad };
+        const next = { ...item, setLog, myLoad: max ? `${fmtNum(max)} kg` : "" };
         if (pr) next.pr = pr;
         else delete next.pr;
         return next;
       });
 
-      Store.updateHistory(h.id, {
+      const saved = Store.updateHistory(h.id, {
         workoutName: name,
         startedAt,
         note,
         exercises: updatedExercises,
         exerciseCount: updatedExercises.length || h.exerciseCount,
       });
+      if (!saved) return;
       toast("Registro atualizado!", "success");
       location.hash = back;
     });
@@ -2936,7 +2949,7 @@
         danger: true,
       });
       if (!ok) return;
-      Store.deleteHistory(h.id);
+      if (!Store.deleteHistory(h.id)) return;
       toast("Registro excluído do histórico.");
       location.hash = "#/atividade?aba=historico";
     });
@@ -3326,8 +3339,9 @@
     try {
       data = JSON.parse(await file.text());
       if (!Store.isBackup(data)) throw new Error();
+      Store.validateBackup(data);
     } catch {
-      toast("Esse arquivo não é um backup do MegGym.", "error");
+      toast("Esse arquivo não é um backup válido do MegGym. Seus dados não foram alterados.", "error");
       return;
     }
     const exists = Store.users().some((u) => u.id === data.user.id);
@@ -3339,7 +3353,12 @@
       cancelLabel: "Cancelar",
     });
     if (!ok) return;
-    user = Store.importBackup(data);
+    try {
+      user = Store.importBackup(data);
+    } catch (err) {
+      toast(err.message, "error");
+      return;
+    }
     toast("Backup restaurado!", "success");
     location.hash = "#/inicio";
     enterApp();
@@ -3741,7 +3760,7 @@
   function runContext(prescription) {
     if (prescription.runIndex === undefined || prescription.runIndex === "") return null;
     const session = Store.session(user.id);
-    const w = session && Store.getWorkout(session.workoutId);
+    const w = session && Store.sessionWorkout(user.id);
     if (!w) return null;
     const index = Number(prescription.runIndex);
     return { index, workout: w, restSeconds: itemRestSeconds(w, index), sets: session.sets?.[index] || [] };
@@ -3928,7 +3947,7 @@
       }
       // Todas as séries feitas → exercício concluído na lista.
       const session = Store.setDone(user.id, index, sets.every((s) => s.done));
-      const w = session && Store.getWorkout(session.workoutId);
+      const w = session && Store.sessionWorkout(user.id);
       const slot = $("sets-next-slot");
       if (slot && w) slot.innerHTML = nextRunButtonHtml({ index, workout: w, restSeconds: itemRestSeconds(w, index), sets });
       document.dispatchEvent(new CustomEvent("meggym:run-changed", { detail: { session, exerciseId: exId } }));
@@ -3944,7 +3963,7 @@
       if (nextBtn) {
         const nextIdx = Number(nextBtn.dataset.nextRun);
         const session = Store.session(user.id);
-        const w = session && Store.getWorkout(session.workoutId);
+        const w = session && Store.sessionWorkout(user.id);
         if (!w) return;
         const item = w.items[nextIdx];
         const nextExId = session.swaps?.[nextIdx] || item?.exerciseId;
@@ -3987,7 +4006,7 @@
           row.insertAdjacentHTML("beforeend", `<span class="set-pr">${icon("emoji_events", "mi-inline")} Recorde!</span>`);
           toast(`Novo recorde: ${pr.text}`, "success");
         }
-        const w = Store.getWorkout(Store.session(user.id)?.workoutId);
+        const w = Store.sessionWorkout(user.id);
         const ss = w && supersets(w.items)[index];
         if (ss && !ss.last) {
           const next = findExercise(Store.session(user.id)?.swaps?.[index + 1] || w.items[index + 1]?.exerciseId);
@@ -4451,4 +4470,5 @@
       document.body.innerHTML = `<div class="state" style="margin:24px">${icon("error", "state-icon")}${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="location.reload()">Tentar novamente</button></div>`;
     });
 })();
+
 

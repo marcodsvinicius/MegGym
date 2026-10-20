@@ -47,6 +47,30 @@
     return `${prefix}-${Date.now().toString(36)}-${rand}`;
   }
 
+  // Prepara tudo antes de gravar e desfaz as gravações anteriores se alguma falhar.
+  function writeBatch(entries) {
+    const previous = [];
+    try {
+      const prepared = entries.map(([key, value]) => [key, value == null ? null : JSON.stringify(value)]);
+      const originals = prepared.map(([key]) => localStorage.getItem(key));
+      prepared.forEach(([key, raw], i) => {
+        if (raw === null) localStorage.removeItem(key);
+        else localStorage.setItem(key, raw);
+        previous.push([key, originals[i]]);
+      });
+      return true;
+    } catch {
+      previous.reverse().forEach(([key, raw]) => {
+        try {
+          if (raw === null) localStorage.removeItem(key);
+          else localStorage.setItem(key, raw);
+        } catch { /* mantém o aviso de falha; nunca informa sucesso */ }
+      });
+      try { window.dispatchEvent(new CustomEvent("meggym:storage-error")); } catch {}
+      return false;
+    }
+  }
+
   /* ---------- Usuários ---------- */
 
   function users() {
@@ -179,13 +203,19 @@
     const index = list.findIndex((w) => w.id === workout.id);
     let saved;
     if (index >= 0) {
+      // Sessões anteriores à v57 também precisam congelar a ficha antes de editá-la.
+      for (const u of users()) {
+        const active = read(KEY.session + u.id, null);
+        if (active?.workoutId === workout.id && !active.workout) {
+          if (!write(KEY.session + u.id, { ...active, workout: list[index] })) return null;
+        }
+      }
       saved = list[index] = { ...list[index], ...workout, updatedAt: new Date().toISOString() };
     } else {
       saved = { visibility: "private", ...workout, id: newId("w"), ownerId: user?.id || MEGGYM, createdBy: user?.name || "", createdAt: new Date().toISOString() };
       list.push(saved);
     }
-    write(KEY.workouts, list);
-    return saved;
+    return write(KEY.workouts, list) ? saved : null;
   }
 
   // Treinos que vêm com o app (data/workouts.json). Aplicado uma vez por versão.
@@ -232,13 +262,29 @@
   /* ---------- Treino em andamento (um por usuário) ---------- */
 
   function session(userId) {
-    return read(KEY.session + userId, null);
+    const value = read(KEY.session + userId, null);
+    if (value && !value.workout) {
+      const workout = getWorkout(value.workoutId);
+      if (workout) {
+        value.workout = workout;
+        write(KEY.session + userId, value);
+      }
+    }
+    return value;
+  }
+
+  function sessionWorkout(userId, workoutId) {
+    const active = session(userId);
+    return active && (!workoutId || active.workoutId === workoutId)
+      ? active.workout || getWorkout(active.workoutId)
+      : getWorkout(workoutId);
   }
 
   function startSession(userId, workoutId) {
-    const value = { workoutId, startedAt: new Date().toISOString(), done: {} };
-    write(KEY.session + userId, value);
-    return value;
+    const workout = getWorkout(workoutId);
+    if (!workout) return null;
+    const value = { id: newId("session"), workoutId, workout, startedAt: new Date().toISOString(), done: {} };
+    return write(KEY.session + userId, value) ? value : null;
   }
 
   function toggleDone(userId, index) {
@@ -400,19 +446,47 @@
 
   // Histórico de pesos: um registro por dia (fica o maior peso do dia; replace troca o do dia).
   function weightLog(userId, exerciseId) {
-    return read(KEY.weightLog + userId, {})[exerciseId] || [];
+    const stored = read(KEY.weightLog + userId, {})[exerciseId] || [];
+    const byDay = new Map(stored.map((e) => [e.date, { date: e.date, weight: e.weight }]));
+    history(userId).forEach((h) => (h.exercises || []).filter((e) => e.exerciseId === exerciseId).forEach((e) => {
+      const kg = Math.max(0, ...(e.setLog || []).filter((s) => s.done !== false).map((s) => Number(String(s.weight || "").replace(",", ".")) || 0));
+      if (!kg) return;
+      const date = localDay(h.finishedAt);
+      byDay.set(date, { date, weight: Math.max(byDay.get(date)?.weight || 0, kg) });
+    }));
+    return [...byDay.values()].sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  function localDay(date) {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  // Antes da v57, cargas manuais e resultados de sessões ocupavam a mesma lista.
+  // Remove somente entradas legadas que correspondem ao máximo realizado naquele dia.
+  function manualWeightLog(userId, oldHistory) {
+    const all = read(KEY.weightLog + userId, {});
+    const performed = {};
+    oldHistory.filter((h) => h.userId === userId).forEach((h) => (h.exercises || []).forEach((e) => {
+      const day = localDay(h.finishedAt);
+      const key = `${e.exerciseId}:${day}`;
+      performed[key] = Math.max(performed[key] || 0, ...(e.setLog || []).map((s) => Number(String(s.weight || "").replace(",", ".")) || 0));
+    }));
+    Object.keys(all).forEach((id) => {
+      all[id] = all[id].filter((e) => e.source === "manual" || e.weight !== performed[`${id}:${e.date}`]);
+    });
+    return all;
   }
 
   function logWeight(userId, exerciseId, weight, { replace = false, date = new Date() } = {}) {
     const kg = Math.round(parseFloat(String(weight || "").replace(",", ".")) * 10) / 10;
     if (!(kg > 0)) return;
-    const d = new Date(date);
-    const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const day = localDay(date);
     const all = read(KEY.weightLog + userId, {});
     const list = all[exerciseId] || [];
     const entry = list.find((e) => e.date === day);
-    if (entry) entry.weight = replace ? kg : Math.max(entry.weight, kg);
-    else list.push({ date: day, weight: kg });
+    if (entry) Object.assign(entry, { weight: replace ? kg : Math.max(entry.weight, kg), source: "manual" });
+    else list.push({ date: day, weight: kg, source: "manual" });
     list.sort((a, b) => a.date.localeCompare(b.date));
     all[exerciseId] = list;
     write(KEY.weightLog + userId, all);
@@ -448,13 +522,16 @@
     const list = read(KEY.history, []);
     const record = list.find((h) => h.id === id);
     if (!record) return null;
+    const manual = manualWeightLog(record.userId, list);
     Object.assign(record, changes, { updatedAt: new Date().toISOString() });
-    write(KEY.history, list);
-    return record;
+    return writeBatch([[KEY.weightLog + record.userId, manual], [KEY.history, list]]) ? record : null;
   }
 
   function deleteHistory(id) {
-    write(KEY.history, read(KEY.history, []).filter((h) => h.id !== id));
+    const list = read(KEY.history, []);
+    const record = list.find((h) => h.id === id);
+    if (!record) return false;
+    return writeBatch([[KEY.weightLog + record.userId, manualWeightLog(record.userId, list)], [KEY.history, list.filter((h) => h.id !== id)]]);
   }
 
   // snapshot: lista dos exercícios feitos (nome, grupo, séries, repetições) no momento do treino.
@@ -463,6 +540,7 @@
     if (!current) return null;
     const record = {
       id: newId("h"),
+      sessionId: current.id || `${user.id}:${current.startedAt}`,
       userId: user.id,
       userName: user.name,
       workoutId: workout.id,
@@ -474,10 +552,15 @@
       finishedAt: new Date().toISOString(),
     };
     const list = read(KEY.history, []);
+    const existing = list.find((h) => h.sessionId === record.sessionId);
+    if (existing) return write(KEY.session + user.id, null) ? existing : null;
     list.push(record);
-    write(KEY.history, list);
-    write(KEY.session + user.id, null);
-    return record;
+    const loads = read(KEY.exerciseLoads + user.id, {});
+    snapshot.forEach((e) => {
+      const max = Math.max(0, ...(e.setLog || []).map((s) => Number(String(s.weight || "").replace(",", ".")) || 0));
+      if (max) loads[e.exerciseId] = { ...(loads[e.exerciseId] || {}), weight: String(Math.round(max * 10) / 10).replace(".", ","), updatedAt: record.finishedAt };
+    });
+    return writeBatch([[KEY.history, list], [KEY.exerciseLoads + user.id, loads], [KEY.session + user.id, null]]) ? record : null;
   }
 
   /* ---------- Backup (arquivo .json com tudo do usuário) ---------- */
@@ -510,31 +593,92 @@
     return Boolean(data && data.app === "MegGym" && data.kind === "backup" && data.user && data.user.id && data.user.name);
   }
 
+  function validateBackup(data) {
+    const fail = () => { throw new Error("Backup inválido ou incompatível. Os dados deste aparelho não foram alterados."); };
+    const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+    const text = (v) => typeof v === "string";
+    const id = (v) => text(v) && v.length > 0 && !["__proto__", "constructor", "prototype"].includes(v);
+    const date = (v) => {
+      if (!text(v) || !/^\d{4}-\d\d-\d\dT/.test(v) || !Number.isFinite(Date.parse(v))) return false;
+      const day = v.slice(0, 10);
+      return new Date(`${day}T00:00:00Z`).toISOString().slice(0, 10) === day;
+    };
+    const strings = (v) => Array.isArray(v) && v.every(text);
+    const optionalText = (v) => v == null || text(v);
+    const sets = (v) => Array.isArray(v) && v.every((s) => object(s) && optionalText(s.reps) && optionalText(s.weight) && (s.done == null || typeof s.done === "boolean"));
+    const collection = (v, check) => {
+      if (v == null) return;
+      if (!Array.isArray(v)) fail();
+      const ids = new Set();
+      v.forEach((x) => {
+        if (!object(x) || !id(x.id) || ids.has(x.id) || !check(x)) fail();
+        ids.add(x.id);
+      });
+    };
+    const item = (x) => object(x) && id(x.exerciseId) && [x.sets, x.reps, x.load, x.rir, x.rest].every(optionalText);
+    const workout = (w) => id(w.id) && text(w.name) && Array.isArray(w.items) && w.items.every(item);
+    if (!isBackup(data) || !object(data.user) || !id(data.user.id) || !text(data.user.name) || !data.user.name.trim()) fail();
+    if (data.version != null && data.version !== 1) fail();
+    if (data.createdAt != null && !date(data.createdAt)) fail();
+    if (data.user.equipment != null && !strings(data.user.equipment)) fail();
+    collection(data.workouts, workout);
+    collection(data.structures, (st) => text(st.name) && strings(st.workoutIds) && (st.duration == null || Number.isFinite(Number(st.duration))));
+    collection(data.customExercises, (ex) => text(ex.name) && id(ex.group) && (ex.equipment == null || strings(ex.equipment)) && (ex.equipmentAny == null || strings(ex.equipmentAny)));
+    collection(data.history, (h) => h.userId === data.user.id && id(h.workoutId) && text(h.workoutName) && date(h.startedAt) && date(h.finishedAt)
+      && Date.parse(h.startedAt) <= Date.parse(h.finishedAt) && Number.isInteger(h.exerciseCount) && h.exerciseCount >= 0
+      && (h.exercises == null || (Array.isArray(h.exercises) && h.exercises.every((e) => item(e) && text(e.name) && id(e.group) && (e.setLog == null || sets(e.setLog))))));
+    const p = data.perUser ?? {};
+    if (!object(p)) fail();
+    PER_USER.forEach((k) => { if (p[k] != null && !object(p[k])) fail(); });
+    for (const k of ["notes", "exerciseNotes"]) {
+      if (p[k] && !Object.entries(p[k]).every(([key, value]) => id(key) && text(value))) fail();
+    }
+    if (p.exerciseLoads && !Object.entries(p.exerciseLoads).every(([key, v]) => id(key) && object(v) && optionalText(v.weight) && optionalText(v.band))) fail();
+    if (p.weightLog && !Object.entries(p.weightLog).every(([key, rows]) => id(key) && Array.isArray(rows) && rows.every((r) => {
+      if (!object(r) || !text(r.date) || !/^\d{4}-\d\d-\d\d$/.test(r.date) || !Number.isFinite(r.weight) || r.weight <= 0) return false;
+      const d = new Date(`${r.date}T00:00:00Z`);
+      return Number.isFinite(d.getTime()) && d.toISOString().slice(0, 10) === r.date;
+    }))) fail();
+    if (p.saved && [p.saved.workouts, p.saved.structures].some((v) => v != null && !strings(v))) fail();
+    if (p.plan && (!date(p.plan.startedAt) || (!id(p.plan.workoutId) && !id(p.plan.structureId)))) fail();
+    if (p.rest && (!Number.isFinite(p.rest.end) || !Number.isFinite(p.rest.total) || p.rest.total <= 0)) fail();
+    if (p.session) {
+      const s = p.session;
+      const w = s.workout || (data.workouts || []).find((x) => x.id === s.workoutId) || getWorkout(s.workoutId);
+      if (!id(s.workoutId) || !date(s.startedAt) || !w || !workout(w) || w.id !== s.workoutId || !object(s.done)) fail();
+      const index = (k) => /^(0|[1-9]\d*)$/.test(k) && Number(k) < w.items.length;
+      if (!Object.entries(s.done).every(([k, v]) => index(k) && typeof v === "boolean")) fail();
+      for (const k of ["sets", "swaps", "skipped"]) if (s[k] != null && !object(s[k])) fail();
+      if (s.sets && !Object.entries(s.sets).every(([k, v]) => index(k) && sets(v))) fail();
+      if (s.swaps && !Object.entries(s.swaps).every(([k, v]) => index(k) && id(v))) fail();
+      if (s.skipped && !Object.entries(s.skipped).every(([k, v]) => index(k) && typeof v === "boolean")) fail();
+      if (s.order != null && (!Array.isArray(s.order) || new Set(s.order).size !== s.order.length || !s.order.every((n) => Number.isInteger(n) && n >= 0 && n < w.items.length))) fail();
+    }
+    return true;
+  }
+
   // Restaura: o perfil e os dados dele são substituídos pelos do arquivo; treinos/estruturas/exercícios
   // que não existem no aparelho são adicionados (os que já existem ficam como estão).
   function importBackup(data) {
-    if (!isBackup(data)) throw new Error("Arquivo inválido: não é um backup do MegGym.");
+    validateBackup(data);
     const u = data.user;
     const list = users().filter((x) => x.id !== u.id);
     list.push({ ...u, onboarded: u.onboarded !== false });
-    write(KEY.users, list);
-
     const others = read(KEY.history, []).filter((h) => h.userId !== u.id);
-    write(KEY.history, [...others, ...(Array.isArray(data.history) ? data.history : [])]);
-
-    PER_USER.forEach((k) => write(KEY[k] + u.id, data.perUser?.[k] ?? null));
-
+    const entries = [[KEY.users, list], [KEY.history, [...others, ...(data.history || [])]]];
+    PER_USER.forEach((k) => entries.push([KEY[k] + u.id, data.perUser?.[k] ?? null]));
     const merge = (key, items) => {
       if (!Array.isArray(items)) return;
       const current = read(key, []);
       const ids = new Set(current.map((x) => x.id));
-      write(key, [...current, ...items.filter((x) => x && x.id && !ids.has(x.id))]);
+      entries.push([key, [...current, ...items.filter((x) => !ids.has(x.id))]]);
     };
     merge(KEY.workouts, data.workouts);
     merge(KEY.structures, data.structures);
     merge(KEY.customExercises, data.customExercises);
 
-    write(KEY.currentUser, u.id);
+    entries.push([KEY.currentUser, u.id]);
+    if (!writeBatch(entries)) throw new Error("Não foi possível restaurar o backup. Libere espaço e tente novamente.");
     return currentUser();
   }
 
@@ -542,6 +686,7 @@
     exportBackup,
     importBackup,
     isBackup,
+    validateBackup,
     users,
     currentUser,
     findByName,
@@ -577,6 +722,7 @@
     unfollowStructure,
     applySeed,
     session,
+    sessionWorkout,
     startSession,
     toggleDone,
     saveSets,
@@ -600,3 +746,4 @@
     finishSession,
   };
 })();
+

@@ -1,4 +1,6 @@
 # MegGym
+
+Na versão 57, séries parciais são registradas ao terminar antes; sessões preservam a ficha de quando começaram; falhas ao salvar mantêm o treino recuperável. Edições e exclusões atualizam o gráfico de cargas, e backups são validados antes de restaurar. Cargas manuais novas têm origem identificada. Nas cargas antigas sem essa identificação, uma entrada igual ao máximo da sessão naquele dia é tratada como resultado do treino durante a correção/exclusão.
 academia em casa
 
 App web (mobile first) de treino: lista de exercícios por **grupo muscular**, criação de **treinos**, execução marcando cada exercício e **histórico** de atividade. Os exercícios são cadastrados por uma **área de admin** e ficam salvos no próprio repositório (modo GitHub) ou no **Supabase** (modo banco). O site roda no **GitHub Pages**, sem custo.
@@ -171,4 +173,5 @@ npm install
 npx playwright install chromium
 npm test            # MOTION=1 npm test roda com as animações ligadas
 ```
+
 
