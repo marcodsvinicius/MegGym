@@ -36,6 +36,8 @@ test("retomada é única, fixa e acompanha as telas; desaparece ao retomar ou fi
   }
   await page.click(".resume-dock");
   await page.waitForURL(/executar/);
+  await page.waitForSelector(".run-item");
+  await page.waitForSelector(".resume-dock", { state: "hidden" });
   assert.equal(await page.locator(".resume-dock").isVisible(), false);
   await page.evaluate((workoutId) => {
     const u = MegStore.currentUser();
