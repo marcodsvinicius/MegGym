@@ -56,9 +56,13 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
   await page.locator(".exercise-video iframe").evaluate((el) => { el.dataset.preserved = "yes"; });
   await page.click("[data-video-fullscreen]");
   assert.equal(await page.locator("[data-video-fullscreen]").getAttribute("aria-expanded"), "true");
+  await page.waitForFunction(() => {
+    const box = document.querySelector(".exercise-video").getBoundingClientRect();
+    return Math.abs(box.x) < 1 && Math.abs(box.y) < 1;
+  });
   const box = await page.locator(".exercise-video").boundingBox();
   const size = page.viewportSize();
-  assert.ok(Math.abs(box.x) < 1 && Math.abs(box.y) < 1);
+  assert.ok(Math.abs(box.x) < 1 && Math.abs(box.y) < 1, JSON.stringify(box));
   assert.ok(Math.abs(box.width - size.width) < 1 && Math.abs(box.height - size.height) < 1);
   const frame = await page.locator(".exercise-video iframe").boundingBox();
   assert.ok(Math.abs(frame.width / frame.height - 9 / 16) < 0.01);
@@ -96,6 +100,6 @@ test("recusa da tela cheia nativa usa expansão e navegação limpa o estado", (
   await page.click("[data-video-fullscreen]");
   assert.equal(await page.locator(".exercise-video.video-expanded").count(), 1);
   await page.goto(server.url + "#/inicio");
-  await page.waitForSelector(".today-card");
+  await page.waitForSelector(".page-title");
   assert.equal(await page.locator("body.video-fullscreen").count(), 0);
 }));
