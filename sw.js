@@ -1,6 +1,6 @@
 /* Service worker do MegGym: deixa o app instalável e funcionando offline.
    Ao mudar arquivos do app, aumente VERSION (e o ?v= dos arquivos no index.html). */
-const VERSION = "v65";
+const VERSION = "v66";
 const CACHE = `meggym-${VERSION}`;
 
 const CORE = [
@@ -9,21 +9,21 @@ const CORE = [
   "./manifest.webmanifest",
   "./data/exercises.json",
   "./data/workouts.json",
-  "./assets/css/style.css?v=65",
-  "./assets/js/theme.js?v=65",
-  "./assets/js/config.js?v=65",
-  "./assets/js/supabase.js?v=65",
-  "./assets/js/bodymap.js?v=65",
-  "./assets/js/common.js?v=65",
-  "./assets/js/store.js?v=65",
-  "./assets/js/pwa.js?v=65",
-  "./assets/js/app.js?v=65",
-  "./assets/js/export.js?v=65",
+  "./assets/css/style.css?v=66",
+  "./assets/js/theme.js?v=66",
+  "./assets/js/config.js?v=66",
+  "./assets/js/supabase.js?v=66",
+  "./assets/js/bodymap.js?v=66",
+  "./assets/js/common.js?v=66",
+  "./assets/js/store.js?v=66",
+  "./assets/js/pwa.js?v=66",
+  "./assets/js/app.js?v=66",
+  "./assets/js/export.js?v=66",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/favicon-32.png",
-  "./assets/fonts/material-symbols-rounded.woff2?v=65",
+  "./assets/fonts/material-symbols-rounded.woff2?v=66",
   "./assets/fonts/plus-jakarta-sans.woff2",
   "./assets/fonts/manrope.woff2",
   "./assets/fonts/barlow-condensed-700.woff2",

@@ -4378,6 +4378,9 @@
         <button class="icon-btn" type="button" data-video-close aria-label="Fechar vídeo" autofocus>${icon("close")}</button>
       </header>
       <div class="execution-dialog-body">
+      <section class="execution-guide-card execution-instructions"><div class="execution-card-heading">${icon("format_list_numbered")}<h3>Execução</h3></div>
+        ${instructions ? `<p class="exercise-desc">${escapeHtml(instructions)}</p>` : `<p class="meta">Sem descrição.</p>`}
+      </section>
       ${ytId || videoUrl || img ? `<section class="execution-guide-card execution-media-card" aria-label="Demonstração do exercício">
       <div class="execution-card-heading">${icon("play_arrow")}<h3>Demonstração</h3></div>
       ${ytId ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
@@ -4385,9 +4388,6 @@
         <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
       </div>` : videoUrl ? `<a class="btn btn-block" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("play_arrow")} Abrir vídeo</a>` : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
       </section>` : ""}
-      <section class="execution-guide-card execution-instructions"><div class="execution-card-heading">${icon("format_list_numbered")}<h3>Execução</h3></div>
-        ${instructions ? `<p class="exercise-desc">${escapeHtml(instructions)}</p>` : `<p class="meta">Sem descrição.</p>`}
-      </section>
       </div>
       <div class="execution-sheet-footer"><button class="btn btn-primary btn-block" type="button" data-video-close>Voltar às séries</button></div>`;
     document.body.classList.add("execution-video-open");
