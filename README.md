@@ -1,5 +1,7 @@
 # MegGym
 
+Na versão 64, Ver execução ganhou um card com miniatura vertical e subtítulo. O bottom sheet tem puxador para fechar, cabeçalho com nome do exercício, vídeo e orientações em cards e botão de retorno fixo. Cores acompanham os quatro temas e a animação respeita a preferência por movimento reduzido.
+
 Na versão 63, Ver execução é o primeiro card do exercício. O painel reúne vídeo e instruções, inclusive em exercícios sem vídeo. Grupo muscular vem antes de Equipamentos. O título e o texto de orientação das séries têm mais espaço em relação à tabela.
 
 Na versão 62, Atividade e Configurações têm **Exportar para análise**. É possível baixar um relatório completo em TXT para personal ou IA, dados estruturados em JSON e as séries do histórico em CSV para planilhas. O usuário escolhe todo o histórico, 30 ou 90 dias e se inclui nome, idade e sexo. Plano atual, sessão em andamento, cargas e observações atuais acompanham o período. A exportação funciona no aparelho, sem rede, e não altera dados nem a data do backup.

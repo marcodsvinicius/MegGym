@@ -4348,7 +4348,7 @@
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closePersonalCard();
   });
   const executionDialog = document.createElement("dialog");
-  executionDialog.className = "execution-dialog";
+  executionDialog.className = "execution-dialog execution-guide";
   executionDialog.setAttribute("aria-labelledby", "execution-video-title");
   document.body.appendChild(executionDialog);
   let videoReturnFocus = null;
@@ -4363,27 +4363,32 @@
     videoReturnFocus = button;
     videoScroll = { page: window.scrollY, sheet: $("sheet-content").scrollTop };
     executionDialog.innerHTML = `
+      <div class="execution-sheet-handle" aria-hidden="true"><span></span></div>
       <header class="execution-dialog-head">
-        <h2 id="execution-video-title">Execução do exercício</h2>
+        <span class="execution-sheet-icon" aria-hidden="true">${icon("smart_display")}</span>
+        <div class="execution-sheet-heading"><h2 id="execution-video-title">Execução do exercício</h2><p class="execution-video-name">${escapeHtml(ex.name)}</p></div>
         <button class="icon-btn" type="button" data-video-close aria-label="Fechar vídeo" autofocus>${icon("close")}</button>
       </header>
       <div class="execution-dialog-body">
+      ${ytId || videoUrl || img ? `<section class="execution-guide-card execution-media-card" aria-label="Demonstração do exercício">
+      <div class="execution-card-heading">${icon("play_arrow")}<h3>Demonstração</h3></div>
       ${ytId ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
         <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
         <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
-      </div>` : videoUrl ? `<a class="btn" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>` : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
-      <p class="execution-video-name">${escapeHtml(ex.name)}</p>
-      <section class="sheet-section execution-instructions"><h3>Execução</h3>
+      </div>` : videoUrl ? `<a class="btn btn-block" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("play_arrow")} Abrir vídeo</a>` : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
+      </section>` : ""}
+      <section class="execution-guide-card execution-instructions"><div class="execution-card-heading">${icon("format_list_numbered")}<h3>Execução</h3></div>
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
       </div>
-      <button class="btn btn-block" type="button" data-video-close>Voltar às séries</button>`;
+      <div class="execution-sheet-footer"><button class="btn btn-primary btn-block" type="button" data-video-close>Voltar às séries</button></div>`;
     document.body.classList.add("execution-video-open");
     executionDialog.showModal();
   }
 
   function closeExecutionVideo(restoreFocus = true) {
     if (!executionDialog.open) return;
+    executionSwipe = null;
     closeVideoFullscreen();
     executionDialog.close();
     executionDialog.innerHTML = ""; // Interrompe a reprodução ao voltar para as séries.
@@ -4408,6 +4413,20 @@
     const rect = executionDialog.getBoundingClientRect();
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeExecutionVideo();
   });
+  let executionSwipe = null;
+  executionDialog.addEventListener("touchstart", (event) => {
+    if (!event.target.closest(".execution-sheet-handle") || expandedVideo) return;
+    const touch = event.touches[0];
+    executionSwipe = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+  executionDialog.addEventListener("touchend", (event) => {
+    const start = executionSwipe;
+    executionSwipe = null;
+    if (!start || expandedVideo) return;
+    const touch = event.changedTouches[0];
+    if (touch.clientY - start.y > 60 && Math.abs(touch.clientX - start.x) < 80) closeExecutionVideo();
+  }, { passive: true });
+  executionDialog.addEventListener("touchcancel", () => { executionSwipe = null; });
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-execution-video]");
     if (button) openExecutionVideo(button);
@@ -4489,8 +4508,8 @@
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
     const mediaHtml = `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" aria-haspopup="dialog">
-            <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}${ytId ? `<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</span>
-            ${icon("play_arrow")}<span>Ver execução</span><span class="chevron" aria-hidden="true">›</span>
+            <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}${ytId ? `<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}<span class="execution-preview-play">${icon("play_arrow")}</span></span>
+            <span class="execution-preview-copy"><span class="execution-preview-title">Ver execução</span><span class="execution-preview-subtitle">${ex.video ? "Vídeo e orientações" : "Orientações do exercício"}</span></span><span class="execution-preview-arrow" aria-hidden="true">›</span>
           </button>`;
     return `
       <div class="sheet-head">

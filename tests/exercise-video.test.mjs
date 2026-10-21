@@ -89,6 +89,27 @@ test("exercício sem vídeo mantém card de execução e instruções acessívei
   assert.equal(await page.locator(".exercise-page .execution-preview").isVisible(), true);
 }));
 
+test("bottom sheet separa demonstração e orientações em cards e fecha pelo puxador", () => withApp(async (page) => {
+  await openVideo(page);
+  assert.equal(await page.locator(".execution-guide .execution-guide-card").count(), 2);
+  assert.equal(await page.locator(".execution-media-card iframe").count(), 1);
+  const footer = await page.locator(".execution-sheet-footer").boundingBox();
+  await page.locator(".execution-dialog-body").evaluate(el => { el.scrollTop = el.scrollHeight; });
+  assert.deepEqual(await page.locator(".execution-sheet-footer").boundingBox(), footer);
+  assert.equal(await page.locator(".execution-instructions").isVisible(), true);
+  await page.locator(".execution-sheet-handle").evaluate(handle => {
+    const start = new Event("touchstart", { bubbles: true });
+    Object.defineProperty(start, "touches", { value: [{ clientX: 100, clientY: 100 }] });
+    handle.dispatchEvent(start);
+    const end = new Event("touchend", { bubbles: true });
+    Object.defineProperty(end, "changedTouches", { value: [{ clientX: 102, clientY: 180 }] });
+    handle.dispatchEvent(end);
+  });
+  assert.equal(await page.locator(".execution-guide").evaluate(el => el.open), false);
+  assert.equal(await page.locator("#sheet").isVisible(), true);
+  assert.equal(await page.locator(".exercise-video iframe").count(), 0);
+}));
+
 test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do painel", () => withApp(async (page) => {
   await openVideo(page);
   await page.evaluate(() => { document.querySelector(".exercise-video").requestFullscreen = undefined; });

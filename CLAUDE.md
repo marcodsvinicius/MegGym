@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v63**.
+- Versão atual: **v64**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -46,6 +46,7 @@ Outros cuidados:
 ## Funcionalidades prontas
 - **Integridade v57:** finalização só limpa a sessão após persistir o histórico e a carga; gravações em lote desfazem mudanças anteriores em caso de erro. Séries parciais entram no histórico. Sessões guardam a ficha original e migram sessões antigas antes de editar. Gráficos combinam resultados do histórico com cargas manuais identificadas; editar registros antigos não troca a carga atual. Backup validado integralmente antes de gravar, com reversão em caso de falha.
 - **Exercício:**
+  - Ver execução tem miniatura vertical, play sobreposto, título/subtítulo e indicador de abertura. O painel usa bottom sheet com puxador para fechar por gesto, cabeçalho com nome do exercício, cards de Demonstração e Execução e rodapé fixo de retorno; conteúdo rola separadamente. Estilos são exclusivos de `.execution-guide`, sem alterar os painéis de carga/observações. Movimento de entrada respeita redução de movimento e é desativado em tela cheia.
   - "Ver execução" é o primeiro card, seguido dos cards de prescrição, séries, Minha carga, Minhas observações, Grupo muscular e Equipamentos. As instruções de execução ficam dentro do painel de Ver execução, junto do vídeo ou imagem, inclusive quando não há vídeo. O vídeo só carrega ao abrir, vertical 9:16, com tela cheia e modo expandido de compatibilidade. Corpo do painel tem rolagem própria e botão de retorno permanece acessível. Fechar preserva formulário, rolagem e foco. Título e orientação de Séries têm espaçamento da tabela.
   - O peso da primeira série preenche as seguintes. A origem do preenchimento é preservada na sessão para atualizar valores herdados e respeitar ajustes manuais e séries já concluídas. Minha carga usa a primeira série como referência, enquanto o gráfico mantém o máximo realizado.
   - Minha carga é um card com o peso atual que abre o gráfico e ajustes em um diálogo; para peso corporal aparece Minha evolução. Minhas observações é um card com prévia que abre o editor. Os mesmos campos são movidos para o diálogo e devolvidos ao fechar, preservando eventos e valores; rolagem e foco são restaurados. A tabela possui cabeçalho e colunas alinhadas Série, Carga (kg), Reps e check, com variantes para tempo/unilateral/sem carga.
