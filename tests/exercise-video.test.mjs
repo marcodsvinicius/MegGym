@@ -32,15 +32,19 @@ async function openVideo(page) {
   await page.waitForSelector(".execution-dialog[open] .exercise-video");
 }
 
-test("cards, botão compacto, séries, carga e observações; player só carrega ao abrir", () => withApp(async (page) => {
+test("execução é o primeiro card, instruções ficam no painel e equipamentos após o grupo", () => withApp(async (page) => {
   const sequence = await page.evaluate(() => {
     const content = document.querySelector("#sheet-content");
-    const selectors = [".stats", ".execution-preview", ".sets-log", ".my-load", ".my-note"];
+    const selectors = [".execution-preview", ".stats", ".sets-log", ".my-load", ".my-note"];
     return selectors.map((selector) => [...content.children].indexOf(content.querySelector(selector)));
   });
   assert.ok(sequence.every((n) => n >= 0));
   assert.deepEqual(sequence, [...sequence].sort((a, b) => a - b));
   assert.ok(sequence[0] < sequence[1]);
+  assert.equal(await page.locator("#sheet-content .execution-instructions").count(), 0);
+  assert.deepEqual(await page.locator("#sheet-content > .sheet-section > h3").allTextContents(), ["Séries", "Grupo muscular", "Equipamentos"]);
+  const spacing = await page.evaluate(() => document.querySelector(".sets-table").getBoundingClientRect().top - document.querySelector(".sets-log > h3").getBoundingClientRect().bottom);
+  assert.ok(spacing >= 14, `Espaço entre título e tabela: ${spacing}`);
   assert.match(await page.textContent(".stats"), /Séries[\s\S]*Reps[\s\S]*Descanso[\s\S]*RIR/);
   assert.equal(await page.locator(".exercise-video iframe").count(), 0);
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 430, height: 932 }]) {
@@ -48,6 +52,8 @@ test("cards, botão compacto, séries, carga e observações; player só carrega
     const preview = await page.locator(".execution-preview").boundingBox();
     assert.ok(preview.height >= 44 && preview.height <= 96);
     await openVideo(page);
+    assert.match(await page.locator(".execution-instructions").textContent(), /Execução/);
+    assert.ok((await page.locator(".execution-instructions .exercise-desc").textContent()).length > 0);
     const box = await page.locator(".exercise-video").boundingBox();
     assert.ok(Math.abs(box.width / box.height - 9 / 16) < 0.01);
     assert.ok(box.x >= 0 && box.x + box.width <= viewport.width);
@@ -68,6 +74,19 @@ test("cards, botão compacto, séries, carga e observações; player só carrega
   await page.locator("#ex-note").blur();
   await page.getByRole("button", { name: "Voltar ao exercício", exact: true }).click();
   assert.equal(await page.evaluate(() => MegStore.exerciseNote(MegStore.currentUser().id, "goblet-squat")), "Apoio firme");
+}));
+
+test("exercício sem vídeo mantém card de execução e instruções acessíveis", () => withApp(async (page) => {
+  const id = await page.evaluate(() => {
+    MegStore.saveExercise({ name: "Exercício sem vídeo", group: "peito", description: "Instrução exclusiva sem vídeo", equipment: [] }, MegStore.currentUser());
+    return MegStore.customExercises().find(e => e.name === "Exercício sem vídeo").id;
+  });
+  await page.goto(server.url + `#/exercicios/ver/${id}`);
+  await page.click(".execution-preview");
+  assert.equal(await page.locator(".exercise-video iframe").count(), 0);
+  assert.equal(await page.locator(".execution-instructions .exercise-desc").textContent(), "Instrução exclusiva sem vídeo");
+  await page.getByRole("button", { name: "Voltar às séries", exact: true }).click();
+  assert.equal(await page.locator(".exercise-page .execution-preview").isVisible(), true);
 }));
 
 test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do painel", () => withApp(async (page) => {

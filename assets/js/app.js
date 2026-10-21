@@ -4357,7 +4357,9 @@
   function openExecutionVideo(button) {
     const ex = findExercise(button.dataset.executionVideo);
     const ytId = ex && youtubeId(ex.video);
-    if (!ytId) return;
+    if (!ex) return;
+    const videoUrl = safeUrl(ex.video);
+    const img = safeUrl(ex.image);
     videoReturnFocus = button;
     videoScroll = { page: window.scrollY, sheet: $("sheet-content").scrollTop };
     executionDialog.innerHTML = `
@@ -4365,11 +4367,16 @@
         <h2 id="execution-video-title">Execução do exercício</h2>
         <button class="icon-btn" type="button" data-video-close aria-label="Fechar vídeo" autofocus>${icon("close")}</button>
       </header>
-      <div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
+      <div class="execution-dialog-body">
+      ${ytId ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
         <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
         <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
-      </div>
+      </div>` : videoUrl ? `<a class="btn" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">Abrir vídeo</a>` : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
       <p class="execution-video-name">${escapeHtml(ex.name)}</p>
+      <section class="sheet-section execution-instructions"><h3>Execução</h3>
+        ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
+      </section>
+      </div>
       <button class="btn btn-block" type="button" data-video-close>Voltar às séries</button>`;
     document.body.classList.add("execution-video-open");
     executionDialog.showModal();
@@ -4453,9 +4460,7 @@
 
   function exerciseDetailHtml(ex, prescription = {}, { titleId = "sheet-title" } = {}) {
     const g = findGroup(ex.group);
-    const img = safeUrl(ex.image);
     const ytId = youtubeId(ex.video);
-    const videoUrl = safeUrl(ex.video);
     const sets = prescription.sets || ex.sets;
     const reps = prescription.reps || ex.reps;
     const run = runContext(prescription);
@@ -4483,24 +4488,19 @@
     const equip = equipmentChips(ex.equipment, ex.equipmentAny);
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
-    const mediaHtml = `${ytId
-        ? `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" aria-haspopup="dialog">
-            <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+    const mediaHtml = `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" aria-haspopup="dialog">
+            <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}${ytId ? `<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</span>
             ${icon("play_arrow")}<span>Ver execução</span><span class="chevron" aria-hidden="true">›</span>
-          </button>`
-        : videoUrl
-          ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
-          : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}`;
+          </button>`;
     return `
       <div class="sheet-head">
         <h2 id="${titleId}">${escapeHtml(ex.name)}</h2>
         ${difficultyBadge(ex.difficulty)}
       </div>
       ${typeTag(ex)}
+      ${mediaHtml}
       ${stats ? `<div class="stats">${stats}</div>` : ""}
       ${rirTip}
-
-      ${mediaHtml}
 
       ${run ? setsTableHtml(ex, run, sets, reps) : ""}
 
@@ -4508,16 +4508,6 @@
       ${prescription.load ? `<p class="meta">Carga sugerida pelo treino: ${escapeHtml(prescription.load)}</p>` : ""}
 
       ${personalNoteHtml(ex.id)}
-
-      <section class="sheet-section">
-        <h3>Execução</h3>
-        ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
-      </section>
-
-      <section class="sheet-section">
-        <h3>Equipamentos</h3>
-        ${equip ? `<div class="equip-chips">${equip}</div>` : `<p class="meta">Nenhum — peso do corpo.</p>`}
-      </section>
 
       ${
         g
@@ -4534,6 +4524,10 @@
             </section>`
           : ""
       }
+      <section class="sheet-section exercise-equipment">
+        <h3>Equipamentos</h3>
+        ${equip ? `<div class="equip-chips">${equip}</div>` : `<p class="meta">Nenhum — peso do corpo.</p>`}
+      </section>
       ${ex.custom && ex.createdBy ? `<p class="meta">Cadastrado por ${escapeHtml(ex.createdBy)}</p>` : ""}`;
   }
 
