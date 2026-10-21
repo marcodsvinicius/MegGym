@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v66**.
+- Versão atual: **v67**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -64,6 +64,7 @@ Outros cuidados:
 - **Início:** card "Treino de hoje"; motivação dentro de "Sua semana"; card de instalação com botão de fechar (depois de fechado, a opção fica em Configurações).
 - **Atividade:** abas Resumo, Evolução e Histórico. O Resumo mostra "Séries por músculo na semana" com as séries realizadas e contribuição proporcional dos músculos secundários, sem recomendações automáticas.
 - **Treinos:**
+  - Dentro de divisões, cards mostram só Treino A/B/C…; botões usam Começar/Iniciar Treino A/B/C… sem repetir nome da divisão ou músculos. O treino sugerido na Home segue a mesma identificação curta quando pertence à divisão seguida. Nomes completos dos dados/histórico/exportações são preservados.
   - Abas Meu Treino, Explorar e Salvos.
   - Treino e Divisão (A/B/C…), cada um público ou privado; dá para salvar, seguir e copiar.
 - **Hipertrofia Avançada:** antiga Treino GPT v1, divisão ABCD manual com IDs `treino-gpt-v1*` preservados. Quatro sessões por ciclo, 25 exercícios. Seed v6 renomeia somente nomes anteriores exatos por meio de `renames`, sem alterar fichas editadas, nomes personalizados ou snapshots históricos/em andamento. Seed grava tudo com `writeBatch`, inclusive versão, para permitir nova tentativa se falhar.

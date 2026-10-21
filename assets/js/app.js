@@ -529,7 +529,7 @@
           pr.completed
             ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída!</p>`
             : pr.next
-              ? `<p class="meta">Próximo: Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</p>`
+              ? `<p class="meta">Próximo: Treino ${pr.next.letter}</p>`
               : ""
         }
       </section>`;
@@ -541,7 +541,7 @@
     const st = plan && Store.getStructure(plan.structureId);
     if (st) {
       const pr = structureProgress(st);
-      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: `Treino ${pr.next.letter} · ${st.name}`, progress: pr };
+      if (pr.next && !pr.completed) return { workout: pr.next.workout, reason: st.name, progress: pr };
     }
     const single = plan?.workoutId && Store.getWorkout(plan.workoutId);
     if (single) return { workout: single, reason: "Seu treino atual" };
@@ -576,7 +576,7 @@
     return `
       <section class="today-card">
         <span class="meta">${icon("today", "mi-inline")} Treino de hoje · ${escapeHtml(sug.reason)}</span>
-        <h2>${escapeHtml(w.name)}</h2>
+        <h2>${sug.progress ? `Treino ${sug.progress.next.letter}` : escapeHtml(w.name)}</h2>
         <div class="group-chips">${groupChips(workoutGroups(w.items))}</div>
         <p class="meta">${w.items.length} exercícios · ${sets} séries · cerca de ${minutes} min</p>
         ${
@@ -1128,7 +1128,7 @@
             <li><a class="item-row item-link ${isNext ? "highlight-next" : ""}" href="#/treinos/${encodeURIComponent(w.id)}">
               <span class="item-index letter-index">${letter(i)}</span>
               <div class="item-main">
-                <div class="item-title">${escapeHtml(shortName(w.name))}</div>
+                <div class="item-title">Treino ${letter(i)}</div>
                 <div class="meta">${w.items.length} exercícios${isNext ? " · <strong>próximo</strong>" : ""}</div>
               </div>
               <span class="chevron" aria-hidden="true">›</span>
@@ -1146,7 +1146,7 @@
             pr.completed
               ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída! Escolha outra em Explorar ou recomece.</p>`
               : pr.next && !activeWorkout
-                ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="mt-start" data-workout="${escapeHtml(pr.next.workout.id)}">${icon("play_arrow", "mi-inline")} Começar Treino ${pr.next.letter} — ${escapeHtml(shortName(pr.next.workout.name))}</button>`
+                ? `<button class="btn btn-primary btn-block btn-lg" type="button" id="mt-start" data-workout="${escapeHtml(pr.next.workout.id)}">${icon("play_arrow", "mi-inline")} Começar Treino ${pr.next.letter}</button>`
                 : ""
           }
         </section>
@@ -1368,9 +1368,6 @@
   /* ================= Estruturas de treino ================= */
 
   const letter = (i) => String.fromCharCode(65 + (i % 26));
-  // "Treino — Peito + Ombros" → "Peito + Ombros" (para não repetir "Treino A — Treino — …").
-  const shortName = (name) => String(name || "").replace(/^treino\s*[—–-]\s*/i, "");
-
   // Progresso do usuário numa estrutura: treinos dela feitos desde que começou a seguir.
   function structureProgress(st) {
     const plan = Store.plan(user.id);
@@ -1414,7 +1411,7 @@
           <li><a class="item-row item-link ${isNext ? "highlight-next" : ""}" href="#/treinos/${encodeURIComponent(w.id)}">
             <span class="item-index letter-index">${letter(i)}</span>
             <div class="item-main">
-              <div class="item-title">Treino ${letter(i)} — ${escapeHtml(shortName(w.name))}</div>
+              <div class="item-title">Treino ${letter(i)}</div>
               <div class="group-chips" style="margin-top:6px">${groupChips(workoutGroups(w.items))}</div>
               <div class="meta">${w.items.length} exercícios${isNext ? " · <strong>próximo</strong>" : ""}</div>
             </div>
