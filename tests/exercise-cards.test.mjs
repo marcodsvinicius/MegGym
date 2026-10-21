@@ -112,7 +112,11 @@ test("cards e painéis sem violações axe nos quatro temas e dois modos", () =>
   await page.addScriptTag({ content: axeSrc });
   const problems = [];
   for (const style of ["energia", "esportivo", "pink-money", "arcade"]) for (const mode of ["light", "dark"]) {
+    await page.click("#sheet-close");
+    await page.waitForSelector("#sheet", { state: "hidden" });
     await page.evaluate(([st, th]) => (MegTheme.setStyle(st), MegTheme.set(th)), [style, mode]);
+    await page.locator(".run-item .item-main").click();
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     for (const panel of [null, "load", "note"]) {
       if (panel) await page.click(`[data-personal-card="${panel}"]`);
       const v = await page.evaluate(async () => (await axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] })).violations.map(x => `${x.id}: ${x.nodes[0]?.target.join(" ")} ${JSON.stringify(x.nodes[0]?.any)}`));

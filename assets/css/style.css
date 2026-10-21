@@ -2042,7 +2042,6 @@ body.sheet-open .rest-bar { bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
 .sets-table .sets-table-head { background: var(--surface-2); color: var(--text-muted); font-size: .75rem; font-weight: 700; text-align: center; }
 .sets-table .set-list { gap: 0; }
-.sets-log > .meta { color: var(--text); background: var(--surface); }
 .sets-table .set-row { border-top: 1px solid var(--border); }
 .sets-table .set-row.done { background: color-mix(in srgb, var(--success) 6%, var(--surface)); }
 .sets-table .set-num { width: auto; font-size: 1rem; }
