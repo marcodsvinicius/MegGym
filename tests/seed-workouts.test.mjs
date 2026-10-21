@@ -8,7 +8,7 @@ import { ROOT, startServer, openApp, seedUser } from "./helpers.mjs";
 const seed = JSON.parse(await readFile(join(ROOT, "data/workouts.json"), "utf8"));
 const storeSource = await readFile(join(ROOT, "assets/js/store.js"), "utf8");
 
-test("seed v5 acrescenta Treino GPT v1 sem perder treinos, histórico ou sessão", () => {
+test("seed v6 acrescenta Hipertrofia Avançada e Turbo Kelw sem perder dados", () => {
   const values = new Map();
   const context = { window: {}, localStorage: { getItem: (k) => values.get(k) ?? null, setItem: (k, v) => values.set(k, v), removeItem: (k) => values.delete(k) } };
   vm.runInNewContext(storeSource, context);
@@ -16,8 +16,8 @@ test("seed v5 acrescenta Treino GPT v1 sem perder treinos, histórico ou sessão
   const u = s.createUser({ name: "Teste migração", equipment: ["halter", "elastico"] });
   const previous = JSON.parse(JSON.stringify(seed));
   previous.version = 4;
-  previous.workouts = previous.workouts.filter((w) => !w.id.startsWith("treino-gpt-v1"));
-  previous.structures = previous.structures.filter((st) => st.id !== "treino-gpt-v1");
+  previous.workouts = previous.workouts.filter((w) => !w.id.startsWith("treino-gpt-v1") && !w.id.startsWith("turbo-kelw"));
+  previous.structures = previous.structures.filter((st) => st.id !== "treino-gpt-v1" && st.id !== "turbo-kelw");
   s.applySeed(previous);
   const old = s.workouts()[0];
   s.saveWorkout({ ...old, name: "Meu ajuste anterior" }, u);
@@ -29,7 +29,7 @@ test("seed v5 acrescenta Treino GPT v1 sem perder treinos, histórico ou sessão
   s.saveExerciseNote(u.id, "flexao", "Minha anotação");
   const oldCount = s.workouts().length;
   assert.equal(s.applySeed(seed), true);
-  assert.equal(s.workouts().length, oldCount + 4);
+  assert.equal(s.workouts().length, oldCount + 7);
   assert.equal(s.getWorkout(old.id).name, "Meu ajuste anterior");
   assert.equal(s.getWorkout(custom.id).name, "Meu treino particular");
   assert.equal(s.history(u.id).length, 1);
@@ -37,20 +37,20 @@ test("seed v5 acrescenta Treino GPT v1 sem perder treinos, histórico ou sessão
   assert.equal(s.plan(u.id).workoutId, custom.id);
   assert.equal(s.exerciseNote(u.id, "flexao"), "Minha anotação");
   const division = s.getStructure("treino-gpt-v1");
-  assert.equal(division.name, "Treino GPT v1");
+  assert.equal(division.name, "Hipertrofia Avançada");
   assert.equal(division.workoutIds.length, 4);
   assert.equal(division.workoutIds.reduce((n, id) => n + s.getWorkout(id).items.length, 0), 25);
   assert.equal(s.applySeed(seed), false);
-  assert.equal(s.workouts().length, oldCount + 4, "não duplica ao reabrir");
+  assert.equal(s.workouts().length, oldCount + 7, "não duplica ao reabrir");
 });
 
-test("Treino GPT v1 aparece em Explorar e permite registrar as variantes da planilha", async () => {
+test("Hipertrofia Avançada aparece em Explorar e permite registrar as variantes da planilha", async () => {
   const server = await startServer();
   const { browser, page, errors } = await openApp(server.url);
   try {
     await seedUser(page, { equipment: ["halter", "kettlebell", "elastico", "roldana", "step"] });
     await page.goto(server.url + "#/treinos?aba=explorar");
-    await page.fill("#ex-q", "Treino GPT v1");
+    await page.fill("#ex-q", "Hipertrofia Avançada");
     assert.equal(await page.locator(".structure-card").count(), 1);
     await page.locator(".structure-card").click();
     await page.click("#st-follow");
@@ -79,3 +79,4 @@ test("Treino GPT v1 aparece em Explorar e permite registrar as variantes da plan
     server.close();
   }
 });
+

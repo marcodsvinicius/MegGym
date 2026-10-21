@@ -111,10 +111,11 @@
       .join("");
   }
 
-  function equipmentChips(list, any = []) {
+  function equipmentChips(list, any = [], optional = []) {
     const chips = equipmentLabels(list).map((label) => `<span class="equip-chip">${escapeHtml(label)}</span>`);
     const options = equipmentLabels(any);
     if (options.length) chips.push(`<span class="equip-chip">${escapeHtml(options.join(" ou "))}</span>`);
+    equipmentLabels(optional).forEach(label => chips.push(`<span class="equip-chip">Opcional: ${escapeHtml(label)}</span>`));
     return chips.join("");
   }
 
@@ -752,13 +753,13 @@
     const t = exerciseType(ex);
     if (t === "reps") return "";
     const [label, ic] = EXERCISE_TYPES[t];
-    return `<span class="type-tag type-${t}">${icon(ic, "mi-inline")} ${label}</span>`;
+    return `<span class="type-tag type-${t}">${icon(ic, "mi-inline")} ${ex.timePerSide ? "Tempo por lado" : label}</span>`;
   }
 
   // "10-12 cada lado" → "10-12" quando o tipo já é "por lado" (o rótulo diz Reps/lado).
   function repsShort(ex, reps) {
     const t = String(reps || "");
-    return exerciseType(ex) === "unilateral" ? t.replace(/\s*(cada|por)\s+(lado|braço|perna)s?$/i, "") : t;
+    return exerciseType(ex) === "unilateral" || ex.timePerSide ? t.replace(/\s*(cada|por)\s+(lado|braço|perna)s?(?=\s*\(|,|$)/i, "") : t;
   }
 
   function exerciseCard(ex, { showGroup = false } = {}) {
@@ -1291,7 +1292,7 @@
         const ex = findExercise(item.exerciseId);
         const g = ex && findGroup(ex.group);
         return `
-          <li class="item-row ${supersetClass(ssDetail[i])} ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"` : ""}>
+          <li class="item-row ${supersetClass(ssDetail[i])} ${ex ? "tappable" : ""}" ${ex ? `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}" data-instructions="${escapeHtml(item.instructions || "")}"` : ""}>
             <span class="item-index">${i + 1}</span>
             <div class="item-main">
               <div class="item-title">${ex ? escapeHtml(ex.name) : "<em>Exercício removido</em>"}</div>
@@ -1772,8 +1773,9 @@
           notes: String(draft.notes || "").trim(),
           restSeconds: Math.min(Math.max(parseInt(draft.restSeconds, 10) || DEFAULT_REST, 10), 600),
           visibility: draft.visibility === "public" ? "public" : "private",
-          items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest, linkNext, warmup }, i, all) => ({
+          items: draft.items.map(({ exerciseId, sets, reps, load, rir, rest, linkNext, warmup, instructions }, i, all) => ({
             exerciseId,
+            ...(instructions ? { instructions } : {}),
             ...(warmup ? { warmup: true } : {}),
             ...(linkNext && i < all.length - 1 ? { linkNext: true } : {}),
             sets: String(sets).trim(),
@@ -2016,7 +2018,7 @@
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
                 </button>`
           }
-          <div class="item-main ${skipped ? "" : "tappable"}" ${skipped ? "" : `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}"`}>
+          <div class="item-main ${skipped ? "" : "tappable"}" ${skipped ? "" : `data-exercise="${escapeHtml(ex.id)}" data-sets="${escapeHtml(item.sets)}" data-reps="${escapeHtml(item.reps)}" data-load="${escapeHtml(item.load || "")}" data-rir="${escapeHtml(item.rir || "")}" data-rest="${escapeHtml(item.rest || "")}" data-instructions="${escapeHtml(item.instructions || "")}"`}>
             <div class="item-title">${escapeHtml(ex.name)}</div>
             ${supersetTag(ss)}
             ${original ? `<div class="run-tag">${icon("swap_horiz", "mi-inline")} no lugar de ${escapeHtml(original.name)}</div>` : ""}
@@ -2027,7 +2029,7 @@
                   <div class="meta">${g ? `${escapeHtml(g.name)}` : ""}${item.rir ? ` · RIR ${escapeHtml(item.rir)}` : ""}</div>
                   ${loadPreview(ex)}
                   ${notePreview(ex.id)}
-                  <div class="run-sets-done" data-sets-summary="${i}" data-type="${exerciseType(ex)}">${escapeHtml(setsSummary(session.sets?.[i], exerciseType(ex)))}</div>
+                  <div class="run-sets-done" data-sets-summary="${i}" data-type="${exerciseType(ex)}" data-time-per-side="${Boolean(ex.timePerSide)}">${escapeHtml(setsSummary(session.sets?.[i], exerciseType(ex), ex.timePerSide))}</div>
                   <div class="meta link-text">Registrar séries ›</div>`
             }
           </div>
@@ -2127,7 +2129,7 @@
         row.classList.toggle("done", done);
         row.querySelector("[data-toggle]")?.setAttribute("aria-pressed", String(done));
         const sum = row.querySelector("[data-sets-summary]");
-        if (sum) sum.textContent = setsSummary(session.sets?.[i], sum.dataset.type);
+        if (sum) sum.textContent = setsSummary(session.sets?.[i], sum.dataset.type, sum.dataset.timePerSide === "true");
       });
       updateProgress();
     };
@@ -2186,6 +2188,8 @@
         swappedFrom: swapped ? item.exerciseId : "",
         note: Store.exerciseNote(user.id, ex.id),
         myLoad: loadText(Store.exerciseLoad(user.id, ex.id), ex),
+        instructions: swapped ? ex.description || "" : item.instructions || "",
+        timePerSide: Boolean(ex.timePerSide),
         setLog: (session.sets?.[i] || []).filter((s) => s.done).map(({ weightSource, ...s }) => s),
         type: exerciseType(ex),
       }));
@@ -2298,14 +2302,14 @@
   }
 
   // "3 séries: 12×10 kg · 10×10 kg · 8×10 kg"
-  function unitOf(type) {
-    return type === "tempo" ? "s" : type === "unilateral" ? "reps/lado" : "reps";
+  function unitOf(type, timePerSide = false) {
+    return type === "tempo" ? timePerSide ? "s/lado" : "s" : type === "unilateral" ? "reps/lado" : "reps";
   }
 
-  function setsSummary(sets, type = "reps") {
+  function setsSummary(sets, type = "reps", timePerSide = false) {
     const done = (sets || []).filter((s) => s.done);
     if (!done.length) return "";
-    const unit = unitOf(type);
+    const unit = unitOf(type, timePerSide);
     const parts = done.map((s) => [s.reps ? (unit === "s" ? `${s.reps}s` : `${s.reps} ${unit}`) : "", s.weight ? `${s.weight} kg` : ""].filter(Boolean).join(" × ")).filter(Boolean);
     const label = `${done.length} ${done.length === 1 ? "série feita" : "séries feitas"}`;
     return parts.length ? `${label}: ${parts.join(" · ")}` : label;
@@ -2783,13 +2787,13 @@
                   const g = findGroup(e.group);
                   const exists = findExercise(e.exerciseId);
                   return `
-                    <li class="item-row ${exists ? "tappable" : ""}" ${exists ? `data-exercise="${escapeHtml(e.exerciseId)}" data-sets="${escapeHtml(e.sets)}" data-reps="${escapeHtml(e.reps)}" data-load="${escapeHtml(e.load || "")}"` : ""}>
+                    <li class="item-row ${exists ? "tappable" : ""}" ${exists ? `data-exercise="${escapeHtml(e.exerciseId)}" data-sets="${escapeHtml(e.sets)}" data-reps="${escapeHtml(e.reps)}" data-load="${escapeHtml(e.load || "")}" data-instructions="${escapeHtml(e.instructions || "")}"` : ""}>
                       <span class="item-index done-index">${icon("check")}</span>
                       <div class="item-main">
                         <div class="item-title">${escapeHtml(e.name)}</div>
                         <div class="meta">${g ? `${escapeHtml(g.name)} · ` : ""}${escapeHtml(prescription(e)) || "—"}</div>
                         ${e.pr ? `<div class="pr-badge">${icon("emoji_events", "mi-inline")} Recorde: ${escapeHtml(e.pr.text)}</div>` : ""}
-                        ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type))}</div>` : ""}
+                        ${e.setLog?.length ? `<div class="run-sets-done">${escapeHtml(setsSummary(e.setLog, e.type, e.timePerSide))}</div>` : ""}
                         ${e.partial ? `<p class="meta">Parcial: ${escapeHtml(e.sets)} de ${escapeHtml(e.plannedSets || e.sets)} séries realizadas.</p>` : ""}
                         ${e.myLoad ? `<div class="ex-load-preview">${icon("fitness_center", "mi-inline")} <span>${escapeHtml(e.myLoad)}</span></div>` : ""}
                         ${e.note ? `<div class="ex-note-preview">${icon("edit_note", "mi-inline")} <span>${escapeHtml(e.note)}</span></div>` : ""}
@@ -2893,7 +2897,7 @@
               .map((e, ei) => {
                 const ex = findExercise(e.exerciseId);
                 const weight = ex ? usesWeight(ex) : true;
-                const unit = unitOf(e.type || (ex ? exerciseType(ex) : "reps"));
+                const unit = unitOf(e.type || (ex ? exerciseType(ex) : "reps"), e.timePerSide || ex?.timePerSide);
                 const rows = e.setLog
                   .map(
                     (s, si) => `
@@ -3795,7 +3799,7 @@
     mode = mode || (canWeight ? "peso" : "reps");
     const isWeight = mode === "peso";
     const list = (isWeight ? Store.weightLog(user.id, exerciseId).map((e) => ({ date: e.date, value: e.weight })) : repsLog(exerciseId)).slice(-12);
-    const unit = isWeight ? "kg" : "reps";
+    const unit = isWeight ? "kg" : ex && exerciseType(ex) === "tempo" ? ex.timePerSide ? "s/lado" : "s" : "reps";
     const toggle = canWeight
       ? `<div class="seg" role="tablist" aria-label="Mostrar">
           <button type="button" role="tab" data-chart-mode="peso" aria-selected="${isWeight}">Peso</button>
@@ -3958,7 +3962,7 @@
     const last = lastSets(ex.id);
     const type = exerciseType(ex);
     const timed = type === "tempo";
-    const unit = unitOf(type);
+    const unit = unitOf(type, ex.timePerSide);
     const target = parseInt(String(repsText || "").match(/\d+/)?.[0], 10) || 30;
     const rows = Array.from({ length: Math.max(count, run.sets.length) }, (_, i) => {
       const s = run.sets[i] || {};
@@ -3975,11 +3979,11 @@
                   <input class="input input-sm" data-set-field="weight" data-weight-source="${s.weightSource === "first" ? "first" : s.weight ? "manual" : ""}" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || prev?.weight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
               : ""
           }
-          <label class="set-field"><span class="visually-hidden">${timed ? "Segundos" : "Repetições"} da série ${i + 1}</span>
+          <label class="set-field"><span class="visually-hidden">${timed ? ex.timePerSide ? "Segundos por lado" : "Segundos" : "Repetições"} da série ${i + 1}</span>
             <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(timed ? String(secs) : prev?.reps || repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">${unit === "reps/lado" ? "/lado" : unit}</span></label>
           ${
             timed
-              ? `<button type="button" class="set-timer" data-set-timer="${secs}" aria-label="Iniciar cronômetro de ${secs} segundos da série ${i + 1}">${icon("play_arrow", "mi-inline")}<span>${secs}s</span></button>`
+              ? `<button type="button" class="set-timer" data-set-timer="${secs}" ${ex.timePerSide ? 'data-timer-per-side="true"' : ""} aria-label="Iniciar cronômetro de ${secs} segundos${ex.timePerSide ? " por lado" : ""} da série ${i + 1}">${icon("play_arrow", "mi-inline")}<span>${secs}s</span></button>`
               : ""
           }
           <button type="button" class="set-check" data-set-check aria-pressed="${Boolean(s.done)}" aria-label="Concluir série ${i + 1}">
@@ -3993,10 +3997,10 @@
         <h3>Séries</h3>
         ${last ? `<p class="meta">${icon("history", "mi-inline")} Comparando com ${escapeHtml(formatDateTime(last.date))}. Campos vazios usam o valor sugerido ao marcar.</p>` : ""}
         <div class="sets-table ${weight ? "weighted" : ""} ${timed ? "timed" : ""}">
-          <div class="sets-table-head" aria-hidden="true"><span>Série</span>${weight ? "<span>Carga (kg)</span>" : ""}<span>${timed ? "Tempo (s)" : unit === "reps/lado" ? "Reps/lado" : "Reps"}</span>${timed ? `<span>${icon("timer")}</span>` : ""}<span>${icon("check")}</span></div>
+          <div class="sets-table-head" aria-hidden="true"><span>Série</span>${weight ? "<span>Carga (kg)</span>" : ""}<span>${timed ? ex.timePerSide ? "Tempo (s/lado)" : "Tempo (s)" : unit === "reps/lado" ? "Reps/lado" : "Reps"}</span>${timed ? `<span>${icon("timer")}</span>` : ""}<span>${icon("check")}</span></div>
           <ol class="set-list">${rows}</ol>
         </div>
-        <p class="meta">${timed ? `Toque em ${icon("play_arrow", "mi-inline")} para cronometrar a série; ao terminar ela é marcada e o descanso de ${run.restSeconds}s começa.` : `Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.`}</p>
+        <p class="meta">${timed ? ex.timePerSide ? `Cronometre cada lado separadamente. Marque a série somente após completar os dois lados; então começa o descanso de ${run.restSeconds}s.` : `Toque em ${icon("play_arrow", "mi-inline")} para cronometrar a série; ao terminar ela é marcada e o descanso de ${run.restSeconds}s começa.` : `Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.`}</p>
         <div id="sets-next-slot">${nextRunButtonHtml(run)}</div>
       </section>`;
   }
@@ -4162,7 +4166,10 @@
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         input.value = String(total);
         const check = row.querySelector("[data-set-check]");
-        if (!row.classList.contains("done")) check.click();
+        if (btn.dataset.timerPerSide === "true") {
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          toast("Tempo de um lado concluído. Faça o outro lado e marque a série após os dois.");
+        } else if (!row.classList.contains("done")) check.click();
       }
     };
     setTimer.id = setInterval(tick, 250);
@@ -4179,7 +4186,7 @@
     btn.style.removeProperty("--p");
     btn.querySelector(".mi").textContent = "play_arrow";
     btn.querySelector("span:not(.mi)").textContent = `${total}s`;
-    btn.setAttribute("aria-label", `Iniciar cronômetro de ${total} segundos`);
+    btn.setAttribute("aria-label", `Iniciar cronômetro de ${total} segundos${btn.dataset.timerPerSide === "true" ? " por lado" : ""}`);
   }
 
   // Temporizador de descanso: barra fixa acima de tudo, continua com o painel fechado.
@@ -4360,6 +4367,7 @@
     if (!ex) return;
     const videoUrl = safeUrl(ex.video);
     const img = safeUrl(ex.image);
+    const instructions = button.dataset.executionInstructions || ex.description;
     videoReturnFocus = button;
     videoScroll = { page: window.scrollY, sheet: $("sheet-content").scrollTop };
     executionDialog.innerHTML = `
@@ -4378,7 +4386,7 @@
       </div>` : videoUrl ? `<a class="btn btn-block" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("play_arrow")} Abrir vídeo</a>` : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}
       </section>` : ""}
       <section class="execution-guide-card execution-instructions"><div class="execution-card-heading">${icon("format_list_numbered")}<h3>Execução</h3></div>
-        ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
+        ${instructions ? `<p class="exercise-desc">${escapeHtml(instructions)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
       </div>
       <div class="execution-sheet-footer"><button class="btn btn-primary btn-block" type="button" data-video-close>Voltar às séries</button></div>`;
@@ -4486,7 +4494,7 @@
     const restLabel = run ? `${run.restSeconds}s` : prescription.rest || ex.rest;
     const stats = [
       ["Séries", sets],
-      [exerciseType(ex) === "tempo" ? "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, reps)],
+      [exerciseType(ex) === "tempo" ? ex.timePerSide ? "Tempo/lado" : "Tempo" : exerciseType(ex) === "unilateral" ? "Reps/lado" : "Reps", repsShort(ex, reps)],
     ]
       .filter(([, v]) => v)
       .map(([label, v]) => `<div class="stat"><span class="stat-label">${label}</span><span class="stat-value">${escapeHtml(v)}</span></div>`)
@@ -4504,10 +4512,12 @@
     const rirTip = prescription.rir
       ? `<p class="tip hidden" id="tip-rir" role="note"><strong>RIR (repetições na reserva):</strong> quantas repetições você ainda conseguiria fazer quando termina a série. RIR ${escapeHtml(prescription.rir)} = pare quando sentir que faltam cerca de ${escapeHtml(prescription.rir)} para não conseguir mais. RIR 0 = até a falha.</p>`
       : "";
-    const equip = equipmentChips(ex.equipment, ex.equipmentAny);
+    const equip = equipmentChips(ex.equipment, ex.equipmentAny, ex.equipmentOptional);
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
-    const mediaHtml = `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" aria-haspopup="dialog">
+    const runItem = run?.workout.items[run.index];
+    const instructions = (run ? runItem?.exerciseId === ex.id ? runItem.instructions : "" : prescription.instructions) || ex.description || "";
+    const mediaHtml = `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" data-execution-instructions="${escapeHtml(instructions)}" aria-haspopup="dialog">
             <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}${ytId ? `<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}<span class="execution-preview-play">${icon("play_arrow")}</span></span>
             <span class="execution-preview-copy"><span class="execution-preview-title">Ver execução</span><span class="execution-preview-subtitle">${ex.video ? "Vídeo e orientações" : "Orientações do exercício"}</span></span><span class="execution-preview-arrow" aria-hidden="true">›</span>
           </button>`;
@@ -4700,6 +4710,7 @@
         load: target.dataset.load,
         rir: target.dataset.rir,
         rest: target.dataset.rest,
+        instructions: target.dataset.instructions,
         runIndex: target.closest(".run-item")?.dataset.index,
       });
   });

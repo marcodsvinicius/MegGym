@@ -4767,6 +4767,119 @@
       "complexity": 1,
       "impact": false,
       "type": "unilateral"
+    },
+    {
+      "id": "agachamento-dividido-apoio",
+      "group": "quadriceps",
+      "name": "Agachamento dividido com apoio — afundo parado",
+      "description": "Mantenha um pé à frente e outro atrás, ambos no chão. Use apoio firme e desça dobrando os joelhos. Comece sem carga; acrescente halter quando controlar o movimento. Descanso após completar os dois lados.",
+      "sets": "2",
+      "reps": "8-12 por perna",
+      "rest": "90-120s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "equipmentOptional": [
+        "halter"
+      ],
+      "type": "unilateral"
+    },
+    {
+      "id": "ponte-gluteos-chao-opcional",
+      "group": "gluteos",
+      "name": "Ponte de glúteos no chão",
+      "description": "Deitado, dobre os joelhos e apoie os pés no chão. Eleve o quadril contraindo os glúteos, sem hiperestender a lombar.\nCarga: se estiver fácil, use halter sobre o quadril, segurando-o com as mãos e protegendo o contato com uma toalha.",
+      "sets": "2",
+      "reps": "10-15",
+      "rest": "90-120s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "equipmentOptional": [
+        "halter"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "prancha-lateral-joelhos",
+      "group": "abdomen",
+      "name": "Prancha lateral com joelhos apoiados",
+      "description": "Apoie o antebraço com o cotovelo abaixo do ombro e mantenha os joelhos dobrados. Eleve o quadril, alinhando ombros, quadril e joelhos. Respire normalmente. Sustente 15–25 segundos por lado. Completar os dois lados corresponde a uma série. Descanso após completar os dois lados.",
+      "sets": "2",
+      "reps": "15-25s por lado",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "timePerSide": true,
+      "type": "tempo"
+    },
+    {
+      "id": "triceps-testa-chao",
+      "group": "triceps",
+      "name": "Tríceps testa com halteres no chão",
+      "description": "Deitado, mantenha as palmas voltadas uma para a outra. Dobre os cotovelos, levando os halteres ao lado da cabeça, e estenda com controle. Use carga leve no início.",
+      "sets": "2",
+      "reps": "10-15",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "halter"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "panturrilha-em-pe-apoio",
+      "group": "panturrilha",
+      "name": "Panturrilha em pé com apoio",
+      "description": "Segure um apoio firme, eleve os calcanhares e desça devagar. Comece com os dois pés; acrescente um halter quando ficar fácil.",
+      "sets": "2",
+      "reps": "12-20",
+      "rest": "60-90s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "equipmentOptional": [
+        "halter"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "isometria-abdominal-bola",
+      "group": "abdomen",
+      "name": "Isometria abdominal com bola — pressão de mãos e joelhos",
+      "description": "Deitado, mantenha quadris e joelhos dobrados, com a bola entre as mãos e os joelhos. Pressione a bola suavemente pelos dois lados, mantendo a lombar confortável e respirando. Cada série tem 5 pressões de 5 segundos, com aproximadamente 5 segundos de descanso entre pressões. Descanse 60 segundos entre séries.",
+      "sets": "2",
+      "reps": "5 × 5s",
+      "rest": "60s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [
+        "bola-suica"
+      ],
+      "type": "reps"
+    },
+    {
+      "id": "ponte-calcanhares-afastados",
+      "group": "posterior",
+      "name": "Ponte com calcanhares afastados do quadril",
+      "description": "Deitado, mantenha os calcanhares no chão mais afastados do quadril. Eleve o quadril com controle, sem exagerar no arco da lombar. Alternativa à flexão de joelhos na bola quando faltar controle: 2 séries de 10–15 repetições.",
+      "sets": "2",
+      "reps": "10-15",
+      "rest": "90-120s",
+      "difficulty": "iniciante",
+      "image": "",
+      "video": "",
+      "equipment": [],
+      "type": "reps"
     }
   ]
 }
+

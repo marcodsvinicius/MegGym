@@ -21,7 +21,7 @@
     kettlebell: "Kettlebell",
     estacao: "Paralelas / estação",
     corda: "Corda de pular",
-    "bola-suica": "Bola suíça",
+    "bola-suica": "Bola de Pilates / suíça",
     step: "Step",
     caneleira: "Caneleira",
     roldana: "Roldana de porta",
@@ -146,7 +146,7 @@
   };
 
   function exerciseEquipment(ex) {
-    return [...(ex.equipment || []), ...(ex.equipmentAny || [])];
+    return [...(ex.equipment || []), ...(ex.equipmentAny || []), ...(ex.equipmentOptional || [])];
   }
 
   function usesWeight(ex) {
@@ -339,3 +339,4 @@
     fromRows,
   };
 })();
+

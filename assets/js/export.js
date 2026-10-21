@@ -10,7 +10,7 @@
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   };
-  const typeUnit = (type) => type === "tempo" ? "segundos" : type === "unilateral" ? "repetições por lado" : "repetições";
+  const typeUnit = (type, perSide = false) => type === "tempo" ? perSide ? "segundos por lado" : "segundos" : type === "unilateral" ? "repetições por lado" : "repetições";
   const fmt = (value) => value == null || value === "" ? "não informado" : String(value);
 
   function build(source, catalog, { days = 0, includeProfile = true, now = new Date() } = {}) {
@@ -25,16 +25,16 @@
     const definitions = new Map((catalog.exercises || []).map((e) => [e.id, e]));
     const groups = new Map((catalog.groups || []).map((g) => [g.id, g.name]));
     const exName = (id) => definitions.get(id)?.name || source.history?.flatMap(h => h.exercises || []).find(e => e.exerciseId === id)?.name || id || "Exercício não identificado";
-    const cleanSet = (s, index, type, active = false) => ({
-      serie: index + 1, cargaKg: number(s.weight), quantidade: number(s.reps), unidade: typeUnit(type),
+    const cleanSet = (s, index, type, active = false, perSide = false) => ({
+      serie: index + 1, cargaKg: number(s.weight), quantidade: number(s.reps), unidade: typeUnit(type, perSide),
       concluida: active ? s.done === true : s.done !== false,
     });
     const workout = (w) => w ? ({
-      id: w.id, nome: w.name, descricao: w.description || "", descansoPadraoSegundos: w.restSeconds || 60,
+      id: w.id, nome: w.name, descricao: w.description || "", observacoes: w.notes || "", descansoPadraoSegundos: w.restSeconds || 60,
       exercicios: (w.items || []).map((item, i) => {
         const ex = definitions.get(item.exerciseId);
         return { ordem: i + 1, exercicioId: item.exerciseId, nome: exName(item.exerciseId), grupo: groups.get(ex?.group) || ex?.group || "",
-          tipo: ex?.type || "reps", seriesPlanejadas: item.sets || "", repeticoesOuTempoPlanejados: item.reps || "",
+          tipo: ex?.type || "reps", tempoPorLado: Boolean(ex?.timePerSide), instrucoes: item.instructions || ex?.description || "", seriesPlanejadas: item.sets || "", repeticoesOuTempoPlanejados: item.reps || "",
           descanso: item.rest || `${w.restSeconds || 60}s`, rirPlanejado: item.rir ?? "", cargaSugerida: item.load || "", ligadoAoProximo: Boolean(item.linkNext) };
       }),
     }) : null;
@@ -49,7 +49,7 @@
         tipo: e.type || definitions.get(e.exerciseId)?.type || "reps", parcial: Boolean(e.partial),
         seriesRegistradas: e.sets || "", seriesPlanejadas: e.plannedSets || "", prescricaoRepeticoes: e.reps || "",
         cargaSugerida: e.load || "", cargaPessoalNaSessao: e.myLoad || "", rirPlanejado: e.rir ?? "", descanso: e.rest || "",
-        observacao: e.note || "", substituidoDe: e.swappedFrom || "", series: (e.setLog || []).map((s, i) => cleanSet(s, i, e.type || definitions.get(e.exerciseId)?.type)),
+        observacao: e.note || "", instrucoes: e.instructions || "", tempoPorLado: Boolean(e.timePerSide ?? definitions.get(e.exerciseId)?.timePerSide), substituidoDe: e.swappedFrom || "", series: (e.setLog || []).map((s, i) => cleanSet(s, i, e.type || definitions.get(e.exerciseId)?.type, false, e.timePerSide ?? definitions.get(e.exerciseId)?.timePerSide)),
       })),
     })).sort((a, b) => a.fim.localeCompare(b.fim));
     const active = source.session;
@@ -63,7 +63,7 @@
         const id = active.swaps?.[index] || item.exerciseId;
         const ex = definitions.get(id);
         return { ordem: position + 1, indiceOriginal: index, exercicioId: id, nome: exName(id), substituidoDe: id !== item.exerciseId ? item.exerciseId : "", concluido: Boolean(active.done?.[index]), pulado: Boolean(active.skipped?.[index]),
-          series: (active.sets?.[index] || []).map((s, i) => cleanSet(s, i, ex?.type, true)) };
+          series: (active.sets?.[index] || []).map((s, i) => cleanSet(s, i, ex?.type, true, ex?.timePerSide)) };
       }),
     } : null;
     const related = new Set([
@@ -138,7 +138,11 @@
     line(`Qualidade dos dados: ${data.resumo.sessoesSemDetalhes} sessões sem lista de exercícios; ${data.resumo.exerciciosSemSeriesDetalhadas} exercícios sem detalhes por série.`);
     const printWorkout = (w) => {
       line(`\n${w.nome}${w.descricao ? ` — ${w.descricao}` : ""}`);
-      w.exercicios.forEach(e => line(`${e.ordem}. ${e.nome}: ${fmt(e.seriesPlanejadas)} séries × ${fmt(e.repeticoesOuTempoPlanejados)} (${typeUnit(e.tipo)}); descanso ${fmt(e.descanso)}; RIR planejado ${fmt(e.rirPlanejado)}; carga sugerida ${fmt(e.cargaSugerida)}${e.ligadoAoProximo ? "; conjugado com o próximo exercício" : ""}.`));
+      w.exercicios.forEach(e => {
+        line(`${e.ordem}. ${e.nome}: ${fmt(e.seriesPlanejadas)} séries × ${fmt(e.repeticoesOuTempoPlanejados)} (${typeUnit(e.tipo, e.tempoPorLado)}); descanso ${fmt(e.descanso)}; RIR planejado ${fmt(e.rirPlanejado)}; carga sugerida ${fmt(e.cargaSugerida)}${e.ligadoAoProximo ? "; conjugado com o próximo exercício" : ""}.`);
+        if (e.instrucoes) line(`  Execução: ${e.instrucoes}`);
+      });
+      if (w.observacoes) line(`Observações do treino:\n${w.observacoes}`);
     };
     line("\nPLANO ATUAL (PRESCRIÇÃO)");
     if (data.planoAtual.divisao) line(`Divisão: ${data.planoAtual.divisao.nome} — ${data.planoAtual.divisao.descricao}`);

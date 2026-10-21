@@ -1,5 +1,9 @@
 # MegGym
 
+Na versão 65, **Treino GPT v1** passou a se chamar **Hipertrofia Avançada**, mantendo IDs, séries e histórico. A migração muda apenas títulos de fábrica que ainda têm o nome anterior, preservando nomes personalizados e fichas editadas. Foi acrescentada a divisão **Turbo Kelw**, com A na segunda, B na quarta e C na sexta: 20 exercícios, duas séries de trabalho, instruções por exercício e todas as orientações gerais nas observações. Cargas prescritas em branco; o ajuste para três séries permanece uma orientação a partir da terceira semana.
+
+Sete variantes foram adicionadas ao catálogo sem substituir vídeos de movimentos diferentes. Halteres opcionais permitem registrar peso em afundo com apoio, ponte no chão e panturrilha com apoio, sem bloquear a versão sem carga. A prancha lateral com joelhos usa segundos por lado: o cronômetro não marca a série nem inicia descanso ao concluir um só lado. A confirmação dos dois lados é manual. Exportações incluem instruções, observações da ficha e a unidade de tempo por lado. Seed v6 usa gravação em lote com reversão em caso de falha.
+
 Na versão 64, Ver execução ganhou um card com miniatura vertical e subtítulo. O bottom sheet tem puxador para fechar, cabeçalho com nome do exercício, vídeo e orientações em cards e botão de retorno fixo. Cores acompanham os quatro temas e a animação respeita a preferência por movimento reduzido.
 
 Na versão 63, Ver execução é o primeiro card do exercício. O painel reúne vídeo e instruções, inclusive em exercícios sem vídeo. Grupo muscular vem antes de Equipamentos. O título e o texto de orientação das séries têm mais espaço em relação à tabela.
@@ -69,7 +73,7 @@ O app usa ícones do **Material Symbols** (Google), guardados em `assets/fonts/`
 
 ## Treinos que vêm com o app
 
-**Treino GPT v1** é uma divisão ABCD com quatro sessões por ciclo e 25 exercícios. Está em **Treinos → Explorar → Divisões**. O cadastro preserva séries, repetições, descanso, RIR e observações; as cargas atuais devem ser registradas pelo usuário.
+**Hipertrofia Avançada** é uma divisão ABCD com quatro sessões por ciclo e 25 exercícios. Está em **Treinos → Explorar → Divisões**. O cadastro preserva séries, repetições, descanso, RIR e observações; as cargas atuais devem ser registradas pelo usuário.
 
 `data/workouts.json` traz treinos prontos. Ao subir a `version`, o app aplica a lista **uma vez** em cada aparelho; com `"replaceExisting": true` ele apaga os treinos salvos no aparelho e deixa só os do arquivo (o histórico é mantido).
 

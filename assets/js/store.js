@@ -225,11 +225,17 @@
     if (read(KEY.seed, 0) >= seed.version) return false;
     const now = new Date().toISOString();
     const current = workouts();
+    const entries = [];
+    // Renomeia apenas títulos de fábrica que ainda têm exatamente o nome anterior.
+    const renamed = (kind, item) => {
+      const change = (seed.renames || []).find(r => r.kind === kind && r.id === item.id && r.from === item.name);
+      return change ? { ...item, name: change.to } : item;
+    };
     // Sem replaceExisting: só adiciona os treinos que ainda não existem (não mexe nos já salvos/editados).
     const fresh = seed.workouts
       .filter((w) => seed.replaceExisting || !current.some((c) => c.id === w.id))
       .map((w) => ({ ...w, createdBy: w.createdBy || "MegGym", createdAt: now }));
-    write(KEY.workouts, seed.replaceExisting ? fresh : [...current, ...fresh]);
+    entries.push([KEY.workouts, seed.replaceExisting ? fresh : [...current.map(w => renamed("workout", w)), ...fresh]]);
     if (Array.isArray(seed.structures)) {
       const currentStructures = structures();
       // "update": atualiza a estrutura de fábrica se o usuário ainda não a editou.
@@ -242,17 +248,17 @@
       const newStructures = seed.structures
         .filter((st) => !currentStructures.some((c) => c.id === st.id))
         .map(({ update, ...st }) => ({ ...st, createdBy: st.createdBy || "MegGym", createdAt: now }));
-      write(KEY.structures, [...updated, ...newStructures]);
+      entries.push([KEY.structures, [...updated.map(st => renamed("structure", st)), ...newStructures]]);
     }
     if (seed.replaceExisting) {
       // Treino em andamento de um treino apagado não faz mais sentido.
       users().forEach((u) => {
-        const s = session(u.id);
-        if (s && !fresh.some((f) => f.id === s.workoutId)) write(KEY.session + u.id, null);
+        const s = read(KEY.session + u.id, null);
+        if (s && !fresh.some((f) => f.id === s.workoutId)) entries.push([KEY.session + u.id, null]);
       });
     }
-    write(KEY.seed, seed.version);
-    return true;
+    entries.push([KEY.seed, seed.version]);
+    return writeBatch(entries);
   }
 
   function deleteWorkout(id) {

@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "replaceExisting": false,
   "workouts": [
     {
@@ -201,7 +201,7 @@
     },
     {
       "id": "treino-gpt-v1-a",
-      "name": "Treino GPT v1 — A — Quadríceps, panturrilhas e abdômen",
+      "name": "Hipertrofia Avançada — A — Quadríceps, panturrilhas e abdômen",
       "description": "Dia A: Quadríceps, panturrilhas e abdômen. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
       "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nAgachamento goblet — Kettlebell: Controle a descida.\nAgachamento búlgaro com halteres — Halteres: Apoio firme.\nAfundo reverso com halteres — Halteres: Passo confortável.\nExtensão de joelho com elástico — Elástico: Âncora segura.\nElevação de panturrilha em pé com halteres — Halteres: Pausa no topo.\nDead bug — Tapete: Lombar controlada.",
       "restSeconds": 90,
@@ -264,7 +264,7 @@
     },
     {
       "id": "treino-gpt-v1-b",
-      "name": "Treino GPT v1 — B — Peito, ombros e tríceps",
+      "name": "Hipertrofia Avançada — B — Peito, ombros e tríceps",
       "description": "Dia B: Peito, ombros e tríceps. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
       "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nSupino no chão — Halteres: Amplitude confortável.\nFlexão de braço — Tapete: Progredir dificuldade.\nDesenvolvimento Arnold — Halteres: Sem compensar lombar.\nElevação lateral — Halteres: Sem balanço.\nTríceps pulley (roldana/elástico) — Polia + elástico: Fixação firme.\nTríceps francês unilateral — Halter: Cotovelo estável.",
       "restSeconds": 90,
@@ -327,7 +327,7 @@
     },
     {
       "id": "treino-gpt-v1-c",
-      "name": "Treino GPT v1 — C — Glúteos, posteriores e panturrilhas",
+      "name": "Hipertrofia Avançada — C — Glúteos, posteriores e panturrilhas",
       "description": "Dia C: Glúteos, posteriores e panturrilhas. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
       "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nPonte de glúteos com carga — Halter/kettlebell: Pausa no topo.\nAgachamento sumô com kettlebell — Kettlebell: Base confortável.\nFlexora com elástico — Elástico: Fixação segura.\nSubida em plataforma baixa com halteres — Halteres: Plataforma estável.\nAbdução sentado com elástico — Elástico: Controle; realizar sentado, com elástico acima dos joelhos.\nElevação de panturrilha unilateral com halter — Halter: Apoio seguro.",
       "restSeconds": 90,
@@ -391,7 +391,7 @@
     },
     {
       "id": "treino-gpt-v1-d",
-      "name": "Treino GPT v1 — D — Costas, bíceps e abdômen",
+      "name": "Hipertrofia Avançada — D — Costas, bíceps e abdômen",
       "description": "Dia D: Costas, bíceps e abdômen. Hipertrofia em casa; preservar séries, repetições, descanso e RIR de cada exercício.",
       "notes": "Escolha a carga atual para cumprir a faixa de repetições e o RIR indicado; cargas históricas não são prescrições atuais.\nCardio separado.\nObservações por exercício:\nRemada unilateral com apoio firme — Halter: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nRemada curvada com 2 halteres — Halteres: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nPullover no chão com halter — Halter: Carga atual a definir pelo RIR, sem usar o histórico como meta..\nPuxada alta com elástico — Polia + elástico: Fixação superior segura.\nRosca concentrada sentada — Halter: Carga a confirmar.\nRosca martelo unilateral — Halter: Sem balanço.\nPrancha — Tapete: Sem dor lombar.",
       "restSeconds": 90,
@@ -459,6 +459,242 @@
         "biceps",
         "abdomen"
       ]
+    },
+    {
+      "id": "turbo-kelw-a",
+      "name": "Turbo Kelw — A — Quadríceps, posteriores de coxa, glúteos, peito, costas, ombros, panturrilhas e core",
+      "description": "Treino A — segunda-feira. Quadríceps, posteriores de coxa, glúteos, peito, costas, ombros, panturrilhas e core. Aproximadamente 45–60 minutos.",
+      "notes": "Objetivo: hipertrofia equilibrada do corpo todo e fortalecimento do tronco.\nFrequência: 3 vezes por semana, em dias alternados.\nDivisão: segunda A · quarta B · sexta C.\nDuração: aproximadamente 45–60 minutos.\nEquipamentos: halteres, anilhas, bola de Pilates e tapete.\n\nAs séries são de trabalho; o aquecimento não entra na contagem. Nos exercícios unilaterais, completar os dois lados corresponde a uma série.\n\nORIENTAÇÕES GERAIS\nAquecimento: 5 minutos de caminhada ou marcha no lugar, seguidos de uma série leve dos primeiros exercícios. Não precisa cansar.\n\nCarga inicial: escolher uma carga que permita terminar cada série com capacidade para fazer mais 3 repetições com boa técnica. Não há carga fixa em quilos definida.\n\nPrimeiras duas semanas: realizar as 2 séries indicadas, sem chegar à falha.\n\nA partir da terceira semana: se estiver recuperando bem, sem piora da lombar e dentro do tempo disponível, aumentar gradualmente os quatro primeiros exercícios de cada treino para 3 séries. Manter os demais com 2 séries.\n\nProgressão: quando alcançar o máximo de repetições em todas as séries, ainda conseguindo mais 2 repetições bem executadas, aumentar a carga pelo menor incremento disponível. Depois, retornar à parte baixa da faixa de repetições.\n\nRespiração: soltar o ar durante o esforço e inspirar durante o retorno, evitando prender a respiração por períodos prolongados.\n\nQuarto dia opcional: caminhada confortável de 20–30 minutos durante a fase de retorno.\n\nLombar: reduzir a carga ou interromper qualquer exercício que aumente o incômodo. O fortalecimento proposto não substitui avaliação da dor persistente por fisioterapeuta ou médico.\n\nORIENTAÇÕES POR EXERCÍCIO\n1. Agachamento goblet\nSegure o halter junto ao peito, mantenha os pés totalmente apoiados e desça até uma amplitude confortável. Joelhos acompanham a direção dos pés.\n\n2. Supino no chão\nDeitado com joelhos dobrados e pés apoiados, desça até os braços encostarem suavemente no chão. Mantenha os punhos alinhados e empurre sem bater os halteres.\n\n3. Remada unilateral com apoio firme\nApoie a mão livre em uma superfície firme. Puxe o cotovelo em direção ao quadril, mantendo o tronco parado e sem girar. Descanso após completar os dois lados.\n\n4. Flexora na bola suíça\nDeitado, coloque os calcanhares na bola. Eleve o quadril e dobre os joelhos, trazendo a bola em sua direção. Retorne lentamente, sem exagerar no arco da lombar.\nAlternativa se faltar controle: ponte com calcanhares no chão mais afastados do quadril, 2 × 10–15.\n\n5. Elevação lateral\nMantenha cotovelos levemente dobrados e eleve os braços até uma altura confortável, próxima da linha dos ombros. Evite balanço do corpo.\n\n6. Panturrilha em pé com apoio\nSegure um apoio firme, eleve os calcanhares e desça devagar. Comece com os dois pés; acrescente um halter quando ficar fácil.\n\n7. Perdigueiro (bird dog)\nCom mãos sob os ombros e joelhos sob os quadris, estenda braço e perna opostos. Evite girar a bacia ou arquear a lombar. Respire durante a sustentação. Faça 6 repetições por lado, sustentando 3 segundos. Completar os dois lados corresponde a uma série.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "goblet-squat",
+          "sets": "2",
+          "reps": "8-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Segure o halter junto ao peito, mantenha os pés totalmente apoiados e desça até uma amplitude confortável. Joelhos acompanham a direção dos pés."
+        },
+        {
+          "exerciseId": "supino-chao",
+          "sets": "2",
+          "reps": "8-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado com joelhos dobrados e pés apoiados, desça até os braços encostarem suavemente no chão. Mantenha os punhos alinhados e empurre sem bater os halteres."
+        },
+        {
+          "exerciseId": "remada-unilateral-apoio",
+          "sets": "2",
+          "reps": "10-12 por lado",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Apoie a mão livre em uma superfície firme. Puxe o cotovelo em direção ao quadril, mantendo o tronco parado e sem girar. Descanso após completar os dois lados."
+        },
+        {
+          "exerciseId": "flexora-bola",
+          "sets": "2",
+          "reps": "8-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado, coloque os calcanhares na bola. Eleve o quadril e dobre os joelhos, trazendo a bola em sua direção. Retorne lentamente, sem exagerar no arco da lombar.\nAlternativa se faltar controle: ponte com calcanhares no chão mais afastados do quadril, 2 × 10–15."
+        },
+        {
+          "exerciseId": "elevacao-lateral",
+          "sets": "2",
+          "reps": "12-15",
+          "rest": "60-90s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha cotovelos levemente dobrados e eleve os braços até uma altura confortável, próxima da linha dos ombros. Evite balanço do corpo."
+        },
+        {
+          "exerciseId": "panturrilha-em-pe-apoio",
+          "sets": "2",
+          "reps": "12-20",
+          "rest": "60-90s",
+          "rir": "",
+          "load": "",
+          "instructions": "Segure um apoio firme, eleve os calcanhares e desça devagar. Comece com os dois pés; acrescente um halter quando ficar fácil."
+        },
+        {
+          "exerciseId": "bird-dog",
+          "sets": "2",
+          "reps": "6 por lado (3s)",
+          "rest": "60s",
+          "rir": "",
+          "load": "",
+          "instructions": "Com mãos sob os ombros e joelhos sob os quadris, estenda braço e perna opostos. Evite girar a bacia ou arquear a lombar. Respire durante a sustentação. Faça 6 repetições por lado, sustentando 3 segundos. Completar os dois lados corresponde a uma série."
+        }
+      ],
+      "groups": [
+        "quadriceps",
+        "peito",
+        "costas",
+        "posterior",
+        "ombros",
+        "panturrilha",
+        "lombar"
+      ]
+    },
+    {
+      "id": "turbo-kelw-b",
+      "name": "Turbo Kelw — B — Quadríceps, glúteos, peito, costas, bíceps e abdômen lateral",
+      "description": "Treino B — quarta-feira. Quadríceps, glúteos, peito, costas, bíceps e abdômen lateral. Aproximadamente 45–60 minutos.",
+      "notes": "Objetivo: hipertrofia equilibrada do corpo todo e fortalecimento do tronco.\nFrequência: 3 vezes por semana, em dias alternados.\nDivisão: segunda A · quarta B · sexta C.\nDuração: aproximadamente 45–60 minutos.\nEquipamentos: halteres, anilhas, bola de Pilates e tapete.\n\nAs séries são de trabalho; o aquecimento não entra na contagem. Nos exercícios unilaterais, completar os dois lados corresponde a uma série.\n\nORIENTAÇÕES GERAIS\nAquecimento: 5 minutos de caminhada ou marcha no lugar, seguidos de uma série leve dos primeiros exercícios. Não precisa cansar.\n\nCarga inicial: escolher uma carga que permita terminar cada série com capacidade para fazer mais 3 repetições com boa técnica. Não há carga fixa em quilos definida.\n\nPrimeiras duas semanas: realizar as 2 séries indicadas, sem chegar à falha.\n\nA partir da terceira semana: se estiver recuperando bem, sem piora da lombar e dentro do tempo disponível, aumentar gradualmente os quatro primeiros exercícios de cada treino para 3 séries. Manter os demais com 2 séries.\n\nProgressão: quando alcançar o máximo de repetições em todas as séries, ainda conseguindo mais 2 repetições bem executadas, aumentar a carga pelo menor incremento disponível. Depois, retornar à parte baixa da faixa de repetições.\n\nRespiração: soltar o ar durante o esforço e inspirar durante o retorno, evitando prender a respiração por períodos prolongados.\n\nQuarto dia opcional: caminhada confortável de 20–30 minutos durante a fase de retorno.\n\nLombar: reduzir a carga ou interromper qualquer exercício que aumente o incômodo. O fortalecimento proposto não substitui avaliação da dor persistente por fisioterapeuta ou médico.\n\nORIENTAÇÕES POR EXERCÍCIO\n1. Agachamento dividido com apoio — afundo parado\nMantenha um pé à frente e outro atrás, ambos no chão. Use apoio firme e desça dobrando os joelhos. Comece sem carga; acrescente halter quando controlar o movimento. Descanso após completar os dois lados.\n\n2. Flexão de braço\nMantenha o tronco alinhado e dobre os cotovelos sem abri-los excessivamente. Se necessário, faça com joelhos no tapete ou mãos em uma superfície elevada e firme.\n\n3. Remada unilateral com apoio firme\nApoie a mão livre em superfície firme e puxe o cotovelo em direção ao quadril. Evite impulso e rotação do tronco. Descanso após completar os dois lados.\n\n4. Ponte de glúteos no chão\nDeitado, dobre os joelhos e apoie os pés no chão. Eleve o quadril contraindo os glúteos, sem hiperestender a lombar.\nCarga: se estiver fácil, use halter sobre o quadril, segurando-o com as mãos e protegendo o contato com uma toalha.\n\n5. Rosca direta com halteres\nMantenha os cotovelos próximos ao corpo. Dobre os braços sem balançar o tronco e desça de forma controlada.\n\n6. Prancha lateral com joelhos apoiados\nApoie o antebraço com o cotovelo abaixo do ombro e mantenha os joelhos dobrados. Eleve o quadril, alinhando ombros, quadril e joelhos. Respire normalmente. Sustente 15–25 segundos por lado. Completar os dois lados corresponde a uma série. Descanso após completar os dois lados.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "agachamento-dividido-apoio",
+          "sets": "2",
+          "reps": "8-12 por perna",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha um pé à frente e outro atrás, ambos no chão. Use apoio firme e desça dobrando os joelhos. Comece sem carga; acrescente halter quando controlar o movimento. Descanso após completar os dois lados."
+        },
+        {
+          "exerciseId": "flexao",
+          "sets": "2",
+          "reps": "6-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha o tronco alinhado e dobre os cotovelos sem abri-los excessivamente. Se necessário, faça com joelhos no tapete ou mãos em uma superfície elevada e firme."
+        },
+        {
+          "exerciseId": "remada-unilateral-apoio",
+          "sets": "2",
+          "reps": "10-12 por lado",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Apoie a mão livre em superfície firme e puxe o cotovelo em direção ao quadril. Evite impulso e rotação do tronco. Descanso após completar os dois lados."
+        },
+        {
+          "exerciseId": "ponte-gluteos-chao-opcional",
+          "sets": "2",
+          "reps": "10-15",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado, dobre os joelhos e apoie os pés no chão. Eleve o quadril contraindo os glúteos, sem hiperestender a lombar.\nCarga: se estiver fácil, use halter sobre o quadril, segurando-o com as mãos e protegendo o contato com uma toalha."
+        },
+        {
+          "exerciseId": "rosca-direta",
+          "sets": "2",
+          "reps": "10-15",
+          "rest": "60-90s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha os cotovelos próximos ao corpo. Dobre os braços sem balançar o tronco e desça de forma controlada."
+        },
+        {
+          "exerciseId": "prancha-lateral-joelhos",
+          "sets": "2",
+          "reps": "15-25s por lado",
+          "rest": "60s",
+          "rir": "",
+          "load": "",
+          "instructions": "Apoie o antebraço com o cotovelo abaixo do ombro e mantenha os joelhos dobrados. Eleve o quadril, alinhando ombros, quadril e joelhos. Respire normalmente. Sustente 15–25 segundos por lado. Completar os dois lados corresponde a uma série. Descanso após completar os dois lados."
+        }
+      ],
+      "groups": [
+        "quadriceps",
+        "peito",
+        "costas",
+        "gluteos",
+        "biceps",
+        "abdomen"
+      ]
+    },
+    {
+      "id": "turbo-kelw-c",
+      "name": "Turbo Kelw — C — Quadríceps, posteriores de coxa, glúteos, peito, costas, tríceps, panturrilhas e abdômen",
+      "description": "Treino C — sexta-feira. Quadríceps, posteriores de coxa, glúteos, peito, costas, tríceps, panturrilhas e abdômen. Aproximadamente 45–60 minutos.",
+      "notes": "Objetivo: hipertrofia equilibrada do corpo todo e fortalecimento do tronco.\nFrequência: 3 vezes por semana, em dias alternados.\nDivisão: segunda A · quarta B · sexta C.\nDuração: aproximadamente 45–60 minutos.\nEquipamentos: halteres, anilhas, bola de Pilates e tapete.\n\nAs séries são de trabalho; o aquecimento não entra na contagem. Nos exercícios unilaterais, completar os dois lados corresponde a uma série.\n\nORIENTAÇÕES GERAIS\nAquecimento: 5 minutos de caminhada ou marcha no lugar, seguidos de uma série leve dos primeiros exercícios. Não precisa cansar.\n\nCarga inicial: escolher uma carga que permita terminar cada série com capacidade para fazer mais 3 repetições com boa técnica. Não há carga fixa em quilos definida.\n\nPrimeiras duas semanas: realizar as 2 séries indicadas, sem chegar à falha.\n\nA partir da terceira semana: se estiver recuperando bem, sem piora da lombar e dentro do tempo disponível, aumentar gradualmente os quatro primeiros exercícios de cada treino para 3 séries. Manter os demais com 2 séries.\n\nProgressão: quando alcançar o máximo de repetições em todas as séries, ainda conseguindo mais 2 repetições bem executadas, aumentar a carga pelo menor incremento disponível. Depois, retornar à parte baixa da faixa de repetições.\n\nRespiração: soltar o ar durante o esforço e inspirar durante o retorno, evitando prender a respiração por períodos prolongados.\n\nQuarto dia opcional: caminhada confortável de 20–30 minutos durante a fase de retorno.\n\nLombar: reduzir a carga ou interromper qualquer exercício que aumente o incômodo. O fortalecimento proposto não substitui avaliação da dor persistente por fisioterapeuta ou médico.\n\nORIENTAÇÕES POR EXERCÍCIO\n1. Agachamento goblet\nSegure o halter próximo ao peito, mantenha os pés apoiados e desça com controle. Não force a profundidade.\n\n2. Supino no chão\nMantenha joelhos dobrados, pés apoiados e punhos alinhados. Encoste os braços suavemente no chão antes de subir.\n\n3. Remada unilateral com apoio firme\nMantenha apoio firme e tronco estável. Puxe o cotovelo em direção ao quadril, sem girar o corpo. Descanso após completar os dois lados.\n\n4. Flexora na bola suíça\nDeitado com calcanhares na bola, eleve o quadril e puxe a bola dobrando os joelhos. Estenda novamente com controle.\nAlternativa se faltar controle: ponte com calcanhares no chão mais afastados do quadril, 2 × 10–15.\n\n5. Tríceps testa com halteres no chão\nDeitado, mantenha as palmas voltadas uma para a outra. Dobre os cotovelos, levando os halteres ao lado da cabeça, e estenda com controle. Use carga leve no início.\n\n6. Panturrilha em pé com apoio\nSuba os calcanhares sem impulso e desça devagar. Use apoio firme para equilibrar e acrescente carga conforme a facilidade.\n\n7. Isometria abdominal com bola — pressão de mãos e joelhos\nDeitado, mantenha quadris e joelhos dobrados, com a bola entre as mãos e os joelhos. Pressione a bola suavemente pelos dois lados, mantendo a lombar confortável e respirando. Cada série tem 5 pressões de 5 segundos, com aproximadamente 5 segundos de descanso entre pressões. Descanse 60 segundos entre séries.",
+      "restSeconds": 90,
+      "visibility": "public",
+      "items": [
+        {
+          "exerciseId": "goblet-squat",
+          "sets": "2",
+          "reps": "10-15",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Segure o halter próximo ao peito, mantenha os pés apoiados e desça com controle. Não force a profundidade."
+        },
+        {
+          "exerciseId": "supino-chao",
+          "sets": "2",
+          "reps": "8-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha joelhos dobrados, pés apoiados e punhos alinhados. Encoste os braços suavemente no chão antes de subir."
+        },
+        {
+          "exerciseId": "remada-unilateral-apoio",
+          "sets": "2",
+          "reps": "10-12 por lado",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Mantenha apoio firme e tronco estável. Puxe o cotovelo em direção ao quadril, sem girar o corpo. Descanso após completar os dois lados."
+        },
+        {
+          "exerciseId": "flexora-bola",
+          "sets": "2",
+          "reps": "8-12",
+          "rest": "90-120s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado com calcanhares na bola, eleve o quadril e puxe a bola dobrando os joelhos. Estenda novamente com controle.\nAlternativa se faltar controle: ponte com calcanhares no chão mais afastados do quadril, 2 × 10–15."
+        },
+        {
+          "exerciseId": "triceps-testa-chao",
+          "sets": "2",
+          "reps": "10-15",
+          "rest": "60-90s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado, mantenha as palmas voltadas uma para a outra. Dobre os cotovelos, levando os halteres ao lado da cabeça, e estenda com controle. Use carga leve no início."
+        },
+        {
+          "exerciseId": "panturrilha-em-pe-apoio",
+          "sets": "2",
+          "reps": "12-20",
+          "rest": "60-90s",
+          "rir": "",
+          "load": "",
+          "instructions": "Suba os calcanhares sem impulso e desça devagar. Use apoio firme para equilibrar e acrescente carga conforme a facilidade."
+        },
+        {
+          "exerciseId": "isometria-abdominal-bola",
+          "sets": "2",
+          "reps": "5 × 5s",
+          "rest": "60s",
+          "rir": "",
+          "load": "",
+          "instructions": "Deitado, mantenha quadris e joelhos dobrados, com a bola entre as mãos e os joelhos. Pressione a bola suavemente pelos dois lados, mantendo a lombar confortável e respirando. Cada série tem 5 pressões de 5 segundos, com aproximadamente 5 segundos de descanso entre pressões. Descanse 60 segundos entre séries."
+        }
+      ],
+      "groups": [
+        "quadriceps",
+        "peito",
+        "costas",
+        "posterior",
+        "triceps",
+        "panturrilha",
+        "abdomen"
+      ]
     }
   ],
   "structures": [
@@ -476,7 +712,7 @@
     },
     {
       "id": "treino-gpt-v1",
-      "name": "Treino GPT v1",
+      "name": "Hipertrofia Avançada",
       "description": "Divisão ABCD para hipertrofia em casa, com prioridade para pernas e abdômen. Quatro dias por semana, sessões planejadas de 45–60 minutos e cardio separado. Siga A → B → C → D; um ciclo tem quatro sessões e pode ser recomeçado ao concluir.",
       "duration": 4,
       "workoutIds": [
@@ -486,6 +722,51 @@
         "treino-gpt-v1-d"
       ],
       "visibility": "public"
+    },
+    {
+      "id": "turbo-kelw",
+      "name": "Turbo Kelw",
+      "description": "Objetivo: hipertrofia equilibrada do corpo todo e fortalecimento do tronco.\nFrequência: 3 vezes por semana, em dias alternados.\nDivisão: segunda A · quarta B · sexta C.\nDuração: aproximadamente 45–60 minutos.\nEquipamentos: halteres, anilhas, bola de Pilates e tapete.\n\nAs séries são de trabalho; o aquecimento não entra na contagem. Nos exercícios unilaterais, completar os dois lados corresponde a uma série.\n\nUm ciclo tem 3 sessões (A, B e C); ao concluir, recomece a sequência na semana seguinte.\n\nAquecimento: 5 minutos de caminhada ou marcha no lugar, seguidos de uma série leve dos primeiros exercícios. Não precisa cansar.\n\nCarga inicial: escolher uma carga que permita terminar cada série com capacidade para fazer mais 3 repetições com boa técnica. Não há carga fixa em quilos definida.\n\nPrimeiras duas semanas: realizar as 2 séries indicadas, sem chegar à falha.\n\nA partir da terceira semana: se estiver recuperando bem, sem piora da lombar e dentro do tempo disponível, aumentar gradualmente os quatro primeiros exercícios de cada treino para 3 séries. Manter os demais com 2 séries.\n\nProgressão: quando alcançar o máximo de repetições em todas as séries, ainda conseguindo mais 2 repetições bem executadas, aumentar a carga pelo menor incremento disponível. Depois, retornar à parte baixa da faixa de repetições.\n\nRespiração: soltar o ar durante o esforço e inspirar durante o retorno, evitando prender a respiração por períodos prolongados.\n\nQuarto dia opcional: caminhada confortável de 20–30 minutos durante a fase de retorno.\n\nLombar: reduzir a carga ou interromper qualquer exercício que aumente o incômodo. O fortalecimento proposto não substitui avaliação da dor persistente por fisioterapeuta ou médico.",
+      "duration": 3,
+      "workoutIds": [
+        "turbo-kelw-a",
+        "turbo-kelw-b",
+        "turbo-kelw-c"
+      ],
+      "visibility": "public"
+    }
+  ],
+  "renames": [
+    {
+      "kind": "workout",
+      "id": "treino-gpt-v1-a",
+      "from": "Treino GPT v1 — A — Quadríceps, panturrilhas e abdômen",
+      "to": "Hipertrofia Avançada — A — Quadríceps, panturrilhas e abdômen"
+    },
+    {
+      "kind": "workout",
+      "id": "treino-gpt-v1-b",
+      "from": "Treino GPT v1 — B — Peito, ombros e tríceps",
+      "to": "Hipertrofia Avançada — B — Peito, ombros e tríceps"
+    },
+    {
+      "kind": "workout",
+      "id": "treino-gpt-v1-c",
+      "from": "Treino GPT v1 — C — Glúteos, posteriores e panturrilhas",
+      "to": "Hipertrofia Avançada — C — Glúteos, posteriores e panturrilhas"
+    },
+    {
+      "kind": "workout",
+      "id": "treino-gpt-v1-d",
+      "from": "Treino GPT v1 — D — Costas, bíceps e abdômen",
+      "to": "Hipertrofia Avançada — D — Costas, bíceps e abdômen"
+    },
+    {
+      "kind": "structure",
+      "id": "treino-gpt-v1",
+      "from": "Treino GPT v1",
+      "to": "Hipertrofia Avançada"
     }
   ]
 }
+
