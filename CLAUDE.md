@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v60**.
+- Versão atual: **v61**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -48,6 +48,7 @@ Outros cuidados:
 - **Exercício:**
   - Cards de prescrição, botão compacto "Ver execução", séries registráveis, Minha carga e Minhas observações vêm nessa ordem. O vídeo só carrega ao abrir um diálogo separado, vertical 9:16, com tela cheia e modo expandido quando a API nativa não está disponível. Fechar interrompe o vídeo, preserva o formulário e restaura a rolagem e o foco. Evolução e instruções ficam abaixo.
   - O peso da primeira série preenche as seguintes. A origem do preenchimento é preservada na sessão para atualizar valores herdados e respeitar ajustes manuais e séries já concluídas. Minha carga usa a primeira série como referência, enquanto o gráfico mantém o máximo realizado.
+  - Minha carga é um card com o peso atual que abre o gráfico e ajustes em um diálogo; para peso corporal aparece Minha evolução. Minhas observações é um card com prévia que abre o editor. Os mesmos campos são movidos para o diálogo e devolvidos ao fechar, preservando eventos e valores; rolagem e foco são restaurados. A tabela possui cabeçalho e colunas alinhadas Série, Carga (kg), Reps e check, com variantes para tempo/unilateral/sem carga.
   - O check inicia o descanso com timer. O timer sobrevive a recarregar a página, emite bipe e mantém a tela ligada.
   - Descanso configurável por treino; RIR com tooltip; "Última vez" em cada série.
 - **Execução do treino:**

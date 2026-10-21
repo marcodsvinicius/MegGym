@@ -129,11 +129,19 @@
 
   // "Minhas observações" de um exercício: salvas só para o usuário, automaticamente.
   function personalNoteHtml(exerciseId) {
+    const note = Store.exerciseNote(user.id, exerciseId);
     return `
       <section class="sheet-section my-note">
-        <h3><label for="ex-note">Minhas observações</label></h3>
-        <textarea class="textarea textarea-sm" id="ex-note" data-note-exercise="${escapeHtml(exerciseId)}" maxlength="1000" placeholder="Ex.: usei 12 kg, subir para 14 na próxima; sentir mais o peito…">${escapeHtml(Store.exerciseNote(user.id, exerciseId))}</textarea>
-        <p class="meta" id="ex-note-status">Só você vê. Salva automaticamente.</p>
+        <button class="exercise-summary" type="button" data-personal-card="note" aria-haspopup="dialog">
+          <span class="exercise-summary-icon">${icon("edit_note")}</span>
+          <span class="exercise-summary-copy"><span class="exercise-summary-label">Minhas observações</span><span class="exercise-summary-value" data-note-summary="${escapeHtml(exerciseId)}">${escapeHtml(note || "Adicionar observação")}</span></span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="exercise-card-content" hidden>
+          <label for="ex-note">Sua observação</label>
+          <textarea class="textarea textarea-sm" id="ex-note" data-note-exercise="${escapeHtml(exerciseId)}" maxlength="1000" placeholder="Ex.: manter o movimento controlado…">${escapeHtml(note)}</textarea>
+          <p class="meta" id="ex-note-status">Só você vê. Salva automaticamente.</p>
+        </div>
       </section>`;
   }
 
@@ -141,11 +149,16 @@
   function loadFieldsHtml(ex) {
     const weight = usesWeight(ex);
     const band = usesBand(ex);
-    if (!weight && !band) return "";
     const load = Store.exerciseLoad(user.id, ex.id);
     return `
       <section class="sheet-section my-load" data-load-exercise="${escapeHtml(ex.id)}">
-        <h3>Minha carga</h3>
+        <button class="exercise-summary" type="button" data-personal-card="load" aria-haspopup="dialog">
+          <span class="exercise-summary-icon">${icon("fitness_center")}</span>
+          <span class="exercise-summary-copy"><span class="exercise-summary-label">${weight || band ? "Minha carga" : "Minha evolução"}</span><span class="exercise-summary-value" data-load-summary="${escapeHtml(ex.id)}">${escapeHtml(loadText(load, ex) || (weight || band ? "Ver evolução e ajustar carga" : "Ver evolução das repetições"))}</span></span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="exercise-card-content" hidden>
+        <section class="sheet-section" data-weight-chart="${escapeHtml(ex.id)}">${weightChartHtml(ex.id)}</section>
         ${
           weight
             ? `<label class="weight-field">
@@ -171,7 +184,8 @@
               </div>`
             : ""
         }
-        <p class="meta" id="ex-load-status">Só você vê. Salva automaticamente.</p>
+        ${weight || band ? `<p class="meta" id="ex-load-status">Só você vê. Salva automaticamente.</p>` : ""}
+        </div>
       </section>`;
   }
 
@@ -187,6 +201,9 @@
       el.classList.toggle("hidden", !text);
       el.querySelector("span:not(.mi)").textContent = text;
     });
+    document.querySelectorAll(`[data-load-summary="${CSS.escape(exerciseId)}"]`).forEach((el) => {
+      el.textContent = text || (ex && (usesWeight(ex) || usesBand(ex)) ? "Ver evolução e ajustar carga" : "Ver evolução das repetições");
+    });
   }
 
   let weightLogTimer;
@@ -194,6 +211,7 @@
     const box = document.querySelector("[data-load-exercise]");
     if (!box) return;
     const id = box.dataset.loadExercise;
+    const controls = box.querySelector(".exercise-card-content") || box;
     const status = $("ex-load-status");
     const saved = () => {
       if (status) status.textContent = "Salvo. Só você vê.";
@@ -216,10 +234,10 @@
         }, 800);
       });
     }
-    box.querySelectorAll("[data-band]").forEach((btn) =>
+    controls.querySelectorAll("[data-band]").forEach((btn) =>
       btn.addEventListener("click", () => {
         const already = btn.getAttribute("aria-checked") === "true";
-        box.querySelectorAll("[data-band]").forEach((b) => b.setAttribute("aria-checked", "false"));
+        controls.querySelectorAll("[data-band]").forEach((b) => b.setAttribute("aria-checked", "false"));
         if (!already) btn.setAttribute("aria-checked", "true");
         Store.saveExerciseLoad(user.id, id, { band: already ? "" : btn.dataset.band });
         saved();
@@ -246,6 +264,9 @@
         const text = Store.exerciseNote(user.id, id);
         el.classList.toggle("hidden", !text);
         el.querySelector("span:not(.mi)").textContent = text;
+      });
+      document.querySelectorAll(`[data-note-summary="${CSS.escape(id)}"]`).forEach((el) => {
+        el.textContent = Store.exerciseNote(user.id, id) || "Adicionar observação";
       });
     };
     area.addEventListener("input", () => {
@@ -3887,14 +3908,14 @@
       return `
         <li class="set-row ${s.done ? "done" : ""} ${timed ? "timed" : ""} ${weight ? "weighted" : ""}" data-set="${i}">
           <span class="set-num" aria-hidden="true">${i + 1}</span>
-          <label class="set-field"><span class="visually-hidden">${timed ? "Segundos" : "Repetições"} da série ${i + 1}</span>
-            <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(timed ? String(secs) : prev?.reps || repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">${unit === "reps/lado" ? "/lado" : unit}</span></label>
           ${
             weight
               ? `<label class="set-field"><span class="visually-hidden">Peso da série ${i + 1}</span>
                   <input class="input input-sm" data-set-field="weight" data-weight-source="${s.weightSource === "first" ? "first" : s.weight ? "manual" : ""}" inputmode="decimal" maxlength="7" placeholder="${escapeHtml(myWeight || prev?.weight || "0")}" value="${escapeHtml(s.weight || "")}"><span class="set-unit">kg</span></label>`
               : ""
           }
+          <label class="set-field"><span class="visually-hidden">${timed ? "Segundos" : "Repetições"} da série ${i + 1}</span>
+            <input class="input input-sm" data-set-field="reps" inputmode="numeric" maxlength="4" placeholder="${escapeHtml(timed ? String(secs) : prev?.reps || repsText || "0")}" value="${escapeHtml(s.reps || "")}"><span class="set-unit">${unit === "reps/lado" ? "/lado" : unit}</span></label>
           ${
             timed
               ? `<button type="button" class="set-timer" data-set-timer="${secs}" aria-label="Iniciar cronômetro de ${secs} segundos da série ${i + 1}">${icon("play_arrow", "mi-inline")}<span>${secs}s</span></button>`
@@ -3910,7 +3931,10 @@
       <section class="sheet-section sets-log" data-sets-index="${run.index}" data-sets-exercise="${escapeHtml(ex.id)}">
         <h3>Séries</h3>
         ${last ? `<p class="meta">${icon("history", "mi-inline")} Comparando com ${escapeHtml(formatDateTime(last.date))}. Campos vazios usam o valor sugerido ao marcar.</p>` : ""}
-        <ol class="set-list">${rows}</ol>
+        <div class="sets-table ${weight ? "weighted" : ""} ${timed ? "timed" : ""}">
+          <div class="sets-table-head" aria-hidden="true"><span>Série</span>${weight ? "<span>Carga (kg)</span>" : ""}<span>${timed ? "Tempo (s)" : unit === "reps/lado" ? "Reps/lado" : "Reps"}</span>${timed ? `<span>${icon("timer")}</span>` : ""}<span>${icon("check")}</span></div>
+          <ol class="set-list">${rows}</ol>
+        </div>
         <p class="meta">${timed ? `Toque em ${icon("play_arrow", "mi-inline")} para cronometrar a série; ao terminar ela é marcada e o descanso de ${run.restSeconds}s começa.` : `Marque a série ao terminar: o descanso de ${run.restSeconds}s começa sozinho.`}</p>
         <div id="sets-next-slot">${nextRunButtonHtml(run)}</div>
       </section>`;
@@ -4212,6 +4236,56 @@
 
   let expandedVideo = null;
   let nativeVideoFullscreen = false;
+  const personalDialog = document.createElement("dialog");
+  personalDialog.className = "execution-dialog personal-dialog";
+  personalDialog.setAttribute("aria-labelledby", "personal-dialog-title");
+  document.body.appendChild(personalDialog);
+  let personalCard = null;
+
+  function openPersonalCard(button) {
+    const host = button.closest(".my-load, .my-note");
+    const content = host?.querySelector(".exercise-card-content");
+    if (!content) return;
+    const note = button.dataset.personalCard === "note";
+    personalCard = { host, content, button, page: window.scrollY, sheet: $("sheet-content").scrollTop };
+    personalDialog.innerHTML = `<header class="execution-dialog-head"><h2 id="personal-dialog-title">${note ? "Minhas observações" : "Minha evolução"}</h2><button class="icon-btn" type="button" data-personal-close aria-label="Fechar painel" autofocus>${icon("close")}</button></header>`;
+    content.hidden = false;
+    personalDialog.appendChild(content);
+    personalDialog.insertAdjacentHTML("beforeend", `<button class="btn btn-block" type="button" data-personal-close>Voltar ao exercício</button>`);
+    document.body.classList.add("personal-dialog-open");
+    personalDialog.showModal();
+  }
+
+  function closePersonalCard(restoreFocus = true) {
+    if (!personalCard) return;
+    const { host, content, button, page, sheet: scroll } = personalCard;
+    // Salva o campo ativo antes de recolher o painel; os mesmos elementos voltam ao card.
+    personalDialog.querySelector("textarea")?.blur();
+    personalDialog.close();
+    content.hidden = true;
+    host.appendChild(content);
+    personalDialog.innerHTML = "";
+    document.body.classList.remove("personal-dialog-open");
+    $("sheet-content").scrollTop = scroll;
+    window.scrollTo({ top: page, behavior: "instant" });
+    if (restoreFocus && button.isConnected) button.focus({ preventScroll: true });
+    personalCard = null;
+  }
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-personal-card]");
+    if (button) openPersonalCard(button);
+  });
+  personalDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closePersonalCard();
+  });
+  personalDialog.addEventListener("click", (event) => {
+    if (event.target.closest("[data-personal-close]")) return closePersonalCard();
+    if (event.target !== personalDialog) return;
+    const rect = personalDialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closePersonalCard();
+  });
   const executionDialog = document.createElement("dialog");
   executionDialog.className = "execution-dialog";
   executionDialog.setAttribute("aria-labelledby", "execution-video-title");
@@ -4379,8 +4453,6 @@
         ${ex.description ? `<p class="exercise-desc">${escapeHtml(ex.description)}</p>` : `<p class="meta">Sem descrição.</p>`}
       </section>
 
-      <section class="sheet-section" data-weight-chart="${escapeHtml(ex.id)}">${weightChartHtml(ex.id)}</section>
-
       <section class="sheet-section">
         <h3>Equipamentos</h3>
         ${equip ? `<div class="equip-chips">${equip}</div>` : `<p class="meta">Nenhum — peso do corpo.</p>`}
@@ -4405,6 +4477,7 @@
   }
 
   function openSheet(exerciseId, prescription = {}) {
+    closePersonalCard(false);
     closeExecutionVideo(false);
     closeVideoFullscreen();
     const ex = findExercise(exerciseId);
@@ -4490,6 +4563,7 @@
   });
 
   function closeSheet(immediate = false) {
+    closePersonalCard(!immediate);
     closeExecutionVideo(!immediate);
     closeVideoFullscreen();
     clearTimeout(sheetCloseTimer);
@@ -4569,6 +4643,7 @@
     if (e.key === "Escape") {
       if (expandedVideo) { e.preventDefault(); closeVideoFullscreen(); }
       else if (executionDialog.open) { e.preventDefault(); closeExecutionVideo(); }
+      else if (personalDialog.open) { e.preventDefault(); closePersonalCard(); }
       else closeSheet();
     }
   });

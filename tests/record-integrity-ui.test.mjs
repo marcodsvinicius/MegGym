@@ -117,6 +117,7 @@ test("editar nota antiga preserva a carga atual; excluir corrige gráfico e reco
   await page.click('[data-confirm="yes"]');
   await page.waitForURL(/aba=historico/);
   await page.goto(server.url + "#/exercicios/ver/goblet-squat");
+  await page.click('[data-personal-card="load"]');
   await page.waitForSelector("[data-weight-chart]");
   assert.equal(await page.locator(".wbar").count(), 0);
   assert.equal(await page.locator(".pr-line").count(), 0);

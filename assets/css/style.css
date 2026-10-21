@@ -927,6 +927,22 @@ body.backend-supabase .github-only { display: none !important; }
   font: inherit; font-weight: 700; text-align: left; cursor: pointer;
 }
 .execution-preview .chevron { margin-left: auto; }
+.exercise-summary {
+  width: 100%; min-height: 76px; display: flex; align-items: center; gap: 14px;
+  padding: 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface-2); color: var(--text); font: inherit; text-align: left; cursor: pointer;
+}
+.exercise-summary-icon { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--surface); }
+.exercise-summary-copy { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.exercise-summary-label { font-size: .85rem; color: var(--text-muted); font-weight: 600; }
+.exercise-summary-value { font-size: 1rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.my-load .exercise-summary-value { font-size: 1.2rem; }
+.my-load, .my-note { flex: none; }
+.exercise-card-content:not([hidden]) { display: flex; flex-direction: column; gap: 14px; }
+.exercise-card-content[hidden] { display: none; }
+.personal-dialog { min-height: 240px; }
+body.personal-dialog-open { overflow: hidden; }
+body.personal-dialog-open .resume-dock { display: none; }
 .execution-thumbnail {
   position: relative; display: grid; place-items: center; flex: none;
   width: 64px; height: 48px; border-radius: 6px; overflow: hidden; background: var(--surface);
@@ -1210,7 +1226,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=60") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=61") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";
@@ -2013,6 +2029,26 @@ body.sheet-open .rest-bar { bottom: calc(12px + env(safe-area-inset-bottom)); }
 .set-row.done .set-check { border-color: var(--success); }
 :root[data-style="esportivo"] .set-row { border-color: var(--border); border-radius: 0; background: var(--surface); }
 :root[data-style="esportivo"] .set-check { border-radius: 0; }
+
+/* Tabela do exercício: cabeçalho e linhas compartilham as mesmas colunas. */
+.sets-table { --set-cols: 36px minmax(0, 1fr) 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); }
+.sets-table.weighted { --set-cols: 36px minmax(0, 1fr) minmax(0, 1fr) 44px; }
+.sets-table.timed { --set-cols: 30px minmax(0, 1fr) 56px 44px; }
+.sets-table.timed.weighted { --set-cols: 30px minmax(0, 1fr) minmax(0, 1fr) 56px 44px; }
+.sets-table .sets-table-head, .sets-table .set-row, .sets-table .set-row.timed, .sets-table .set-row.timed.weighted {
+  display: grid; grid-template-columns: var(--set-cols); gap: 8px; align-items: center;
+  padding: 12px 10px; margin: 0; border: 0; border-radius: 0; background: transparent;
+}
+.sets-table .sets-table-head { background: var(--surface-2); color: var(--text-muted); font-size: .75rem; font-weight: 700; text-align: center; }
+.sets-table .set-list { gap: 0; }
+.sets-table .set-row { border-top: 1px solid var(--border); }
+.sets-table .set-row.done { background: color-mix(in srgb, var(--success) 6%, var(--surface)); }
+.sets-table .set-num { width: auto; font-size: 1rem; }
+.sets-table .set-unit { display: none; }
+.sets-table .set-field .input { min-height: 44px; padding: 8px 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 1rem; }
+.sets-table .set-check { width: 44px; height: 44px; }
+.sets-table .set-timer { min-width: 0; width: 56px; height: 44px; padding: 0 2px; font-size: .8rem; }
+.sets-table .set-timer .mi { font-size: 18px; }
 
 /* ---------- Lista de execução ---------- */
 .run-item { padding: var(--card-pad); gap: var(--space-3); }

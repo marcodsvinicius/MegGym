@@ -1,5 +1,7 @@
 # MegGym
 
+Na versão 61, Minha carga e Minhas observações são cards compactos com valor e prévia. A carga abre um painel com gráfico de evolução e ajustes; as observações abrem um editor com salvamento automático. A tabela das séries reúne cabeçalho e linhas com série, carga, repetições e check, mantendo a propagação do primeiro peso, os exercícios de tempo e o descanso.
+
 Na versão 60, o vídeo fica no botão compacto "Ver execução", entre os cards de prescrição e as séries. Ao tocar, abre um painel com o vídeo vertical e tela cheia. Fechar interrompe o vídeo e retorna às séries com os campos, marcações, descanso e posição preservados. O player só carrega ao abrir; a miniatura tem alternativa visual se estiver indisponível.
 
 Na versão 59, Energia é o estilo padrão, ao lado de Esportivo, Pink Money e Arcade. Perfis antigos em Suave migram para Energia. A retomada do treino é fixa acima da navegação e dá espaço ao descanso. O peso da primeira série preenche as seguintes, preservando alterações individuais e séries feitas. A ordem do exercício agora é: cards de prescrição, vídeo vertical, séries, Minha carga e Minhas observações.

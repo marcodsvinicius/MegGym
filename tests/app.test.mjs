@@ -125,6 +125,7 @@ test("gráfico do exercício alterna peso e repetições", () =>
   withApp(async ({ page }) => {
     await seedUser(page);
     await page.goto(server.url + "#/exercicios/ver/arnold-press");
+    await page.click('[data-personal-card="load"]');
     await page.fill("#ex-weight", "10");
     await page.waitForSelector("[data-weight-chart] .wchart");
     await page.click('[data-chart-mode="reps"]');
@@ -384,4 +385,5 @@ test("busca global de exercícios, avanço no painel, sincronização de carga e
     await page.waitForURL(/aba=historico/);
     assert.equal(await page.evaluate(() => MegStore.history(MegStore.currentUser().id).length), 0);
   }));
+
 

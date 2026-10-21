@@ -59,10 +59,14 @@ test("cards, botão compacto, séries, carga e observações; player só carrega
     assert.equal(await page.locator(".exercise-video iframe").count(), 0);
   }
   // A carga abaixo das séries continua alimentando a sugestão de peso.
+  await page.click('[data-personal-card="load"]');
   await page.fill("#ex-weight", "14");
   assert.equal(await page.locator('[data-set-field="weight"]').first().getAttribute("placeholder"), "14");
+  await page.getByRole("button", { name: "Voltar ao exercício", exact: true }).click();
+  await page.click('[data-personal-card="note"]');
   await page.fill("#ex-note", "Apoio firme");
   await page.locator("#ex-note").blur();
+  await page.getByRole("button", { name: "Voltar ao exercício", exact: true }).click();
   assert.equal(await page.evaluate(() => MegStore.exerciseNote(MegStore.currentUser().id, "goblet-squat")), "Apoio firme");
 }));
 
@@ -136,7 +140,9 @@ test("fechar vídeo preserva campos, séries, descanso, rolagem e foco do treino
   await weights.first().fill("14");
   await page.locator('[data-set-field="reps"]').first().fill("12");
   await page.locator('[data-set-check]').first().click();
+  await page.click('[data-personal-card="note"]');
   await page.locator("#ex-note").fill("Apoio firme");
+  await page.getByRole("button", { name: "Voltar ao exercício", exact: true }).click();
   await page.locator(".execution-preview").scrollIntoViewIfNeeded();
   const scroll = await page.locator("#sheet-content").evaluate(el => el.scrollTop);
   const session = await page.evaluate(() => JSON.stringify(MegStore.session(MegStore.currentUser().id)));
