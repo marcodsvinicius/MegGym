@@ -565,6 +565,29 @@
 
   /* ---------- Backup (arquivo .json com tudo do usuário) ---------- */
 
+  // Leitura para análise: sem atualizar backup, migrar sessão ou incluir outros perfis.
+  function analysisData(userId) {
+    const user = users().find((u) => u.id === userId);
+    if (!user) return null;
+    const currentPlan = plan(userId);
+    const active = read(KEY.session + userId, null);
+    const followed = currentPlan?.structureId ? getStructure(currentPlan.structureId) : null;
+    const division = followed && canSeeWorkout(followed, userId) ? followed : null;
+    const ids = new Set([currentPlan?.workoutId, ...(division?.workoutIds || []), active?.workoutId]);
+    const mine = workouts().filter((w) => ownerOf(w) === userId || (ids.has(w.id) && canSeeWorkout(w, userId)));
+    return {
+      user: { name: user.name, age: user.age, sex: user.sex, equipment: user.equipment || [] },
+      plan: currentPlan, division,
+      workouts: mine,
+      history: history(userId),
+      session: active ? { ...active, workout: active.workout || getWorkout(active.workoutId) } : null,
+      notes: read(KEY.notes + userId, {}),
+      exerciseNotes: read(KEY.exerciseNotes + userId, {}),
+      exerciseLoads: read(KEY.exerciseLoads + userId, {}),
+      weightLog: read(KEY.weightLog + userId, {}),
+    };
+  }
+
   const PER_USER = ["session", "notes", "exerciseNotes", "exerciseLoads", "weightLog", "plan", "rest", "saved"];
 
   function exportBackup(userId) {
@@ -683,6 +706,7 @@
   }
 
   window.MegStore = {
+    analysisData,
     exportBackup,
     importBackup,
     isBackup,

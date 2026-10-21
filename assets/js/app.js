@@ -2512,7 +2512,7 @@
 
   function renderActivity(params) {
     setHeader("Atividade", {
-      action: `<a class="icon-btn" href="#/atividade/configuracoes" aria-label="Configurações" title="Configurações">
+      action: `<a class="icon-btn" href="#/atividade/exportar" aria-label="Exportar para análise" title="Exportar para análise">${icon("download")}</a><a class="icon-btn" href="#/atividade/configuracoes" aria-label="Configurações" title="Configurações">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </a>`,
     });
@@ -3010,6 +3010,15 @@
       </section>
 
       <section class="settings-group">
+        <h2 class="settings-title">Análise do treino</h2>
+        <div class="settings-list"><a class="settings-item" href="#/atividade/exportar">
+          <span class="settings-icon">${icon("download")}</span>
+          <span class="item-main"><span class="item-title">Exportar para análise</span><br><span class="meta">Treinos, histórico, cargas e observações para personal ou IA</span></span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a></div>
+      </section>
+
+      <section class="settings-group">
         <h2 class="settings-title">Backup</h2>
         <p class="meta" style="margin:0 0 10px">Seus dados ficam só neste aparelho. Salve um arquivo de backup para não perder histórico, pesos e anotações, ou para levar para outro celular.</p>
         <div class="settings-list">
@@ -3149,6 +3158,7 @@
         break;
       case "atividade":
         if (parts[1] === "configuracoes") renderSettings();
+        else if (parts[1] === "exportar") renderAnalysisExport();
         else if (parts[1] === "perfil") renderEditProfile();
         else if (parts[1] === "historico" && parts[2] && parts[3] === "editar") renderHistoryEdit(parts[2]);
         else if (parts[1] === "historico" && parts[2]) renderHistoryDetail(parts[2], params);
@@ -3330,6 +3340,57 @@
   }
 
   /* ================= Backup ================= */
+
+  function renderAnalysisExport() {
+    setTab("atividade");
+    setHeader("Exportar para análise", { back: "#/atividade" });
+    app.innerHTML = `
+      <p class="page-subtitle">Leve seus dados para conversar com um personal ou analisar com IA.</p>
+      <form class="form-stack" id="analysis-export-form">
+        <label class="field"><span>Período do histórico e da evolução</span>
+          <select class="input" id="analysis-period"><option value="0">Todo o histórico</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select>
+        </label>
+        <label class="analysis-profile"><input type="checkbox" id="analysis-profile" checked><span>Incluir nome, idade e sexo do perfil</span></label>
+        <p class="meta">O plano atual, o treino em andamento e suas cargas e observações atuais acompanham qualquer período.</p>
+        <div class="note-box" id="analysis-export-summary" role="status"></div>
+        <div class="settings-list">
+          <button class="settings-item" type="button" data-analysis-format="txt"><span class="settings-icon">${icon("download")}</span><span class="item-main"><span class="item-title">Baixar relatório (.txt)</span><br><span class="meta">Relatório completo para ler e enviar ao personal ou à IA</span></span></button>
+          <button class="settings-item" type="button" data-analysis-format="json"><span class="settings-icon">${icon("download")}</span><span class="item-main"><span class="item-title">Baixar dados completos (.json)</span><br><span class="meta">Dados organizados de treinos, sessões, séries e evolução</span></span></button>
+          <button class="settings-item" type="button" data-analysis-format="csv"><span class="settings-icon">${icon("download")}</span><span class="item-main"><span class="item-title">Baixar séries do histórico (.csv)</span><br><span class="meta">Uma linha por série para abrir no Excel ou Google Sheets</span></span></button>
+        </div>
+        <p class="meta">Os arquivos são gerados neste aparelho. Você escolhe onde compartilhar. Para restaurar seus dados em outro celular, use Exportar backup nas Configurações.</p>
+      </form>`;
+    const build = () => window.MegExport.build(Store.analysisData(user.id), { exercises: exercises(), groups: groups() }, {
+      days: Number($("analysis-period").value), includeProfile: $("analysis-profile").checked,
+    });
+    const refresh = () => {
+      const data = build();
+      $("analysis-export-summary").textContent = `${data.resumo.sessoes} sessões concluídas e ${data.resumo.seriesRealizadasComDetalhes} séries com detalhes no período. ${data.treinoEmAndamento ? "O treino em andamento será incluído separadamente." : "Nenhum treino em andamento."}`;
+    };
+    $("analysis-export-form").addEventListener("submit", e => e.preventDefault());
+    $("analysis-period").addEventListener("change", refresh);
+    $("analysis-export-form").addEventListener("click", (event) => {
+      const format = event.target.closest("[data-analysis-format]")?.dataset.analysisFormat;
+      if (!format) return;
+      try {
+        const data = build();
+        const content = format === "txt" ? window.MegExport.report(data) : format === "csv" ? window.MegExport.csv(data) : JSON.stringify(data, null, 2);
+        const mime = { txt: "text/plain;charset=utf-8", csv: "text/csv;charset=utf-8", json: "application/json;charset=utf-8" }[format];
+        const url = URL.createObjectURL(new Blob([content], { type: mime }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `meggym-analise-${data.geradoEm.replace(/[:.]/g, "-")}.${format}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast("Arquivo gerado para análise.", "success");
+      } catch {
+        toast("Não foi possível gerar o arquivo. Tente novamente.", "error");
+      }
+    });
+    refresh();
+  }
 
   function downloadBackup() {
     const data = Store.exportBackup(user.id);

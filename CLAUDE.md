@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v61**.
+- Versão atual: **v62**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -67,6 +67,7 @@ Outros cuidados:
 - **Treino GPT v1:** divisão ABCD manual, cadastrada em `data/workouts.json` (seed v5, sem apagar dados). Quatro sessões por ciclo, 25 exercícios, com séries, repetições, descanso, RIR e observações. Cargas atuais em branco. As variantes específicas foram adicionadas ao catálogo sem alterar os exercícios antigos.
 - **Formulário de treino:** exercícios primeiro, escolhidos numa folha (sheet); o resto fica em "Mais opções".
 - **Dados e qualidade:**
+  - Exportar para análise em Atividade e Configurações (`#/atividade/exportar`): TXT completo, JSON estruturado e CSV de séries históricas; filtro de todo o histórico/30/90 dias e opção de dados pessoais. `store.analysisData` é leitura pura e isolada por perfil; `export.js` transforma os dados, sem usar o backup nem mudar seu timestamp. Plano seguido/divisão, demais fichas próprias, sessão congelada com ordem/trocas/pulos, histórico, séries, evolução diária, cargas e notas atuais são incluídos. Séries ausentes não são estimadas, prescrição e resultados são separados; CSV tem proteção de fórmulas e BOM UTF-8. Funciona offline e está no CORE do SW.
   - Backup: exporta e importa com data e hora; a restauração é oferecida no cadastro.
   - Aviso de "nova versão"; tour de primeiro uso; telas vazias; animações; revisão de acessibilidade (axe).
   - Aviso quando o aparelho não consegue salvar (armazenamento cheio).

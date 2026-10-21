@@ -1,5 +1,9 @@
 # MegGym
 
+Na versão 62, Atividade e Configurações têm **Exportar para análise**. É possível baixar um relatório completo em TXT para personal ou IA, dados estruturados em JSON e as séries do histórico em CSV para planilhas. O usuário escolhe todo o histórico, 30 ou 90 dias e se inclui nome, idade e sexo. Plano atual, sessão em andamento, cargas e observações atuais acompanham o período. A exportação funciona no aparelho, sem rede, e não altera dados nem a data do backup.
+
+Os arquivos distinguem prescrição e resultados, sessões abertas e concluídas, valores atuais e históricos. Registros antigos sem detalhes não geram séries estimadas. A evolução combina o maior peso do dia com registros manuais, como no gráfico. O volume contabiliza somente séries de repetições com carga e quantidade registradas, sem multiplicar por halteres ou lados. A exportação para análise não é um arquivo de restauração; para isso, use o backup existente.
+
 Na versão 61, Minha carga e Minhas observações são cards compactos com valor e prévia. A carga abre um painel com gráfico de evolução e ajustes; as observações abrem um editor com salvamento automático. A tabela das séries reúne cabeçalho e linhas com série, carga, repetições e check, mantendo a propagação do primeiro peso, os exercícios de tempo e o descanso.
 
 Na versão 60, o vídeo fica no botão compacto "Ver execução", entre os cards de prescrição e as séries. Ao tocar, abre um painel com o vídeo vertical e tela cheia. Fechar interrompe o vídeo e retorna às séries com os campos, marcações, descanso e posição preservados. O player só carrega ao abrir; a miniatura tem alternativa visual se estiver indisponível.

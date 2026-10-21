@@ -646,6 +646,8 @@ body.backend-supabase .github-only { display: none !important; }
 .hello { margin: 8px 0 20px; }
 .lead { margin: 0 0 12px; color: var(--text-muted); white-space: pre-line; }
 .meta { margin: 6px 0 0; color: var(--text-muted); font-size: .85rem; }
+.analysis-profile { display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; }
+.analysis-profile input { width: 22px; height: 22px; flex: none; accent-color: var(--accent); }
 .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .label { font-weight: 600; font-size: .9rem; }
 .state-sm { padding: 18px 12px; font-size: .9rem; }
@@ -1227,7 +1229,7 @@ body.sheet-open { overflow: hidden; }
   font-style: normal;
   font-weight: 400 700;
   font-display: block;
-  src: url("../fonts/material-symbols-rounded.woff2?v=61") format("woff2");
+  src: url("../fonts/material-symbols-rounded.woff2?v=62") format("woff2");
 }
 .mi {
   font-family: "Material Symbols Rounded";

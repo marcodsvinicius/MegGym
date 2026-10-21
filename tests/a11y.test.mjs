@@ -16,7 +16,7 @@ test(`sem violações de acessibilidade (axe) em ${style}, claro e escuro`, asyn
   try {
     await seedUser(page);
     const id = await page.evaluate(() => MegStore.workouts()[0].id);
-    const screens = ["#/inicio", "#/treinos", "#/treinos?aba=explorar", `#/treinos/${id}`, "#/treinos/novo", "#/exercicios/grupo/peito", "#/exercicios/ver/prancha", "#/atividade", "#/atividade?aba=evolucao", "#/atividade?aba=historico", "#/atividade/configuracoes"];
+    const screens = ["#/inicio", "#/treinos", "#/treinos?aba=explorar", `#/treinos/${id}`, "#/treinos/novo", "#/exercicios/grupo/peito", "#/exercicios/ver/prancha", "#/atividade", "#/atividade?aba=evolucao", "#/atividade?aba=historico", "#/atividade/configuracoes", "#/atividade/exportar"];
     const problems = [];
       for (const theme of ["light", "dark"]) {
         await page.evaluate(([st, th]) => (MegTheme.setStyle(st), MegTheme.set(th)), [style, theme]);
