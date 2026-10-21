@@ -115,7 +115,7 @@ test("cards e painéis sem violações axe nos quatro temas e dois modos", () =>
     await page.evaluate(([st, th]) => (MegTheme.setStyle(st), MegTheme.set(th)), [style, mode]);
     for (const panel of [null, "load", "note"]) {
       if (panel) await page.click(`[data-personal-card="${panel}"]`);
-      const v = await page.evaluate(async () => (await axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] })).violations.map(x => `${x.id}: ${x.nodes[0]?.target.join(" ")}`));
+      const v = await page.evaluate(async () => (await axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] })).violations.map(x => `${x.id}: ${x.nodes[0]?.target.join(" ")} ${JSON.stringify(x.nodes[0]?.any)}`));
       v.forEach(x => problems.push(`${style}/${mode}/${panel}: ${x}`));
       if (panel) await page.getByRole("button", { name: "Fechar painel", exact: true }).click();
     }

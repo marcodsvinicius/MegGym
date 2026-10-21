@@ -94,7 +94,7 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
   await page.keyboard.press("Escape");
   assert.equal(await page.locator(".exercise-video.video-expanded").count(), 0);
   assert.equal(await page.locator("#sheet").isVisible(), true);
-  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), true);
+  assert.equal(await page.locator(".execution-dialog:not(.personal-dialog)").evaluate(el => el.open), true);
   assert.equal(await page.locator(".exercise-video iframe").getAttribute("src"), src);
   assert.equal(await page.locator(".exercise-video iframe").getAttribute("data-preserved"), "yes");
   await page.click("[data-video-fullscreen]");
@@ -131,7 +131,7 @@ test("recusa da tela cheia nativa usa expansão e navegação limpa o estado", (
   await page.waitForSelector(".page-title");
   assert.equal(await page.locator("body.video-fullscreen").count(), 0);
   assert.equal(await page.locator("body.execution-video-open").count(), 0);
-  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await page.locator(".execution-dialog:not(.personal-dialog)").evaluate(el => el.open), false);
   assert.equal(await page.locator(".exercise-video iframe").count(), 0);
 }));
 
@@ -149,7 +149,7 @@ test("fechar vídeo preserva campos, séries, descanso, rolagem e foco do treino
   await openVideo(page);
   await page.keyboard.press("Escape");
   assert.equal(await page.locator("#sheet").isVisible(), true);
-  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await page.locator(".execution-dialog:not(.personal-dialog)").evaluate(el => el.open), false);
   assert.equal(await weights.first().inputValue(), "14");
   assert.equal(await weights.nth(1).inputValue(), "14");
   assert.equal(await page.locator('[data-set-check]').first().getAttribute("aria-pressed"), "true");
@@ -169,10 +169,10 @@ test("catálogo também abre vídeo, fecha pelo fundo e conserva botão sem mini
   await page.locator("[data-video-thumbnail]").evaluate(el => el.dispatchEvent(new Event("error")));
   assert.equal(await page.locator("[data-video-thumbnail]").isVisible(), false);
   await openVideo(page);
-  const bounds = await page.locator(".execution-dialog").boundingBox();
+  const bounds = await page.locator(".execution-dialog:not(.personal-dialog)").boundingBox();
   assert.ok(bounds.y > 4);
   await page.mouse.click(4, 4);
-  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await page.locator(".execution-dialog:not(.personal-dialog)").evaluate(el => el.open), false);
   assert.equal(await page.locator(".exercise-page .execution-preview").isVisible(), true);
 }));
 
