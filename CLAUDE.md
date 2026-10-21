@@ -30,7 +30,7 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 ## A cada publicação (obrigatório)
 - Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v59**.
+- Versão atual: **v60**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
@@ -46,7 +46,7 @@ Outros cuidados:
 ## Funcionalidades prontas
 - **Integridade v57:** finalização só limpa a sessão após persistir o histórico e a carga; gravações em lote desfazem mudanças anteriores em caso de erro. Séries parciais entram no histórico. Sessões guardam a ficha original e migram sessões antigas antes de editar. Gráficos combinam resultados do histórico com cargas manuais identificadas; editar registros antigos não troca a carga atual. Backup validado integralmente antes de gravar, com reversão em caso de falha.
 - **Exercício:**
-  - Cards de prescrição, vídeo vertical 9:16, séries registráveis, Minha carga e Minhas observações vêm nessa ordem. O vídeo tem botão próprio de tela cheia e modo expandido quando a API nativa não está disponível. Evolução e instruções ficam abaixo.
+  - Cards de prescrição, botão compacto "Ver execução", séries registráveis, Minha carga e Minhas observações vêm nessa ordem. O vídeo só carrega ao abrir um diálogo separado, vertical 9:16, com tela cheia e modo expandido quando a API nativa não está disponível. Fechar interrompe o vídeo, preserva o formulário e restaura a rolagem e o foco. Evolução e instruções ficam abaixo.
   - O peso da primeira série preenche as seguintes. A origem do preenchimento é preservada na sessão para atualizar valores herdados e respeitar ajustes manuais e séries já concluídas. Minha carga usa a primeira série como referência, enquanto o gráfico mantém o máximo realizado.
   - O check inicia o descanso com timer. O timer sobrevive a recarregar a página, emite bipe e mantém a tela ligada.
   - Descanso configurável por treino; RIR com tooltip; "Última vez" em cada série.

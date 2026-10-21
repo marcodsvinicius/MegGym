@@ -4212,6 +4212,67 @@
 
   let expandedVideo = null;
   let nativeVideoFullscreen = false;
+  const executionDialog = document.createElement("dialog");
+  executionDialog.className = "execution-dialog";
+  executionDialog.setAttribute("aria-labelledby", "execution-video-title");
+  document.body.appendChild(executionDialog);
+  let videoReturnFocus = null;
+  let videoScroll = null;
+
+  function openExecutionVideo(button) {
+    const ex = findExercise(button.dataset.executionVideo);
+    const ytId = ex && youtubeId(ex.video);
+    if (!ytId) return;
+    videoReturnFocus = button;
+    videoScroll = { page: window.scrollY, sheet: $("sheet-content").scrollTop };
+    executionDialog.innerHTML = `
+      <header class="execution-dialog-head">
+        <h2 id="execution-video-title">Execução do exercício</h2>
+        <button class="icon-btn" type="button" data-video-close aria-label="Fechar vídeo" autofocus>${icon("close")}</button>
+      </header>
+      <div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
+        <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+        <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
+      </div>
+      <p class="execution-video-name">${escapeHtml(ex.name)}</p>
+      <button class="btn btn-block" type="button" data-video-close>Voltar às séries</button>`;
+    document.body.classList.add("execution-video-open");
+    executionDialog.showModal();
+  }
+
+  function closeExecutionVideo(restoreFocus = true) {
+    if (!executionDialog.open) return;
+    closeVideoFullscreen();
+    executionDialog.close();
+    executionDialog.innerHTML = ""; // Interrompe a reprodução ao voltar para as séries.
+    document.body.classList.remove("execution-video-open");
+    if (videoScroll) {
+      $("sheet-content").scrollTop = videoScroll.sheet;
+      window.scrollTo({ top: videoScroll.page, behavior: "instant" });
+    }
+    if (restoreFocus && videoReturnFocus?.isConnected) videoReturnFocus.focus({ preventScroll: true });
+    videoReturnFocus = null;
+    videoScroll = null;
+  }
+
+  executionDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    if (expandedVideo) closeVideoFullscreen();
+    else closeExecutionVideo();
+  });
+  executionDialog.addEventListener("click", (event) => {
+    if (event.target.closest("[data-video-close]")) return closeExecutionVideo();
+    if (event.target !== executionDialog || expandedVideo) return;
+    const rect = executionDialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeExecutionVideo();
+  });
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-execution-video]");
+    if (button) openExecutionVideo(button);
+  });
+  document.addEventListener("error", (event) => {
+    if (event.target.matches?.("[data-video-thumbnail]")) event.target.hidden = true;
+  }, true);
 
   function resetVideoFullscreen() {
     if (!expandedVideo) return;
@@ -4288,10 +4349,10 @@
     const groupCount = g ? exercises().filter((e) => inGroup(e, g.id)).length : 0;
 
     const mediaHtml = `${ytId
-        ? `<div class="exercise-video" role="group" aria-label="Vídeo de ${escapeHtml(ex.name)}">
-            <iframe class="video-frame" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?rel=0&playsinline=1" title="Vídeo: ${escapeHtml(ex.name)}" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
-            <button class="video-fullscreen-button" type="button" data-video-fullscreen aria-expanded="false">Tela cheia</button>
-          </div>`
+        ? `<button class="execution-preview" type="button" data-execution-video="${escapeHtml(ex.id)}" aria-haspopup="dialog">
+            <span class="execution-thumbnail" aria-hidden="true">${icon("smart_display")}<img data-video-thumbnail src="https://i.ytimg.com/vi/${encodeURIComponent(ytId)}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+            ${icon("play_arrow")}<span>Ver execução</span><span class="chevron" aria-hidden="true">›</span>
+          </button>`
         : videoUrl
           ? `<a class="btn btn-sm" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">${icon("smart_display", "mi-inline")} Abrir vídeo</a>`
           : img ? `<img class="sheet-image" src="${escapeHtml(img)}" alt="Demonstração: ${escapeHtml(ex.name)}">` : ""}`;
@@ -4344,6 +4405,7 @@
   }
 
   function openSheet(exerciseId, prescription = {}) {
+    closeExecutionVideo(false);
     closeVideoFullscreen();
     const ex = findExercise(exerciseId);
     if (!ex) return;
@@ -4428,6 +4490,7 @@
   });
 
   function closeSheet(immediate = false) {
+    closeExecutionVideo(!immediate);
     closeVideoFullscreen();
     clearTimeout(sheetCloseTimer);
     sheetCloseTimer = null;
@@ -4505,6 +4568,7 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       if (expandedVideo) { e.preventDefault(); closeVideoFullscreen(); }
+      else if (executionDialog.open) { e.preventDefault(); closeExecutionVideo(); }
       else closeSheet();
     }
   });

@@ -1,5 +1,7 @@
 # MegGym
 
+Na versão 60, o vídeo fica no botão compacto "Ver execução", entre os cards de prescrição e as séries. Ao tocar, abre um painel com o vídeo vertical e tela cheia. Fechar interrompe o vídeo e retorna às séries com os campos, marcações, descanso e posição preservados. O player só carrega ao abrir; a miniatura tem alternativa visual se estiver indisponível.
+
 Na versão 59, Energia é o estilo padrão, ao lado de Esportivo, Pink Money e Arcade. Perfis antigos em Suave migram para Energia. A retomada do treino é fixa acima da navegação e dá espaço ao descanso. O peso da primeira série preenche as seguintes, preservando alterações individuais e séries feitas. A ordem do exercício agora é: cards de prescrição, vídeo vertical, séries, Minha carga e Minhas observações.
 
 Na versão 58, o exercício abre com vídeo vertical (9:16) e botão próprio de tela cheia, seguido dos cards de prescrição, séries, Minha carga e Minhas observações. O modo expandido funciona também quando o navegador não oferece tela cheia nativa. Os vídeos já cadastrados continuam com os mesmos links; o player aceita Shorts e os demais links do YouTube.

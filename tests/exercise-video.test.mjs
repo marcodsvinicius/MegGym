@@ -1,7 +1,10 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { startServer, openApp, seedUser } from "./helpers.mjs";
 
+const axeSrc = await readFile(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8");
 let server;
 before(async () => { server = await startServer(); });
 after(() => server.close());
@@ -18,29 +21,42 @@ async function withApp(fn) {
     });
     await page.goto(server.url + `#/treinos/${id}/executar`);
     await page.locator(".run-item .item-main").click();
-    await page.waitForSelector(".exercise-video");
+    await page.waitForSelector(".execution-preview");
     await fn(page);
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 }
 
-test("cards vêm antes do vídeo vertical, séries, carga e observações nas telas mobile", () => withApp(async (page) => {
+async function openVideo(page) {
+  await page.click(".execution-preview");
+  await page.waitForSelector(".execution-dialog[open] .exercise-video");
+}
+
+test("cards, botão compacto, séries, carga e observações; player só carrega ao abrir", () => withApp(async (page) => {
   const sequence = await page.evaluate(() => {
     const content = document.querySelector("#sheet-content");
-    const selectors = [".stats", ".exercise-video", ".sets-log", ".my-load", ".my-note"];
+    const selectors = [".stats", ".execution-preview", ".sets-log", ".my-load", ".my-note"];
     return selectors.map((selector) => [...content.children].indexOf(content.querySelector(selector)));
   });
   assert.ok(sequence.every((n) => n >= 0));
   assert.deepEqual(sequence, [...sequence].sort((a, b) => a - b));
   assert.ok(sequence[0] < sequence[1]);
   assert.match(await page.textContent(".stats"), /Séries[\s\S]*Reps[\s\S]*Descanso[\s\S]*RIR/);
+  assert.equal(await page.locator(".exercise-video iframe").count(), 0);
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 430, height: 932 }]) {
     await page.setViewportSize(viewport);
+    const preview = await page.locator(".execution-preview").boundingBox();
+    assert.ok(preview.height >= 44 && preview.height <= 96);
+    await openVideo(page);
     const box = await page.locator(".exercise-video").boundingBox();
     assert.ok(Math.abs(box.width / box.height - 9 / 16) < 0.01);
     assert.ok(box.x >= 0 && box.x + box.width <= viewport.width);
     const button = await page.locator("[data-video-fullscreen]").boundingBox();
     assert.ok(button.height >= 44);
+    const back = await page.getByRole("button", { name: "Voltar às séries", exact: true }).boundingBox();
+    assert.ok(back.y >= 0 && back.y + back.height <= viewport.height);
+    await page.getByRole("button", { name: "Voltar às séries", exact: true }).click();
+    assert.equal(await page.locator(".exercise-video iframe").count(), 0);
   }
   // A carga abaixo das séries continua alimentando a sugestão de peso.
   await page.fill("#ex-weight", "14");
@@ -51,6 +67,7 @@ test("cards vêm antes do vídeo vertical, séries, carga e observações nas te
 }));
 
 test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do painel", () => withApp(async (page) => {
+  await openVideo(page);
   await page.evaluate(() => { document.querySelector(".exercise-video").requestFullscreen = undefined; });
   const src = await page.locator(".exercise-video iframe").getAttribute("src");
   await page.locator(".exercise-video iframe").evaluate((el) => { el.dataset.preserved = "yes"; });
@@ -64,7 +81,7 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
   const size = page.viewportSize();
   const metrics = await page.locator(".exercise-video").evaluate((el) => {
     const css = getComputedStyle(el);
-    return { width: css.width, height: css.height, boxSizing: css.boxSizing, transform: getComputedStyle(el.closest(".sheet")).transform, innerWidth, innerHeight };
+    return { width: css.width, height: css.height, boxSizing: css.boxSizing, dialog: getComputedStyle(el.closest("dialog")).width, innerWidth, innerHeight };
   });
   assert.ok(Math.abs(box.x) < 1 && Math.abs(box.y) < 1, JSON.stringify(box));
   assert.ok(Math.abs(box.width - size.width) < 1 && Math.abs(box.height - size.height) < 1, JSON.stringify({ box, size, metrics }));
@@ -73,6 +90,7 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
   await page.keyboard.press("Escape");
   assert.equal(await page.locator(".exercise-video.video-expanded").count(), 0);
   assert.equal(await page.locator("#sheet").isVisible(), true);
+  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), true);
   assert.equal(await page.locator(".exercise-video iframe").getAttribute("src"), src);
   assert.equal(await page.locator(".exercise-video iframe").getAttribute("data-preserved"), "yes");
   await page.click("[data-video-fullscreen]");
@@ -81,6 +99,7 @@ test("tela cheia expandida cobre a viewport, preserva o iframe e fecha antes do 
 }));
 
 test("botão solicita tela cheia nativa e trata a saída pelo navegador", () => withApp(async (page) => {
+  await openVideo(page);
   await page.evaluate(() => {
     const video = document.querySelector(".exercise-video");
     video.requestFullscreen = async () => {
@@ -100,10 +119,68 @@ test("botão solicita tela cheia nativa e trata a saída pelo navegador", () => 
 }));
 
 test("recusa da tela cheia nativa usa expansão e navegação limpa o estado", () => withApp(async (page) => {
+  await openVideo(page);
   await page.evaluate(() => { document.querySelector(".exercise-video").requestFullscreen = async () => { throw Error("Não disponível"); }; });
   await page.click("[data-video-fullscreen]");
   assert.equal(await page.locator(".exercise-video.video-expanded").count(), 1);
   await page.goto(server.url + "#/inicio");
   await page.waitForSelector(".page-title");
   assert.equal(await page.locator("body.video-fullscreen").count(), 0);
+  assert.equal(await page.locator("body.execution-video-open").count(), 0);
+  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await page.locator(".exercise-video iframe").count(), 0);
+}));
+
+test("fechar vídeo preserva campos, séries, descanso, rolagem e foco do treino", () => withApp(async (page) => {
+  const weights = page.locator('[data-set-field="weight"]');
+  await weights.first().fill("14");
+  await page.locator('[data-set-field="reps"]').first().fill("12");
+  await page.locator('[data-set-check]').first().click();
+  await page.locator("#ex-note").fill("Apoio firme");
+  await page.locator(".execution-preview").scrollIntoViewIfNeeded();
+  const scroll = await page.locator("#sheet-content").evaluate(el => el.scrollTop);
+  const session = await page.evaluate(() => JSON.stringify(MegStore.session(MegStore.currentUser().id)));
+  await openVideo(page);
+  await page.keyboard.press("Escape");
+  assert.equal(await page.locator("#sheet").isVisible(), true);
+  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await weights.first().inputValue(), "14");
+  assert.equal(await weights.nth(1).inputValue(), "14");
+  assert.equal(await page.locator('[data-set-check]').first().getAttribute("aria-pressed"), "true");
+  assert.equal(await page.locator("#ex-note").inputValue(), "Apoio firme");
+  assert.equal(await page.locator("#sheet-content").evaluate(el => el.scrollTop), scroll);
+  assert.equal(await page.locator(".execution-preview").evaluate(el => el === document.activeElement), true);
+  assert.equal(await page.evaluate(() => JSON.stringify(MegStore.session(MegStore.currentUser().id))), session);
+  assert.equal(await page.locator(".rest-bar").isVisible(), true);
+  await openVideo(page);
+  await page.getByRole("button", { name: "Fechar vídeo", exact: true }).click();
+  assert.equal(await page.locator(".exercise-video iframe").count(), 0);
+}));
+
+test("catálogo também abre vídeo, fecha pelo fundo e conserva botão sem miniatura", () => withApp(async (page) => {
+  await page.goto(server.url + "#/exercicios/ver/goblet-squat");
+  await page.waitForSelector(".exercise-page .execution-preview");
+  await page.locator("[data-video-thumbnail]").evaluate(el => el.dispatchEvent(new Event("error")));
+  assert.equal(await page.locator("[data-video-thumbnail]").isVisible(), false);
+  await openVideo(page);
+  const bounds = await page.locator(".execution-dialog").boundingBox();
+  assert.ok(bounds.y > 4);
+  await page.mouse.click(4, 4);
+  assert.equal(await page.locator(".execution-dialog").evaluate(el => el.open), false);
+  assert.equal(await page.locator(".exercise-page .execution-preview").isVisible(), true);
+}));
+
+test("painel do vídeo é acessível nos quatro estilos, em claro e escuro", () => withApp(async (page) => {
+  await page.addScriptTag({ content: axeSrc });
+  const problems = [];
+  for (const style of ["energia", "esportivo", "pink-money", "arcade"]) {
+    for (const theme of ["light", "dark"]) {
+      await page.evaluate(([st, th]) => (MegTheme.setStyle(st), MegTheme.set(th)), [style, theme]);
+      await openVideo(page);
+      const violations = await page.evaluate(async () => (await axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] })).violations.map(v => `${v.id}: ${v.nodes[0]?.target.join(" ")}`));
+      violations.forEach(v => problems.push(`${style}/${theme}: ${v}`));
+      await page.getByRole("button", { name: "Fechar vídeo", exact: true }).click();
+    }
+  }
+  assert.deepEqual(problems, []);
 }));
