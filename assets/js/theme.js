@@ -7,13 +7,6 @@
   const STYLE_KEY = "meggym.style"; // estilo do aparelho (o do último perfil que entrou)
   const STYLES = ["energia", "esportivo", "pink-money", "arcade"];
   const DEFAULT_STYLE = "energia";
-  // Cor da barra do sistema = cor do cabeçalho de cada estilo/modo.
-  const COLORS = {
-    energia: { light: "#ffffff", dark: "#0d0e10" },
-    esportivo: { light: "#111111", dark: "#000000" },
-    "pink-money": { light: "#fff5fa", dark: "#1c0d18" },
-    arcade: { light: "#f0f1ff", dark: "#0d1025" },
-  };
   const media = window.matchMedia("(prefers-color-scheme: dark)");
 
   function read(key) {
@@ -50,19 +43,25 @@
     return choice === "auto" ? (media.matches ? "dark" : "light") : choice;
   }
 
+  // Cores e medidas têm uma única fonte: os tokens CSS, já carregados no head.
+  function token(name) {
+    return window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
   function apply(choice = get(), style = getStyle()) {
     style = normalizeStyle(style);
     const root = document.documentElement;
     if (choice === "auto") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", choice);
     root.setAttribute("data-style", style);
+    root.setAttribute("data-color-scheme", effective(choice));
     let meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) {
       meta = document.createElement("meta");
       meta.name = "theme-color";
       document.head.appendChild(meta);
     }
-    meta.content = COLORS[style][effective(choice)];
+    meta.content = token("--system-bar");
   }
 
   function set(choice) {
@@ -80,6 +79,6 @@
   media.addEventListener?.("change", () => get() === "auto" && apply());
   apply();
 
-  window.MegTheme = { get, set, getStyle, setStyle, normalizeStyle, STYLES, DEFAULT_STYLE };
+  window.MegTheme = { get, set, getStyle, setStyle, normalizeStyle, STYLES, DEFAULT_STYLE, token };
 })();
 

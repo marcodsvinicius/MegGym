@@ -131,6 +131,12 @@ insert into public.admins (email) values ('email@dela.com');
 
 > A chave que fica em `assets/js/config.js` é a **publishable** (pública). Nunca coloque a chave **secret** no código.
 
+## Design system
+
+A referência visual está em [design-system.html](design-system.html), com os quatro temas, cores, controles, cards, tabela de séries e bottom sheet. A [documentação do design system](docs/design-system.md) descreve os tokens, componentes e regras de manutenção.
+
+O CSS de produção é gerado a partir dos módulos em `assets/css/`. Após editar, rode `npm run css:build` e inclua `style.css` no commit. `npm test` verifica se o bundle está atualizado. O app continua estático e offline, sem build no servidor.
+
 ## Estrutura
 
 ```
@@ -147,7 +153,7 @@ tools/update-icons.py gera a fonte de ícones
 admin.html            área de cadastro
 supabase/schema.sql   tabelas, segurança e dados iniciais do banco
 data/exercises.json   cópia de reserva dos dados (usada se o Supabase falhar)
-assets/css/style.css  estilos (responsivo, tema claro/escuro)
+assets/css/*.css      design system e módulos; style.css é gerado por npm run css:build
 assets/js/config.js   modo (BACKEND), URL e chave pública do Supabase
 assets/js/supabase.js cliente da API do Supabase (banco, login, imagens)
 assets/js/common.js   funções compartilhadas

@@ -1,0 +1,240 @@
+/* Base: reset, fontes, texto e contrato tipográfico de títulos. Veja docs/design-system.md. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: var(--line-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--accent-ink);
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1, h2, h3 {
+  line-height: var(--line-heading);
+  letter-spacing: -.01em;
+  margin: 0;
+}
+
+.page-title {
+  font-size: clamp(var(--fs-heading), 4vw, var(--fs-display-lg));
+  font-weight: var(--fw-heavy);
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  margin: var(--space-1-5) 0 0;
+}
+
+.page-head {
+  margin-bottom: var(--space-6);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3-5);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: var(--fw-medium);
+}
+
+.back-link:hover {
+  color: var(--text);
+}
+
+.section-intro {
+  margin: 0 0 var(--space-3-5);
+}
+
+.hello {
+  margin: var(--space-2) 0 var(--space-5);
+}
+
+.lead {
+  margin: 0 0 var(--space-3);
+  color: var(--text-muted);
+  white-space: pre-line;
+}
+
+.meta {
+  margin: var(--space-1-5) 0 0;
+  color: var(--text-muted);
+}
+
+.label {
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-sm);
+}
+
+@media (display-mode: standalone) {
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
+.radio-chip input:checked + span::before {
+  content: "●";
+  font-size: var(--fs-caption);
+}
+
+.equip-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.equip-filter .meta {
+  margin: 0 0 0 var(--space-1);
+}
+
+.missing {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  color: var(--c-intermediario);
+}
+
+.done-index {
+  background: var(--done);
+  color: var(--on-done);
+}
+
+@font-face {
+  font-family: "Material Symbols Rounded";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: block;
+  src: url("../fonts/material-symbols-rounded.woff2?v=68") format("woff2");
+}
+
+.mi {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: var(--icon-lg);
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "liga";
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
+  overflow: hidden;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  max-width: 1em;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mi-inline {
+  font-size: 1.15em;
+  vertical-align: -0.2em;
+  width: 1em;
+}
+
+.done-index .mi {
+  font-size: var(--icon-xs);
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../fonts/plus-jakarta-sans.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../fonts/manrope.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Barlow Condensed";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/barlow-condensed-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Anton";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/anton.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("../fonts/archivo.woff2") format("woff2");
+}
+
+.eyebrow-text {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-heavy);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+[data-weight-chart] > *, #evolution > * {
+  animation: page-fade var(--duration-slow) var(--ease-out) both;
+}
+
+.meta {
+  font-size: var(--fs-sm);
+}
+
+body {
+  --resume-space: 0px;
+  --rest-space: 0px;
+}
+
+:root :is(.page-title, .app-title, .onboarding-step h1, .stat-tile-value, .week-stat-value, .run-timer-value,
+.structure-progress-value strong, .home-structure-count strong, .history-hero h2, .sheet-head h2,
+.motivation h2, .subsection-title, .week-head h2, .structure-progress h2, .group-name, .run-sets) {
+  font-family: var(--font-display);
+  text-transform: var(--display-transform);
+  letter-spacing: var(--display-tracking);
+  font-weight: var(--display-weight);
+}

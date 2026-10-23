@@ -28,13 +28,13 @@ Este é o resumo das conversas de desenvolvimento, feito para dar contexto a nov
 - `sw.js`: service worker. Não ativa sozinho (sem skipWaiting automático): o app mostra a barra "nova versão disponível".
 
 ## A cada publicação (obrigatório)
-- Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js` e `assets/css/style.css` (a URL da fonte também é versionada).
+- Aumente o `?v=N` em `index.html`, `admin.html`, `sw.js`, `design-system.html` e `assets/css/base.css` (a URL da fonte também é versionada); rode `npm run css:build` para atualizar o `style.css`.
 - Aumente também o `VERSION` no `sw.js`.
-- Versão atual: **v67**.
+- Versão atual: **v68**.
 
 Outros cuidados:
 - Ícones: a fonte Material Symbols é um subconjunto. Ao usar um ícone novo, rode `python3 tools/update-icons.py`. Ícones que o script não detecta sozinho vão na lista `EXTRA`.
-- Design system: tokens em `:root` (`--space-*`, `--fs-*`, `--accent-ink`, `--on-success`…). Estilos: energia (padrão), esportivo, pink-money e arcade. Suave foi retirado; perfis antigos migram para Energia ao entrar.
+- Design system: fonte em `assets/css/{tokens,themes,base,layout,controls,cards,training,activity,onboarding,admin,overlays,motion,utilities}.css`. Consulte `docs/design-system.md` e `design-system.html`. Não editar `style.css` diretamente: rode `npm run css:build` após alterar os módulos; `npm test` verifica se o CSS gerado está atualizado. Aparência aplica `data-style` e o modo efetivo `data-color-scheme` antes da primeira pintura. Cores do sistema e Canvas usam `MegTheme.token`, sem paletas duplicadas no JS. Estilos: energia (padrão), esportivo, pink-money e arcade. Suave foi retirado; perfis antigos migram para Energia ao entrar.
 - Ícones do mapa corporal: os SVGs usam `<use>`, então o CSS precisa mirar `#bm-sprite ...`.
 
 ## Testes

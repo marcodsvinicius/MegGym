@@ -1,0 +1,224 @@
+/* Movimento: animações e preferência por redução de movimento. Veja docs/design-system.md. */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .execution-guide[open] {
+    animation: execution-sheet-in var(--duration-sheet) ease-out;
+  }
+
+  @keyframes execution-sheet-in {
+    from {
+      opacity: .7;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes page-forward {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-back {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.app-main.page-forward {
+  animation: page-forward var(--duration-page) var(--ease-out);
+}
+
+.app-main.page-back {
+  animation: page-back var(--duration-page) var(--ease-out);
+}
+
+.app-main.page-fade {
+  animation: page-fade var(--duration-slow) var(--ease-out);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stagger {
+  animation: rise var(--duration-stagger) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 35ms + 40ms);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pop {
+  animation: pop var(--duration-pop) var(--ease-spring);
+}
+
+@keyframes grow-up {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes grow-right {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes slide-up-bar {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-celebration);
+  overflow: hidden;
+}
+
+.confetti i {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  border-radius: var(--radius-sm);
+  left: var(--confetti-x);
+  background: var(--confetti-color);
+  animation: confetti-fall var(--confetti-duration) linear var(--confetti-delay) forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(var(--drift), 105vh) rotate(var(--rot));
+    opacity: .9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@keyframes card-out {
+  to {
+    opacity: 0;
+    transform: scale(.96) translateY(-6px);
+  }
+}
+
+.install-card.closing {
+  animation: card-out var(--duration-medium) var(--ease-out) forwards;
+}
+
+.set-timer.running {
+  animation: pulse var(--duration-pulse) ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes update-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

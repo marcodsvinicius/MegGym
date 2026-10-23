@@ -3,10 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test --test-concurrency=1 --test-reporter=spec --test-timeout=60000 tests/*.test.mjs"
+    "css:build": "node tools/build-css.mjs",
+    "css:check": "node tools/build-css.mjs --check",
+    "test": "npm run css:check && node --test --test-concurrency=1 --test-reporter=spec --test-timeout=60000 tests/*.test.mjs"
   },
   "devDependencies": {
     "axe-core": "4.14.0",
     "playwright": "1.56.1"
   }
 }
+

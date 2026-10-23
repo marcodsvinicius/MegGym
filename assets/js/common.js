@@ -64,7 +64,7 @@
         .flat()
         .map((d) => `<path class="bm-off" d="${d}"/>`)
         .join("")}</g>`;
-    const sprite = `<svg id="bm-sprite" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>${side("front", map.sides.front)}${side("back", map.sides.back)}</defs></svg>`;
+    const sprite = `<svg id="bm-sprite" aria-hidden="true" focusable="false" class="bodymap-sprite"><defs>${side("front", map.sides.front)}${side("back", map.sides.back)}</defs></svg>`;
     (document.body || document.documentElement).insertAdjacentHTML("beforeend", sprite);
     return true;
   }

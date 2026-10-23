@@ -7,14 +7,14 @@
   <title>MegGym — Cadastro de exercícios</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
-  <script src="assets/js/theme.js?v=67"></script>
-  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=67" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=67">
+  <link rel="preload" href="assets/fonts/material-symbols-rounded.woff2?v=68" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css?v=68">
+  <script src="assets/js/theme.js?v=68"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="./"><span class="brand-mark mi" aria-hidden="true">fitness_center</span> MegGym <small style="font-weight:600;color:var(--text-muted)">admin</small></a>
+      <a class="brand" href="./"><span class="brand-mark mi" aria-hidden="true">fitness_center</span> MegGym <small class="admin-brand-caption">admin</small></a>
       <span class="status-pill"><span class="status-dot" id="status-dot"></span><span id="status-text">Desconectado</span></span>
     </div>
   </header>
@@ -55,7 +55,7 @@
             <label for="cfg-token">Token pessoal</label>
             <input class="input" id="cfg-token" type="password" placeholder="github_pat_…" required>
           </div>
-          <div class="form-actions" style="grid-column: span 12">
+          <div class="form-actions span-12">
             <button class="btn btn-primary" type="submit">Conectar</button>
             <button class="btn btn-danger" type="button" id="cfg-forget">Esquecer token</button>
           </div>
@@ -82,7 +82,7 @@
           <div class="field">
             <label class="checkbox"><input type="checkbox" data-toggle-password="login-password"> Mostrar senha</label>
           </div>
-          <div class="form-actions" style="grid-column: span 12">
+          <div class="form-actions span-12">
             <button class="btn btn-primary btn-block" type="submit">Entrar</button>
             <button class="btn btn-ghost btn-block" type="button" data-auth-mode="forgot">Esqueci minha senha</button>
           </div>
@@ -90,7 +90,7 @@
 
         <!-- Criar conta com convite -->
         <form id="signup-form" class="form-grid hidden" data-auth-view="signup" novalidate>
-          <p class="page-subtitle" style="grid-column: span 12; margin:0">Para criar uma conta você precisa de um <strong>código de convite</strong>.</p>
+          <p class="page-subtitle span-12 section-description">Para criar uma conta você precisa de um <strong>código de convite</strong>.</p>
           <div class="field">
             <label for="signup-code">Código de convite</label>
             <input class="input" id="signup-code" autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="Ex.: K7M2-PQ9X">
@@ -111,19 +111,19 @@
           <div class="field">
             <label class="checkbox"><input type="checkbox" data-toggle-password="signup-password signup-password2"> Mostrar senha</label>
           </div>
-          <div class="form-actions" style="grid-column: span 12">
+          <div class="form-actions span-12">
             <button class="btn btn-primary btn-block" type="submit">Criar conta</button>
           </div>
         </form>
 
         <!-- Esqueci a senha -->
         <form id="forgot-form" class="form-grid hidden" data-auth-view="forgot" novalidate>
-          <p class="page-subtitle" style="grid-column: span 12; margin:0">Informe seu e-mail e enviaremos um link para criar uma nova senha.</p>
+          <p class="page-subtitle span-12 section-description">Informe seu e-mail e enviaremos um link para criar uma nova senha.</p>
           <div class="field">
             <label for="forgot-email">E-mail</label>
             <input class="input" id="forgot-email" type="email" autocomplete="username" required>
           </div>
-          <div class="form-actions" style="grid-column: span 12">
+          <div class="form-actions span-12">
             <button class="btn btn-primary btn-block" type="submit">Enviar link</button>
             <button class="btn btn-ghost btn-block" type="button" data-auth-mode="login">Voltar para o login</button>
           </div>
@@ -131,7 +131,7 @@
 
         <!-- Nova senha (chegou pelo link do e-mail) -->
         <form id="newpass-form" class="form-grid hidden" data-auth-view="newpass" novalidate>
-          <p class="page-subtitle" style="grid-column: span 12; margin:0">Escolha sua nova senha.</p>
+          <p class="page-subtitle span-12 section-description">Escolha sua nova senha.</p>
           <div class="field">
             <label for="newpass-password">Nova senha</label>
             <input class="input" id="newpass-password" type="password" autocomplete="new-password" minlength="8" required>
@@ -144,7 +144,7 @@
           <div class="field">
             <label class="checkbox"><input type="checkbox" data-toggle-password="newpass-password newpass-password2"> Mostrar senha</label>
           </div>
-          <div class="form-actions" style="grid-column: span 12">
+          <div class="form-actions span-12">
             <button class="btn btn-primary btn-block" type="submit">Salvar nova senha</button>
           </div>
         </form>
@@ -160,7 +160,7 @@
             <p class="page-subtitle supabase-only">As alterações aparecem no site na hora.</p>
             <p class="page-subtitle github-only">Cada alteração salva vira um commit. O site atualiza em cerca de 1 minuto.</p>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div class="admin-toolbar">
             <button class="btn btn-sm" type="button" id="reload-btn">↻ Recarregar</button>
             <button class="btn btn-sm github-only" type="button" id="config-open">⚙ Conexão</button>
             <button class="btn btn-sm supabase-only" type="button" id="logout-btn">Sair</button>
@@ -240,7 +240,7 @@
                 <input class="input" id="ex-video" placeholder="https://youtube.com/watch?v=…">
                 <span class="hint">Links do YouTube abrem dentro do site.</span>
               </div>
-              <div class="form-actions" style="grid-column: span 12">
+              <div class="form-actions span-12">
                 <button class="btn btn-primary" type="submit" id="exercise-submit">Salvar exercício</button>
               </div>
             </form>
@@ -283,9 +283,9 @@
               </div>
               <div class="field span-3">
                 <label for="gr-color">Cor</label>
-                <input class="input" id="gr-color" type="color" value="#ff5a1f" style="padding:4px">
+                <input class="input color-input" id="gr-color" type="color" value="#ff5a1f">
               </div>
-              <div class="form-actions" style="grid-column: span 12">
+              <div class="form-actions span-12">
                 <button class="btn btn-primary" type="submit">Salvar grupo</button>
               </div>
             </form>
@@ -323,14 +323,14 @@
                   <option value="">Sem validade</option>
                 </select>
               </div>
-              <div class="form-actions" style="grid-column: span 12">
+              <div class="form-actions span-12">
                 <button class="btn btn-primary" type="submit">Gerar código</button>
               </div>
             </form>
             <div class="invite-created hidden" id="invite-created">
               <span class="stat-label">Código criado</span>
               <strong class="invite-code invite-code-big" id="invite-created-code"></strong>
-              <div class="form-actions" style="margin-top:8px">
+              <div class="form-actions form-actions-compact">
                 <button class="btn btn-primary" type="button" id="invite-created-share">Compartilhar</button>
                 <button class="btn" type="button" id="invite-created-copy">Copiar</button>
               </div>
@@ -360,7 +360,7 @@
       el.className = "toast error";
     });
   </script>
-  <script src="assets/js/config.js?v=67"></script>
+  <script src="assets/js/config.js?v=68"></script>
   <script>
     // Carrega o admin do modo escolhido em config.js (BACKEND: "github" ou "supabase").
     (function () {
@@ -371,7 +371,7 @@
         : ["common.js", "admin-github.js"];
       files.forEach(function (name) {
         var el = document.createElement("script");
-        el.src = "assets/js/" + name + "?v=67";
+        el.src = "assets/js/" + name + "?v=68";
         el.async = false; // mantém a ordem
         document.body.appendChild(el);
       });

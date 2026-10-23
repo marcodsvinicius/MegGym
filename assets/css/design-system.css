@@ -1,0 +1,22 @@
+/* Galeria de desenvolvimento. Usa os tokens e componentes do bundle publicado. */
+.ds-main { padding-block: var(--space-6); }
+.ds-main > * + * { margin-top: var(--space-6); }
+.ds-intro { max-width: var(--app-maxw); }
+.ds-intro .field-row { margin-top: var(--space-4); }
+.ds-grid { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.ds-section { min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); padding: var(--card-pad); background: var(--card-bg); border: var(--card-border-w) solid var(--card-border); border-radius: var(--radius); }
+.ds-section > p { margin: 0; }
+.ds-palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-3); }
+.ds-swatch { min-width: 0; display: grid; gap: var(--space-1); }
+.ds-swatch i { display: block; height: var(--space-16); border-radius: var(--radius-sm); border: var(--border-hairline) solid var(--border); background: var(--swatch); }
+.ds-swatch code { font-size: var(--fs-xs); overflow-wrap: anywhere; }
+.ds-swatch small { color: var(--text-muted); font-size: var(--fs-xs); }
+.ds-spacing { display: flex; align-items: flex-end; gap: var(--space-2); height: var(--space-12); }
+.ds-spacing i { display: block; width: var(--space-6); background: var(--accent); }
+.ds-spacing i:nth-child(1) { height: var(--space-1); }
+.ds-spacing i:nth-child(2) { height: var(--space-2); }
+.ds-spacing i:nth-child(3) { height: var(--space-3); }
+.ds-spacing i:nth-child(4) { height: var(--space-4); }
+.ds-spacing i:nth-child(5) { height: var(--space-5); }
+.ds-spacing i:nth-child(6) { height: var(--space-6); }
+.ds-video-placeholder { width: min(100%, 180px); aspect-ratio: 9 / 16; display: grid; place-content: center; justify-items: center; gap: var(--space-3); margin-inline: auto; border-radius: var(--radius-sm); background: var(--tint); color: var(--text-muted); font-size: var(--fs-xs); }

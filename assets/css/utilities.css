@@ -1,0 +1,126 @@
+/* Utilitários: visibilidade e apresentação estática dos templates. Veja docs/design-system.md. */
+
+.hidden {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: calc(-1 * var(--space-px));
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+body.backend-github .supabase-only,
+body.backend-supabase .github-only {
+  display: none !important;
+}
+
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.accent {
+  color: var(--accent-ink);
+}
+
+.ex-note-preview.hidden {
+  display: none;
+}
+
+.ex-load-preview.hidden {
+  display: none;
+}
+
+.toast:not(.hidden) {
+  animation: slide-up var(--duration-slow) var(--ease-spring);
+}
+
+.rest-bar:not(.hidden) {
+  animation: slide-up-bar var(--duration-pop) var(--ease-spring);
+}
+
+.tip:not(.hidden) {
+  animation: page-fade var(--duration-medium) var(--ease-out);
+}
+
+:root[data-style="esportivo"] .app-header .accent {
+  color: var(--sports-accent);
+}
+
+.update-bar:not(.hidden) {
+  animation: update-in var(--duration-pop) var(--ease-spring);
+}
+
+.search-count {
+  margin: 0 0 var(--space-3);
+}
+
+.item-muscles {
+  margin-top: var(--space-1-5);
+}
+
+.result-muscles {
+  margin-top: var(--space-2-5);
+}
+
+.history-set-list {
+  margin-top: var(--space-2);
+}
+
+.settings-description {
+  margin: 0 0 var(--space-2-5);
+}
+
+.settings-description-spaced {
+  margin-top: var(--space-4);
+}
+
+.section-description {
+  margin: 0;
+}
+
+.fatal-state {
+  margin: var(--space-6);
+}
+
+.bodymap-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.admin-brand-caption {
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+}
+
+.span-12 {
+  grid-column: span 12;
+}
+
+.admin-toolbar {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.color-input {
+  padding: var(--space-1);
+}
+
+.form-actions-compact {
+  margin-top: var(--space-2);
+}

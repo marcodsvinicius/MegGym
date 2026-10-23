@@ -178,7 +178,7 @@
                   .map(
                     ([id, [label, color]]) => `
                     <button type="button" class="band" role="radio" data-band="${id}" aria-checked="${load.band === id}" title="${label}">
-                      <span class="band-dot" style="background:${color}"></span><span>${label}</span>
+                      <span class="band-dot" style="--band-color:${color}"></span><span>${label}</span>
                     </button>`
                   )
                   .join("")}
@@ -524,7 +524,7 @@
           </span>
           <span class="home-structure-count"><strong>${pr.done}</strong>/${pr.duration}</span>
         </a>
-        <div class="progress"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+        <div class="progress"><div class="progress-bar" style="--progress:${pr.percent}%"></div></div>
         ${
           pr.completed
             ? `<p class="meta">${icon("emoji_events", "mi-inline")} Divisão concluída!</p>`
@@ -581,7 +581,7 @@
         <p class="meta">${w.items.length} exercícios · ${sets} séries · cerca de ${minutes} min</p>
         ${
           sug.progress
-            ? `<div class="progress" role="progressbar" aria-label="Progresso da divisão" aria-valuemin="0" aria-valuemax="${sug.progress.duration}" aria-valuenow="${sug.progress.done}"><div class="progress-bar" style="width:${sug.progress.percent}%"></div></div>
+            ? `<div class="progress" role="progressbar" aria-label="Progresso da divisão" aria-valuemin="0" aria-valuemax="${sug.progress.duration}" aria-valuenow="${sug.progress.done}"><div class="progress-bar" style="--progress:${sug.progress.percent}%"></div></div>
                <p class="meta">${sug.progress.done} de ${sug.progress.duration} sessões da divisão</p>`
             : ""
         }
@@ -706,7 +706,7 @@
         const hidden = all.filter((e) => !available(e) && (normalizeText(e.name).includes(q) || normalizeText(e.description).includes(q))).length;
         const items = all.filter((e) => available(e) && (normalizeText(e.name).includes(q) || normalizeText(e.description).includes(q)));
         $("exercise-groups-view").innerHTML = items.length
-          ? `<p class="meta" style="margin:0 0 12px">${items.length} ${items.length === 1 ? "exercício encontrado" : "exercícios encontrados"}</p><div class="exercise-grid">${items.map((ex) => exerciseCard(ex, { showGroup: true })).join("")}</div>`
+          ? `<p class="meta search-count">${items.length} ${items.length === 1 ? "exercício encontrado" : "exercícios encontrados"}</p><div class="exercise-grid">${items.map((ex) => exerciseCard(ex, { showGroup: true })).join("")}</div>`
           : empty(
               "search_off",
               hidden && equipFilter ? "Nenhum exercício com os seus equipamentos para essa busca." : "Nenhum exercício encontrado.",
@@ -1140,7 +1140,7 @@
         <section class="my-plan">
           <p class="eyebrow-text">${icon("flag", "mi-inline")} Divisão que você segue</p>
           <a class="my-plan-title" href="#/estruturas/${encodeURIComponent(st.id)}"><h2>${escapeHtml(st.name)}</h2><span class="chevron" aria-hidden="true">›</span></a>
-          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${pr.duration}" aria-valuenow="${pr.done}" aria-label="Progresso da divisão"><div class="progress-bar" style="width:${pr.percent}%"></div></div>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${pr.duration}" aria-valuenow="${pr.done}" aria-label="Progresso da divisão"><div class="progress-bar" style="--progress:${pr.percent}%"></div></div>
           <p class="meta">${pr.done} de ${pr.duration} sessões · desde ${new Date(plan.startedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</p>
           ${
             pr.completed
@@ -1412,7 +1412,7 @@
             <span class="item-index letter-index">${letter(i)}</span>
             <div class="item-main">
               <div class="item-title">Treino ${letter(i)}</div>
-              <div class="group-chips" style="margin-top:6px">${groupChips(workoutGroups(w.items))}</div>
+              <div class="group-chips item-muscles">${groupChips(workoutGroups(w.items))}</div>
               <div class="meta">${w.items.length} exercícios${isNext ? " · <strong>próximo</strong>" : ""}</div>
             </div>
             <span class="chevron" aria-hidden="true">›</span>
@@ -1573,7 +1573,7 @@
               (w) => `
               <li class="item-row">
                 <div class="item-main"><div class="item-title">${escapeHtml(w.name)}</div>
-                <div class="group-chips" style="margin-top:6px">${groupChips(workoutGroups(w.items))}</div></div>
+                <div class="group-chips item-muscles">${groupChips(workoutGroups(w.items))}</div></div>
                 <button class="btn btn-sm ${d.workoutIds.includes(w.id) ? "" : "btn-primary"}" type="button" data-st-add="${escapeHtml(w.id)}">${icon("add", "mi-inline")} ${d.workoutIds.includes(w.id) ? "De novo" : "Adicionar"}</button>
               </li>`
             )
@@ -2049,7 +2049,7 @@
       const done = list.filter((x) => x.done).length;
       const total = list.length;
       $("run-count").textContent = `${done} de ${total} exercícios`;
-      $("run-bar").style.width = `${total ? (done / total) * 100 : 0}%`;
+      $("run-bar").style.setProperty("--progress", `${total ? (done / total) * 100 : 0}%`);
       // Cartão no fim da lista (não fica fixo): terminar quando quiser ou descartar.
       const complete = total > 0 && done === total;
       const recorded = runItems(w, session).filter((x) => x.performed).length;
@@ -2412,7 +2412,7 @@
             ({ g, n }) => `
           <li style="--group-color:${safeColor(g.color)}">
             <span class="hbar-label">${escapeHtml(g.name)}</span>
-            <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
+            <span class="hbar-track"><span class="hbar-fill" style="--bar-value:${(n / max) * 100}%"></span></span>
             <span class="hbar-value">${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}</span>
           </li>`
           )
@@ -2504,7 +2504,7 @@
           const n = weekly[g.id] || 0;
           return `<li style="--group-color:${safeColor(g.color)}">
             <span class="hbar-label">${escapeHtml(g.name)}</span>
-            <span class="hbar-track"><span class="hbar-fill" style="width:${(n / max) * 100}%"></span></span>
+            <span class="hbar-track"><span class="hbar-fill" style="--bar-value:${(n / max) * 100}%"></span></span>
             <span class="hbar-value">${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}</span>
           </li>`;
         }).join("")}</ul>
@@ -2609,9 +2609,8 @@
   /* ---------- Resumo para compartilhar (imagem gerada no aparelho) ---------- */
 
   async function shareSummary(h) {
-    const css = getComputedStyle(document.documentElement);
-    const v = (name, fb) => css.getPropertyValue(name).trim() || fb;
-    const c = { bg: v("--bg", "#111"), surface: v("--surface", "#1b1b1b"), tint: v("--tint", "#222"), text: v("--text", "#fff"), muted: v("--text-muted", "#aaa"), accent: v("--accent", "#ff5a1f"), onAccent: v("--accent-contrast", "#fff") };
+    const v = window.MegTheme.token;
+    const c = { bg: v("--bg"), surface: v("--surface"), tint: v("--tint"), text: v("--text"), muted: v("--text-muted"), accent: v("--accent"), onAccent: v("--accent-contrast") };
     const display = v("--font-display", "sans-serif");
     const body = v("--font-body", "sans-serif");
     const upper = v("--display-transform", "none") === "uppercase";
@@ -2772,7 +2771,7 @@
         <div class="stat-tile"><span class="stat-tile-value">${totalSets || "—"}</span><span class="stat-tile-label">séries no total</span></div>
       </div>
 
-      ${groupsDone.length ? `<section class="subsection"><h2 class="subsection-title">Músculos trabalhados</h2><div class="group-chips" style="margin-top:10px">${groupChips(groupsDone)}</div></section>` : ""}
+      ${groupsDone.length ? `<section class="subsection"><h2 class="subsection-title">Músculos trabalhados</h2><div class="group-chips result-muscles">${groupChips(groupsDone)}</div></section>` : ""}
 
       <section class="subsection">
         <h2 class="subsection-title">Exercícios feitos</h2>
@@ -2916,7 +2915,7 @@
                     <span class="item-index">${ei + 1}</span>
                     <div class="item-main">
                       <div class="item-title">${escapeHtml(e.name)}</div>
-                      <ol class="set-list" style="margin-top:8px">${rows}</ol>
+                      <ol class="set-list history-set-list">${rows}</ol>
                     </div>
                   </li>`;
               })
@@ -2990,9 +2989,9 @@
     app.innerHTML = `
       <section class="settings-group">
         <h2 class="settings-title">Personalização</h2>
-        <p class="meta" style="margin:0 0 10px">Estilo do app</p>
+        <p class="meta settings-description">Estilo do app</p>
         <form id="style-form">${stylePickerHtml(window.MegTheme.normalizeStyle(user.style), "set")}</form>
-        <p class="meta" style="margin:16px 0 10px">Modo</p>
+        <p class="meta settings-description settings-description-spaced">Modo</p>
         ${modePickerHtml(theme, "theme-picker")}
         <p class="meta">${theme === "auto" ? "Segue o tema do seu celular." : "Escolhido por você neste aparelho."}</p>
       </section>
@@ -3021,7 +3020,7 @@
 
       <section class="settings-group">
         <h2 class="settings-title">Backup</h2>
-        <p class="meta" style="margin:0 0 10px">Seus dados ficam só neste aparelho. Salve um arquivo de backup para não perder histórico, pesos e anotações, ou para levar para outro celular.</p>
+        <p class="meta settings-description">Seus dados ficam só neste aparelho. Salve um arquivo de backup para não perder histórico, pesos e anotações, ou para levar para outro celular.</p>
         <div class="settings-list">
           <button class="settings-item" type="button" id="backup-export">
             <span class="settings-icon">${icon("download")}</span>
@@ -3111,7 +3110,7 @@
     setHeader("Meus equipamentos", { back: "#/atividade/configuracoes" });
     app.innerHTML = `
       <form class="form-stack" id="equipment-form" novalidate>
-        <p class="page-subtitle" style="margin:0">Marque o que você tem em casa. A lista de exercícios e a montagem de treinos mostram o que dá para fazer.</p>
+        <p class="page-subtitle section-description">Marque o que você tem em casa. A lista de exercícios e a montagem de treinos mostram o que dá para fazer.</p>
         ${equipmentPickerHtml(user.equipment || [])}
         <div class="sticky-cta"><button class="btn btn-primary btn-block btn-lg" type="submit">Salvar</button></div>
       </form>`;
@@ -3235,7 +3234,7 @@
   // Confete ao terminar o treino.
   function celebrate() {
     if (reduceMotion()) return;
-    const colors = ["var(--accent)", "var(--success)", "#f2c500", "#1e66d0", "#e85a9b"];
+    const colors = ["var(--accent)", "var(--success)", "var(--award)", "var(--info)", "var(--celebration-pink)"];
     const box = document.createElement("div");
     box.className = "confetti";
     box.setAttribute("aria-hidden", "true");
@@ -3245,7 +3244,7 @@
       const dur = 1400 + Math.round(Math.random() * 900);
       const rot = Math.round(Math.random() * 720 - 360);
       const drift = Math.round(Math.random() * 120 - 60);
-      return `<i style="left:${x}%;background:${colors[i % colors.length]};animation-delay:${delay}ms;animation-duration:${dur}ms;--rot:${rot}deg;--drift:${drift}px"></i>`;
+      return `<i style="--confetti-x:${x}%;--confetti-color:${colors[i % colors.length]};--confetti-delay:${delay}ms;--confetti-duration:${dur}ms;--rot:${rot}deg;--drift:${drift}px"></i>`;
     }).join("");
     document.body.appendChild(box);
     setTimeout(() => box.remove(), 2800);
@@ -3783,7 +3782,7 @@
         return `
           <li class="wbar ${i === list.length - 1 ? "latest" : ""} ${e.value ? "" : "zero"}" title="${fmt(e.value)} ${unit} em ${d}/${m}/${y}">
             <span class="wbar-value">${fmt(e.value)}</span>
-            <span class="wbar-col"><span class="wbar-fill" style="height:${e.value ? Math.max(4, (e.value / max) * 100) : 0}%"></span></span>
+            <span class="wbar-col"><span class="wbar-fill" style="--bar-value:${e.value ? Math.max(4, (e.value / max) * 100) : 0}%"></span></span>
             <span class="wbar-date">${lbl}</span>
           </li>`;
       })
@@ -4288,7 +4287,7 @@
     }
     const sec = Math.ceil(left / 1000);
     $("rest-time").textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
-    $("rest-fill").style.width = `${Math.min(100, (left / restTotal) * 100)}%`;
+    $("rest-fill").style.setProperty("--progress", `${Math.min(100, (left / restTotal) * 100)}%`);
   }
 
   function stopRest() {
@@ -4767,7 +4766,7 @@
       else showLogin();
     })
     .catch((err) => {
-      document.body.innerHTML = `<div class="state" style="margin:24px">${icon("error", "state-icon")}${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="location.reload()">Tentar novamente</button></div>`;
+      document.body.innerHTML = `<div class="state fatal-state">${icon("error", "state-icon")}${escapeHtml(err.message)}<br><button class="btn" type="button" onclick="location.reload()">Tentar novamente</button></div>`;
     });
 })();
 

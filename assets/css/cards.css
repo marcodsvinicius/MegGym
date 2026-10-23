@@ -1,0 +1,569 @@
+/* Cards compartilhados, catálogo, estados vazios e progresso. Veja docs/design-system.md. */
+
+.today-card, .install-card, .week-card, .stat-tile, .item-row, .run-item, .last-workout, .home-structure,
+.structure-progress, .settings-list, .workout-card, .exercise-card, .group-card, .structure-card, .history-hero, .rest-bar {
+  background: var(--card-bg);
+  border: var(--card-border-w) solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+}
+
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3-5);
+}
+
+.group-card {
+  --group-color: var(--accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3-5);
+  min-height: 140px;
+  padding: var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast), border-color var(--duration-fast);
+}
+
+.group-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--group-color);
+}
+
+.group-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--group-color);
+}
+
+.group-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  font-size: var(--fs-heading);
+  background: color-mix(in srgb, var(--group-color) 16%, transparent);
+}
+
+.group-name {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-md);
+}
+
+.group-count {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3-5);
+  margin-bottom: var(--space-5);
+}
+
+.group-head .group-icon {
+  width: 56px;
+  height: 56px;
+  font-size: var(--fs-display);
+  flex: none;
+}
+
+.exercise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.exercise-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.exercise-media {
+  aspect-ratio: 16 / 10;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: var(--fs-display-lg);
+}
+
+.exercise-media--empty {
+  aspect-ratio: 16 / 5;
+  font-size: var(--fs-2xl);
+}
+
+.exercise-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.exercise-body {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  flex: 1;
+}
+
+.exercise-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.exercise-title h3 {
+  font-size: var(--fs-lg);
+}
+
+.exercise-desc {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  white-space: pre-line;
+}
+
+.exercise-actions {
+  margin-top: auto;
+  padding-top: var(--space-1);
+}
+
+.state {
+  text-align: center;
+  color: var(--text-muted);
+  border-radius: var(--radius);
+}
+
+.state-emoji {
+  font-size: var(--fs-display);
+  display: block;
+  margin-bottom: var(--space-1-5);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto var(--space-2-5);
+  border-radius: var(--radius-circle);
+  border: var(--border-emphasis) solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin var(--duration-spin) linear infinite;
+}
+
+.notice {
+  padding: var(--space-3) var(--space-3-5);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border: var(--border-hairline) solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-4);
+}
+
+.notice ol {
+  margin: var(--space-1-5) 0 0;
+  padding-left: var(--space-5);
+}
+
+.state-sm {
+  padding: var(--space-4-5) var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.app-main .group-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+@media (min-width: 520px) {
+  .app-main .group-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.app-main .exercise-grid {
+  grid-template-columns: 1fr;
+}
+
+.group-icon-sm {
+  font-size: var(--fs-title);
+  flex: none;
+}
+
+.workout-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.workout-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.workout-card:active {
+  transform: scale(.99);
+}
+
+.workout-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.workout-card h3 {
+  font-size: var(--fs-lg);
+}
+
+.workout-card .exercise-desc {
+  font-size: var(--fs-sm);
+}
+
+.workout-card .meta {
+  margin: 0;
+}
+
+.subsection {
+  margin-top: var(--space-6);
+}
+
+.subsection-title {
+  font-weight: var(--fw-heavy);
+}
+
+.progress {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--done);
+  border-radius: inherit;
+}
+
+.tappable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.card-foot .meta {
+  margin: 0;
+}
+
+.chevron {
+  color: var(--text-muted);
+  font-size: var(--fs-xl);
+  flex: none;
+}
+
+.link-text {
+  color: var(--accent-ink);
+  font-weight: var(--fw-medium);
+}
+
+.exercise-summary {
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3-5);
+  padding: var(--space-3-5);
+  border: var(--border-hairline) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.exercise-summary-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-circle);
+  background: var(--surface);
+}
+
+.exercise-summary-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-75);
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-summary-label {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-weight: var(--fw-medium);
+}
+
+.exercise-summary-value {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.my-load .exercise-summary-value {
+  font-size: var(--fs-title);
+}
+
+.exercise-card-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5);
+}
+
+.exercise-card-content[hidden] {
+  display: none;
+}
+
+.group-detail {
+  --group-color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-hairline) solid var(--border);
+  border-left: 4px solid var(--group-color);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.group-detail .group-icon {
+  font-size: var(--fs-xl);
+  flex: none;
+}
+
+.exercise-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.subsection-head {
+  margin-bottom: var(--space-2-5);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2-5);
+}
+
+.group-icon .mi {
+  font-size: var(--icon-muscule);
+  color: var(--group-color);
+}
+
+.group-icon-sm .mi {
+  font-size: var(--icon-md);
+}
+
+.group-head .group-icon .mi, .group-detail .group-icon .mi {
+  font-size: var(--icon-xl);
+}
+
+.state-icon {
+  font-size: var(--icon-display);
+  display: block;
+  margin: 0 auto var(--space-2);
+  color: var(--text-muted);
+  width: 40px;
+}
+
+.list-section {
+  margin-bottom: var(--space-5-5);
+}
+
+.list-section-title {
+  margin-bottom: var(--space-2-5);
+}
+
+:root[data-style="esportivo"] .group-card::before {
+  height: 6px;
+}
+
+.tappable:active {
+  transform: scale(.985);
+}
+
+.progress-bar {
+  transition: width var(--duration-progress) var(--ease-out);
+}
+
+.subsection > * + * {
+  margin-top: var(--space-3);
+}
+
+.subsection-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.subsection-title {
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+
+.state, .empty {
+  color: var(--text-muted);
+}
+
+.exercise-title h2.exercise-name {
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border: var(--border-strong) dashed var(--state-border);
+  background: transparent;
+}
+
+.state-badge {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--pill-radius);
+  background: var(--tint);
+}
+
+.state-badge .state-icon {
+  margin: 0;
+  font-size: var(--icon-hero);
+  width: 32px;
+  color: var(--accent-ink);
+}
+
+.state-text {
+  margin: 0;
+  max-width: 32ch;
+  color: var(--text-muted);
+}
+
+.state-actions {
+  margin-top: var(--space-2);
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+:root[data-style="esportivo"] .state-badge {
+  border-radius: var(--radius-none);
+}
+
+.body-icon {
+  display: inline-block;
+  flex: none;
+  overflow: hidden;
+}
+
+#bm-sprite .bm-outline {
+  fill: currentColor;
+  fill-opacity: .06;
+  stroke: currentColor;
+  stroke-opacity: .3;
+  stroke-width: 3;
+}
+
+#bm-sprite .bm-off {
+  fill: currentColor;
+  fill-opacity: .12;
+  stroke: currentColor;
+  stroke-opacity: .26;
+  stroke-width: 2;
+}
+
+.body-icon .bm-on path {
+  fill: var(--group-color, var(--accent));
+  stroke: var(--bodymap-stroke);
+  stroke-width: 2.5;
+}
+
+.group-icon .body-icon {
+  width: 100%;
+  height: 100%;
+  color: var(--text);
+}
+
+.group-icon {
+  overflow: hidden;
+}
+
+.group-card .group-icon {
+  width: 72px;
+  height: 72px;
+}
+
+.group-detail .group-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.group-icon-sm {
+  width: 44px;
+  height: 44px;
+}
+
+.body-icon.mi-inline {
+  width: 1.35em;
+  height: 1.35em;
+  vertical-align: -.35em;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+
+:root[data-style="esportivo"] .body-icon .bm-on path {
+  stroke: var(--text);
+  stroke-opacity: .6;
+}
+
+.list-section-title {
+  flex-wrap: wrap;
+}
+
+.progress-bar {
+  width: var(--progress, 0%);
+}
