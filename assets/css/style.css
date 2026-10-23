@@ -1596,7 +1596,7 @@ main {
 }
 
 .btn-danger-solid:hover {
-  background: var(--danger);
+  background: var(--danger-solid);
   filter: brightness(1.08);
 }
 
