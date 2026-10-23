@@ -59,15 +59,18 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) return; // YouTube, imagens externas etc.
 
   const networkFirst = req.mode === "navigate" || url.pathname.endsWith("/data/exercises.json");
+  // Galeria e admin têm seu próprio documento. Nunca podem substituir o shell offline.
+  const appNavigation = req.mode === "navigate" && (url.pathname.endsWith("/") || url.pathname.endsWith("/index.html"));
+  const cacheKey = appNavigation ? "./index.html" : req;
   if (networkFirst) {
     event.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          if (res.ok) caches.open(CACHE).then((c) => c.put(req.mode === "navigate" ? "./index.html" : req, copy));
+          if (res.ok) caches.open(CACHE).then((c) => c.put(cacheKey, copy));
           return res;
         })
-        .catch(() => caches.match(req.mode === "navigate" ? "./index.html" : req, { ignoreSearch: req.mode === "navigate" }))
+        .catch(() => caches.match(cacheKey, { ignoreSearch: appNavigation }))
     );
     return;
   }

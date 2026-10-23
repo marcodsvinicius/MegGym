@@ -23,6 +23,22 @@ async function withSw(fn) {
 const controlled = (page) => page.waitForFunction(() => navigator.serviceWorker.controller !== null, null, { timeout: 15000 });
 const cacheNames = (page) => page.evaluate(() => caches.keys());
 
+test("visitar galeria e admin não substitui o aplicativo no cache offline", () =>
+  withSw(async ({ page, server }) => {
+    await seedUser(page);
+    await controlled(page);
+    await page.evaluate(() => MegStore.saveExerciseNote(MegStore.currentUser().id, "flexao", "preservada offline"));
+    for (const documentPath of ["design-system.html", "admin.html"]) {
+      await page.goto(server.url + documentPath);
+      await page.waitForFunction(async () => Boolean(await caches.match(location.href)));
+      assert.equal(await page.evaluate(async () => (await (await caches.match("./index.html")).text()).includes('id="app-shell"')), true);
+    }
+    await page.context().setOffline(true);
+    await page.goto(server.url + "#/atividade");
+    await page.waitForSelector("#app-shell:not(.hidden)");
+    assert.equal(await page.evaluate(() => MegStore.exerciseNote(MegStore.currentUser().id, "flexao")), "preservada offline");
+  }));
+
 test("primeira visita: instala sem mostrar aviso e sem recarregar", () =>
   withSw(async ({ page }) => {
     await seedUser(page);
@@ -80,3 +96,4 @@ test("'Agora não' esconde o aviso sem atualizar; reabrir o app volta a avisar",
     await page.reload();
     await page.waitForSelector(".update-bar:not(.hidden)", { timeout: 15000 });
   }));
+
